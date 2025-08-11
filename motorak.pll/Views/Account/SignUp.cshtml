@@ -1,0 +1,153 @@
+﻿@model SignUpViewModel
+@{
+    ViewData["Title"] = "Sign Up";
+}
+
+
+<section class="auth-container">
+    <div class="auth-box">
+        <h2>Create New Account</h2>
+        <form asp-action="SignUp" method="post" class="auth-form" novalidate>
+            <div class="input-group">
+                <label asp-for="Username"></label>
+                <input asp-for="Username" placeholder="Your full name" required />
+                <span asp-validation-for="Username" class="validation-error"></span>
+            </div>
+            <div class="input-group">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" type="email" placeholder="Enter your email" required />
+                <span asp-validation-for="Email" class="validation-error"></span>
+            </div>
+            <div class="input-group">
+                <label asp-for="Password"></label>
+                <input asp-for="Password" type="password" placeholder="Create a password" required />
+                <span asp-validation-for="Password" class="validation-error"></span>
+            </div>
+            <div class="input-group">
+                <label asp-for="ConfirmPassword"></label>
+                <input asp-for="ConfirmPassword" type="password" placeholder="Confirm your password" required />
+                <span asp-validation-for="ConfirmPassword" class="validation-error"></span>
+            </div>
+            <button type="submit" class="btn-primary">Sign Up</button>
+            <p class="auth-switch">
+                Already have an account? <a asp-action="Login" asp-controller="Account">Log In</a>
+            </p>
+        </form>
+    </div>
+</section>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<style>
+    /* Reuse the same styles as Login */
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        color: #fff;
+    }
+
+    .auth-container {
+        background: rgba(255,255,255,0.1);
+        border-radius: 12px;
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        width: 380px;
+        padding: 40px 30px;
+        text-align: center;
+    }
+
+    .auth-box h2 {
+        margin-bottom: 30px;
+        font-weight: 700;
+        font-size: 1.8rem;
+        letter-spacing: 1.2px;
+    }
+
+    .auth-form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .input-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #eee;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: none;
+            font-size: 1rem;
+            outline: none;
+            transition: box-shadow 0.3s ease;
+            background: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+
+            .input-group input::placeholder {
+                color: #ddd;
+            }
+
+            .input-group input:focus {
+                box-shadow: 0 0 8px 2px #a29bfe;
+                background: rgba(255,255,255,0.3);
+            }
+
+    .validation-error {
+        color: #ff6b6b;
+        font-size: 0.8rem;
+        margin-top: 4px;
+        display: block;
+    }
+
+    .btn-primary {
+        padding: 14px 0;
+        background: #6c5ce7;
+        border: none;
+        border-radius: 10px;
+        color: white;
+        font-weight: 700;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background: #4834d4;
+        }
+
+    .auth-switch {
+        margin-top: 20px;
+        font-size: 0.9rem;
+        color: #dfe6e9;
+    }
+
+        .auth-switch a {
+            color: #81ecec;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+            .auth-switch a:hover {
+                text-decoration: underline;
+            }
+</style>

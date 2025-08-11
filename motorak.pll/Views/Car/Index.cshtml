@@ -1,0 +1,64 @@
+﻿@model List<Motorak.BLL.ModelVM.Car.CarListModel>
+@{
+    ViewData["Title"] = "Available Cars";
+}
+
+<h2 class="mb-4">Available Cars</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+@if (ViewBag.Error != null)
+{
+    <div class="alert alert-danger">@ViewBag.Error</div>
+}
+else
+{
+    <div class="row">
+        @foreach (var car in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <img src="@(string.IsNullOrEmpty(car.ImagePath) ? "/images/no-image.png" : car.ImagePath)"
+                         class="card-img-top"
+                         alt="@car.Brand @car.Model"
+                         style="height: 200px; object-fit: cover;" />
+                    <div class="card-body">
+                        <h5 class="card-title">@car.Brand @car.Model</h5>
+                        <p class="card-text">
+                            <strong>Year:</strong> @car.Year<br />
+                            <strong>Price:</strong> @car.Price.ToString("C")<br />
+                            <strong>Mileage:</strong> @car.Mileage km
+                        </p>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <a asp-action="Details" asp-route-id="@car.Id" class="btn btn-info btn-sm">Details</a>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            <form asp-action="Sell" method="post" style="display:inline;">
+                                <input type="hidden" name="carId" value="@car.Id" />
+                                <button type="submit" class="btn btn-success btn-sm">Purchase</button>
+                            </form>
+
+                            <form asp-action="Rent" method="post" style="display:inline;">
+                                <input type="hidden" name="carId" value="@car.Id" />
+                                <button type="submit" class="btn btn-warning btn-sm">Rent</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-sm">Login to Buy/Rent</a>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

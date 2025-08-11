@@ -1,0 +1,18 @@
+﻿
+using Motorak.DAL.Enums.MechaincEnums;
+
+namespace Motorak.BLL.ModelVM.Mechanic
+{
+    public class MechanicListModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Rating { get; set; }
+        public MechanicStatus Status { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public bool IsDeleted { get; set; }
+        public DateTime? DeletedAt { get; set; }
+        public bool IsUpdated { get; set; }
+        public DateTime UpdatedAt { get; set; }
+    }
+}
