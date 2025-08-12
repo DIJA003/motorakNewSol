@@ -1,87 +1,177 @@
-﻿/* Add to the existing CSS */
-
-/* MVC Form Styling */
-.form-group {
-    margin-bottom: 1rem;
+﻿/* Authentication Navigation Styling */
+.nav__auth {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    justify-content: center;
 }
 
-.form-control {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
-    font-size: var(--normal-font-size);
-}
-
-    .form-control:focus {
-        border-color: var(--first-color);
-        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
-        outline: none;
+    .nav__auth a,
+    .nav__auth button {
+        color: var(--title-color);
+        text-decoration: none;
+        font-size: var(--normal-font-size);
+        font-weight: var(--font-medium);
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        border: 2px solid transparent;
+        white-space: nowrap;
+        background: transparent;
+        cursor: pointer;
+        text-transform: none;
+        font-family: var(--body-font);
     }
 
-.form-label {
-    display: block;
-    margin-bottom: 0.5rem;
-    color: var(--title-color);
-    font-weight: var(--font-medium);
-}
+        /* Register Button Styling */
+        .nav__auth a[href*="Register"] {
+            border-color: var(--first-color);
+            color: var(--first-color);
+            background: transparent;
+        }
 
-/* Alert Styling */
-.alert {
-    padding: 1rem;
-    border-radius: 8px;
-    margin-bottom: 1rem;
-    border: none;
-}
+            .nav__auth a[href*="Register"]:hover {
+                background: var(--first-color);
+                color: var(--white-color);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+            }
 
-.alert-success {
-    background: rgba(72, 187, 120, 0.2);
-    color: var(--success-color);
-    border-left: 4px solid var(--success-color);
-}
+        /* Login/Sign In Button Styling */
+        .nav__auth a[href*="Login"] {
+            background: var(--first-color);
+            color: var(--white-color);
+            border-color: var(--first-color);
+        }
 
-.alert-danger {
-    background: rgba(245, 101, 101, 0.2);
-    color: var(--danger-color);
-    border-left: 4px solid var(--danger-color);
-}
+            .nav__auth a[href*="Login"]:hover {
+                background: var(--first-color-alt);
+                color: var(--white-color);
+                border-color: var(--first-color-alt);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(66, 133, 244, 0.3);
+            }
 
-.alert-info {
-    background: rgba(102, 126, 234, 0.2);
-    color: var(--first-color);
-    border-left: 4px solid var(--first-color);
-}
+        /* User Welcome Styling */
+        .nav__auth a[href*="Manage"] {
+            background: var(--container-color);
+            color: var(--title-color);
+            border: 2px solid var(--text-color-light);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
 
-/* Validation Styling */
-.field-validation-error {
-    color: var(--danger-color);
-    font-size: var(--small-font-size);
-    margin-top: 0.25rem;
-    display: block;
-}
+            .nav__auth a[href*="Manage"]:hover {
+                color: var(--first-color);
+                border-color: var(--first-color);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            }
 
-.input-validation-error {
-    border-color: var(--danger-color) !important;
-    box-shadow: 0 0 0 2px rgba(245, 101, 101, 0.2) !important;
-}
-.loading {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    border: 2px solid rgba(255, 255, 255, 0.3);
-    border-top: 2px solid white;
+    /* Logout Button Styling */
+    .nav__auth form {
+        display: inline;
+    }
+
+        .nav__auth form button {
+            background: transparent;
+            border: 2px solid var(--text-color-light);
+            color: var(--text-color);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            font-size: var(--normal-font-size);
+            font-weight: var(--font-medium);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+            .nav__auth form button:hover {
+                border-color: #ff4757;
+                color: #ff4757;
+                transform: translateY(-2px);
+                background: transparent;
+            }
+
+/* User Avatar */
+.nav__user-avatar {
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
+    background: var(--first-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white-color);
+    font-size: var(--small-font-size);
+    font-weight: var(--font-semi-bold);
 }
 
-@keyframes spin {
-    0% {
-        transform: rotate(0deg);
+/* Icons */
+.nav__auth i {
+    font-size: 1rem;
+    margin-right: 0.25rem;
+}
+
+/* Desktop Navigation Integration */
+@media screen and (min-width: 768px) {
+    .nav__auth {
+        margin-top: 0;
+        margin-left: 2rem;
     }
 
-    100% {
-        transform: rotate(360deg);
+    .nav__menu {
+        display: flex;
+        align-items: center;
+    }
+
+    .nav__list {
+        margin-right: auto;
+    }
+}
+
+@media screen and (max-width: 767px) {
+    .nav__auth {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+        margin: 2rem 0;
+        padding: 0 2rem;
+    }
+
+        .nav__auth a,
+        .nav__auth button {
+            justify-content: center;
+            padding: 1rem;
+            text-align: center;
+            width: 100%;
+        }
+
+            .nav__auth a[href*="Manage"] {
+                justify-content: center;
+                margin-bottom: 0.5rem;
+            }
+
+        .nav__auth form button {
+            justify-content: center;
+            width: 100%;
+            padding: 1rem;
+        }
+}
+
+@media screen and (max-width: 767px) {
+    .nav__menu {
+        flex-direction: column;
+    }
+
+    .nav__list {
+        margin-bottom: 1rem;
     }
 }
