@@ -15,7 +15,7 @@ namespace motorak.DAL.DataBase
                  : base(options)
         {
         }
-
+        public DbSet<User>Users { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Mechanic> Mechanics { get; set; }

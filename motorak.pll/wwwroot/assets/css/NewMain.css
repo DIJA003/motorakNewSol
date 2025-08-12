@@ -1,0 +1,87 @@
+﻿/* Add to the existing CSS */
+
+/* MVC Form Styling */
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+    font-size: var(--normal-font-size);
+}
+
+    .form-control:focus {
+        border-color: var(--first-color);
+        box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.2);
+        outline: none;
+    }
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--title-color);
+    font-weight: var(--font-medium);
+}
+
+/* Alert Styling */
+.alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: none;
+}
+
+.alert-success {
+    background: rgba(72, 187, 120, 0.2);
+    color: var(--success-color);
+    border-left: 4px solid var(--success-color);
+}
+
+.alert-danger {
+    background: rgba(245, 101, 101, 0.2);
+    color: var(--danger-color);
+    border-left: 4px solid var(--danger-color);
+}
+
+.alert-info {
+    background: rgba(102, 126, 234, 0.2);
+    color: var(--first-color);
+    border-left: 4px solid var(--first-color);
+}
+
+/* Validation Styling */
+.field-validation-error {
+    color: var(--danger-color);
+    font-size: var(--small-font-size);
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.input-validation-error {
+    border-color: var(--danger-color) !important;
+    box-shadow: 0 0 0 2px rgba(245, 101, 101, 0.2) !important;
+}
+.loading {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

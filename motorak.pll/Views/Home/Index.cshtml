@@ -1,8 +1,41 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Home";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section class="hero" id="home">
+    <div class="container">
+        <div class="hero__content">
+            <h1 class="hero__title">Welcome to Motorak</h1>
+            <p class="hero__subtitle">Your premium car rental and purchase platform</p>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                <a asp-controller="Car" asp-action="Index" class="btn btn-primary">Browse Cars</a>
+                <a asp-controller="Mechanic" asp-action="Index" class="btn btn-secondary">Find Mechanic</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="features" id="features">
+    <div class="container">
+        <h2 class="section__title">Platform Features</h2>
+        <div class="features__grid">
+            <div class="feature__card">
+                <i class="ri-car-line feature__icon"></i>
+                <h3 class="feature__title">Car Rental & Purchase</h3>
+                <p class="feature__description">Browse our extensive collection of vehicles available for both short-term rental and permanent purchase.</p>
+            </div>
+            <div class="feature__card">
+                <i class="ri-tools-line feature__icon"></i>
+                <h3 class="feature__title">Mechanic Services</h3>
+                <p class="feature__description">Connect with certified mechanics for maintenance, repairs, and emergency roadside assistance.</p>
+            </div>
+            <div class="feature__card">
+                <i class="ri-user-3-line feature__icon"></i>
+                <h3 class="feature__title">Multi-Role Platform</h3>
+                <p class="feature__description">Tailored experiences for customers, administrators, and mechanics with role-based access.</p>
+            </div>
+        </div>
+    </div>
+</section>

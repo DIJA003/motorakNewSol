@@ -1,6 +1,7 @@
 ﻿
 
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Motorak.BLL.ModelVM.Service;
 using Motorak.BLL.Services.Abstractions;
 using Motorak.DAL.Entites;
@@ -33,7 +34,38 @@ namespace Motorak.BLL.Services.Implementations
                 return (false, $"Error Occurred: {ex.Message}");
             }
         }
+        public async Task<(bool status, string message, List<ServiceDTO> services)> GetServicesFilteredAsync(
+        Status? status, int? carId, int? customerId, DateTime? from, DateTime? to, int? mechanicId)
+        {
+            try
+            {
+                var query = _serviceRebo.GetAllQueryable();
 
+                if (status.HasValue)
+                    query = query.Where(s => s.Status == status.Value);
+
+                if (carId.HasValue)
+                    query = query.Where(s => s.CarId == carId.Value);
+
+                if (customerId.HasValue)
+                    query = query.Where(s => s.CustomerId == customerId.Value);
+
+                if (from.HasValue && to.HasValue)
+                    query = query.Where(s => s.RequestDate >= from.Value && s.RequestDate <= to.Value);
+
+                if (mechanicId.HasValue)
+                    query = query.Where(s => s.MechanicId == mechanicId.Value);
+
+                var list = await query.ToListAsync();
+                var dtoList = _mapper.Map<List<ServiceDTO>>(list);
+
+                return (true, "Filtered results", dtoList);
+            }
+            catch (Exception ex)
+            {
+                return (false, $"Error: {ex.Message}", new List<ServiceDTO>());
+            }
+        }
         public async Task<(bool status, string message)> DeleteServiceAsync(int serviceId)
         {
             try

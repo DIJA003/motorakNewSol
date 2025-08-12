@@ -17,6 +17,11 @@ namespace Motorak.DAL.Repo.Implementations
         {
             this.db = db;
         }
+        public IQueryable<Service> GetAllQueryable()
+        {
+            return db.Services.AsQueryable();
+        }
+
         public async Task CreateAsync(Service service)
         {
             await db.Services.AddAsync(service);

@@ -1,4 +1,7 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using motorak.dal.Entites;
 using motorak.DAL.DataBase;
 using Motorak.BLL.Mapper.CarMapping;
 using Motorak.BLL.Mapper.CustomerMapping;
@@ -12,18 +15,36 @@ using Motorak.DAl.Repo.Abstractions;
 using Motorak.DAl.Repo.Implementations;
 using Motorak.DAL.Repo.Abstractions;
 using Motorak.DAL.Repo.Implementations;
+using Motorak.Utility;
 
 namespace motorak.pll
 {
     public class Program
     {
-        public static async Task Main(string[] args)
+        public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             var connectionString = builder.Configuration.GetConnectionString("defaultConnection");
             builder.Services.AddDbContext<MotorakDbContext>(options =>
                 options.UseSqlServer(connectionString));
+
+            builder.Services.AddIdentity<User, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+            })
+            .AddEntityFrameworkStores<MotorakDbContext>()
+            .AddDefaultTokenProviders()
+            .AddDefaultUI();
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Identity/Account/Login";
+                options.LogoutPath = "/Identity/Account/Logout";
+                options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            });
+
+            builder.Services.AddRazorPages();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -47,7 +68,11 @@ namespace motorak.pll
             builder.Services.AddScoped<IRentService, RentService>();
             builder.Services.AddScoped<IServiceReviewService, ServiceReviewSercice>();
             builder.Services.AddScoped<IServiceServicecs, ServiceServices>();
-            
+
+            //emailsender
+            builder.Services.AddScoped<IEmailSender, EmailSender>();
+
+
 
             builder.Services.AddAutoMapper(cfg =>
             {
@@ -68,34 +93,6 @@ namespace motorak.pll
 
             var app = builder.Build();
 
-            using (var scope = app.Services.CreateScope())
-            {
-                var services = scope.ServiceProvider;
-                try
-                {
-                    var context = services.GetRequiredService<MotorakDbContext>();
-                    await dal.DataTemp.DbSeeder.SeedAsync(context);
-                }
-                catch (Exception ex)
-                {
-                    var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred during database seeding.");
-                }
-            }
-
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            //    string[] roles = { "Admin", "Mechanic", "Customer" };
-            //    foreach (var role in roles)
-            //    {
-            //        var roleExist = await roleManager.RoleExistsAsync(role);
-            //        if (!roleExist)
-            //        {
-            //            await roleManager.CreateAsync(new IdentityRole(role));
-            //        }
-            //    }
-            //}
 
             // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
@@ -110,7 +107,9 @@ namespace motorak.pll
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+            app.MapRazorPages();
 
             app.MapControllerRoute(
                 name: "default",

@@ -335,7 +335,8 @@
 
         <!--==================== FEATURED ====================-->
         <section class="featured section" id="featured">
-            <h2 class="section__title">Featured Luxury Cars
+            <h2 class="section__title">
+                Featured Luxury Cars
                 <br />to Buy
             </h2>
             <div class="featured__container container">
@@ -499,9 +500,9 @@
 
         <div class="footer__container container grid">
             <div class="footer__content">
-                <a asp-controller="Home" asp-action="Index" class="footer__logo">
+                <a href="#" class="footer__logo">
                     <i class="ri-steering-line"></i>
-                    Motorak
+                    NextCar
                 </a>
                 <p class="footer__description">
                     We offer the best cars of <br>
@@ -510,37 +511,68 @@
                 </p>
             </div>
 
+
             <div class="footer__content">
-                <h3 class="footer__title">Company</h3>
+
+                <h3 class="footer__title">Company </h3>
+
                 <ul class="footer__links">
-                    <li><a asp-controller="Home" asp-action="About" class="footer__links">About</a></li>
-                    <li><a asp-controller="Car" asp-action="Index" class="footer__links">Cars</a></li>
-                    <li><a href="#" class="footer__links">History</a></li>
-                    <li><a href="#" class="footer__links">Shop</a></li>
+                    <li>
+                        <a href="#" class="footer__links">About</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer__links">Cars</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer__links">History</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer__links">Shop</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer__links"></a>
+                    </li>
                 </ul>
             </div>
 
             <div class="footer__content">
-                <h3 class="footer__title">Information</h3>
+                <h3 class="footer__title">Information </h3>
                 <ul class="footer__links">
-                    <li><a href="#" class="footer__links">Request a quote</a></li>
-                    <li><a href="#" class="footer__links">Find a dealer</a></li>
-                    <li><a href="#" class="footer__links">Contact us</a></li>
-                    <li><a href="#" class="footer__links">Services</a></li>
+                    <li>
+                        <a href="#" class="footer__links">Request a quote</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer__links">Find a dealer</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer__links">Contact us</a>
+                    </li>
+                    <li>
+                        <a href="#" class="footer__links">Services</a>
+                    </li>
+
                 </ul>
             </div>
 
             <div class="footer__content">
-                <h3 class="footer__title">Follow us</h3>
+                <h3 class="footer__title"> Follow us </h3>
+
                 <ul class="footer__social">
-                    <a href="#" target="_blank" class="footer__social-link"><i class="ri-facebook-fill"></i></a>
-                    <a href="#" target="_blank" class="footer__social-link"><i class="ri-instagram-line"></i></a>
-                    <a href="#" target="_blank" class="footer__social-link"><i class="ri-twitter-line"></i></a>
+                    <a href="" target="_blank" class="footer__social-link">
+                        <i class="ri-facebook-fill"></i>
+                    </a>
+                    <a href="" target="_blank" class="footer__social-link">
+                        <i class="ri-instagram-line"></i>
+                    </a>
+                    <a href="" target="_blank" class="footer__social-link">
+                        <i class="ri-twitter-line"></i>
+                    </a>
                 </ul>
             </div>
         </div>
+        @RenderBody()
+        @RenderSection("Scripts", required: false)
     </footer>
-
 
 
     <!--========== SCROLL UP ==========-->

@@ -3,34 +3,327 @@
     ViewData["Title"] = "Sign Up";
 }
 
+@section Styles {
+    <style>
+        /* Enhanced Auth Form Styles */
+        body {
+            font-family: 'Exo', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
+
+        .auth-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 450px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+            .auth-container::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+                transform: rotate(45deg);
+                animation: shimmer 3s infinite;
+            }
+
+        .auth-box {
+            position: relative;
+            z-index: 2;
+        }
+
+            .auth-box h2 {
+                margin-bottom: 2rem;
+                font-weight: 700;
+                font-size: 2rem;
+                letter-spacing: 1.5px;
+                background: linear-gradient(135deg, #fff, #e0e6ff);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            text-align: left;
+            position: relative;
+        }
+
+            .input-group label {
+                display: block;
+                margin-bottom: 0.5rem;
+                font-weight: 600;
+                font-size: 0.95rem;
+                color: #f0f0f0;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+            }
+
+            .input-group input,
+            .input-group select {
+                width: 100%;
+                padding: 1rem 1.25rem;
+                border-radius: 12px;
+                border: 2px solid rgba(255, 255, 255, 0.2);
+                font-size: 1rem;
+                outline: none;
+                transition: all 0.3s ease;
+                background: rgba(255, 255, 255, 0.1);
+                color: #fff;
+                box-sizing: border-box;
+            }
+
+                .input-group input::placeholder {
+                    color: rgba(255, 255, 255, 0.7);
+                }
+
+                .input-group input:focus,
+                .input-group select:focus {
+                    border-color: #a29bfe;
+                    background: rgba(255, 255, 255, 0.15);
+                    box-shadow: 0 0 20px rgba(162, 155, 254, 0.3);
+                    transform: translateY(-2px);
+                }
+
+            .input-group select {
+                cursor: pointer;
+                appearance: none;
+                background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='white' viewBox='0 0 16 16'%3e%3cpath d='m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z'/%3e%3c/svg%3e");
+                background-repeat: no-repeat;
+                background-position: right 1rem center;
+                background-size: 16px;
+                padding-right: 3rem;
+            }
+
+                .input-group select option {
+                    background: #2d3748;
+                    color: white;
+                    padding: 0.5rem;
+                }
+
+        .validation-error {
+            color: #ff6b6b;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+            display: block;
+            padding: 0.25rem 0;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        .btn-primary {
+            padding: 1rem 0;
+            background: linear-gradient(135deg, #6c5ce7, #4834d4);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            margin-top: 1rem;
+        }
+
+            .btn-primary::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transition: left 0.5s ease;
+            }
+
+            .btn-primary:hover::before {
+                left: 100%;
+            }
+
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #4834d4, #6c5ce7);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 25px rgba(108, 92, 231, 0.4);
+            }
+
+            .btn-primary:active {
+                transform: translateY(-1px);
+            }
+
+            .btn-primary:disabled {
+                opacity: 0.7;
+                cursor: not-allowed;
+                transform: none;
+            }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.5rem;
+        }
+        .auth-switch {
+            margin-top: 1.5rem;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+            .auth-switch a {
+                color: #81ecec;
+                text-decoration: none;
+                font-weight: 700;
+                transition: all 0.3s ease;
+            }
+
+                .auth-switch a:hover {
+                    color: #00cec9;
+                    text-decoration: underline;
+                }
+
+        /* Role Selection Enhancement */
+        .role-selector {
+            position: relative;
+        }
+
+            .role-selector select:focus + .role-hint {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        .role-hint {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 0.5rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            z-index: 10;
+            margin-top: 0.5rem;
+        }
+
+        /* Success Message Animation */
+        .success-message {
+            background: rgba(72, 187, 120, 0.2);
+            border: 1px solid #48bb78;
+            color: #48bb78;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            animation: slideDown 0.5s ease;
+        }
+
+        /* Enhanced Input States */
+        .input-group.valid input,
+        .input-group.valid select {
+            border-color: #48bb78;
+            box-shadow: 0 0 0 2px rgba(72, 187, 120, 0.2);
+        }
+
+        .input-group.invalid input,
+        .input-group.invalid select {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+        }
+    </style>
+}
 
 <section class="auth-container">
     <div class="auth-box">
         <h2>Create New Account</h2>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="success-message">
+                <i class="ri-check-line"></i> @TempData["Success"]
+            </div>
+        }
+
         <form asp-action="SignUp" method="post" class="auth-form" novalidate>
             <div class="input-group">
-                <label asp-for="Username"></label>
-                <input asp-for="Username" placeholder="Your full name" required />
-                <span asp-validation-for="Username" class="validation-error"></span>
+                <label asp-for="FullName">Full Name</label>
+                <input asp-for="FullName" placeholder="Enter your full name" required />
+                <span asp-validation-for="FullName" class="validation-error"></span>
             </div>
+
             <div class="input-group">
-                <label asp-for="Email"></label>
+                <label asp-for="UserName">Username</label>
+                <input asp-for="UserName" placeholder="Choose a username" required />
+                <span asp-validation-for="UserName" class="validation-error"></span>
+            </div>
+
+            <div class="input-group">
+                <label asp-for="Email">Email Address</label>
                 <input asp-for="Email" type="email" placeholder="Enter your email" required />
                 <span asp-validation-for="Email" class="validation-error"></span>
             </div>
+
             <div class="input-group">
-                <label asp-for="Password"></label>
-                <input asp-for="Password" type="password" placeholder="Create a password" required />
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password" type="password" placeholder="Create a secure password" required />
                 <span asp-validation-for="Password" class="validation-error"></span>
             </div>
+
             <div class="input-group">
-                <label asp-for="ConfirmPassword"></label>
+                <label asp-for="ConfirmPassword">Confirm Password</label>
                 <input asp-for="ConfirmPassword" type="password" placeholder="Confirm your password" required />
                 <span asp-validation-for="ConfirmPassword" class="validation-error"></span>
             </div>
-            <button type="submit" class="btn-primary">Sign Up</button>
+
+            <div class="input-group role-selector">
+                <label asp-for="Role">Account Type</label>
+                <select asp-for="Role" required>
+                    <option value="">-- Select Account Type --</option>
+                    <option value="Customer">Customer - Browse and purchase/rent vehicles</option>
+                    <option value="Mechanic">Mechanic - Provide automotive services</option>
+                    <option value="Admin">Admin - System administration</option>
+                </select>
+                <span asp-validation-for="Role" class="validation-error"></span>
+                <div class="role-hint">
+                    Choose Customer for car purchases/rentals, Mechanic for service providers, or Admin for system management.
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="submitBtn">
+                Create Account
+            </button>
+
             <p class="auth-switch">
-                Already have an account? <a asp-action="Login" asp-controller="Account">Log In</a>
+                Already have an account? <a asp-action="Login" asp-controller="Account">Sign In</a>
             </p>
         </form>
     </div>
@@ -38,116 +331,109 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('.auth-form');
+            const submitBtn = document.getElementById('submitBtn');
+            const inputs = document.querySelectorAll('input, select');
+
+            // Enhanced form submission with loading state
+            form.addEventListener('submit', function(e) {
+                if (form.checkValidity()) {
+                    submitBtn.innerHTML = '<span class="loading"></span>Creating Account...';
+                    submitBtn.disabled = true;
+                }
+            });
+
+            // Real-time validation feedback
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    const inputGroup = this.closest('.input-group');
+
+                    if (this.value && this.checkValidity()) {
+                        inputGroup.classList.remove('invalid');
+                        inputGroup.classList.add('valid');
+                    } else if (this.value) {
+                        inputGroup.classList.remove('valid');
+                        inputGroup.classList.add('invalid');
+                    } else {
+                        inputGroup.classList.remove('valid', 'invalid');
+                    }
+                });
+
+                input.addEventListener('focus', function() {
+                    this.closest('.input-group').classList.remove('invalid');
+                });
+            });
+
+            // Password strength indicator
+            const passwordInput = document.querySelector('input[name="Password"]');
+            const confirmPasswordInput = document.querySelector('input[name="ConfirmPassword"]');
+
+            if (passwordInput) {
+                passwordInput.addEventListener('input', function() {
+                    const strength = calculatePasswordStrength(this.value);
+                    updatePasswordStrength(this, strength);
+                });
+            }
+
+            if (confirmPasswordInput) {
+                confirmPasswordInput.addEventListener('input', function() {
+                    const passwordMatch = this.value === passwordInput.value;
+                    const inputGroup = this.closest('.input-group');
+
+                    if (this.value && passwordMatch) {
+                        inputGroup.classList.remove('invalid');
+                        inputGroup.classList.add('valid');
+                    } else if (this.value) {
+                        inputGroup.classList.remove('valid');
+                        inputGroup.classList.add('invalid');
+                    }
+                });
+            }
+
+            function calculatePasswordStrength(password) {
+                let score = 0;
+                if (password.length >= 8) score++;
+                if (/[a-z]/.test(password)) score++;
+                if (/[A-Z]/.test(password)) score++;
+                if (/\d/.test(password)) score++;
+                if (/[^A-Za-z0-9]/.test(password)) score++;
+                return score;
+            }
+
+            function updatePasswordStrength(input, strength) {
+                const inputGroup = input.closest('.input-group');
+                let existingHint = inputGroup.querySelector('.password-hint');
+
+                if (!existingHint) {
+                    existingHint = document.createElement('div');
+                    existingHint.className = 'password-hint';
+                    existingHint.style.cssText = `
+                        font-size: 0.8rem;
+                        margin-top: 0.5rem;
+                        transition: all 0.3s ease;
+                    `;
+                    inputGroup.appendChild(existingHint);
+                }
+
+                const strengthTexts = [
+                    { text: 'Very Weak', color: '#ff4757' },
+                    { text: 'Weak', color: '#ff6b7a' },
+                    { text: 'Fair', color: '#ffa726' },
+                    { text: 'Good', color: '#66bb6a' },
+                    { text: 'Strong', color: '#4caf50' }
+                ];
+
+                if (input.value.length > 0) {
+                    const strengthInfo = strengthTexts[strength] || strengthTexts[0];
+                    existingHint.textContent = `Password Strength: ${strengthInfo.text}`;
+                    existingHint.style.color = strengthInfo.color;
+                    existingHint.style.opacity = '1';
+                } else {
+                    existingHint.style.opacity = '0';
+                }
+            }
+        });
+    </script>
 }
-
-<style>
-    /* Reuse the same styles as Login */
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #667eea, #764ba2);
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        color: #fff;
-    }
-
-    .auth-container {
-        background: rgba(255,255,255,0.1);
-        border-radius: 12px;
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
-        backdrop-filter: blur(8px);
-        -webkit-backdrop-filter: blur(8px);
-        border: 1px solid rgba(255, 255, 255, 0.18);
-        width: 380px;
-        padding: 40px 30px;
-        text-align: center;
-    }
-
-    .auth-box h2 {
-        margin-bottom: 30px;
-        font-weight: 700;
-        font-size: 1.8rem;
-        letter-spacing: 1.2px;
-    }
-
-    .auth-form {
-        display: flex;
-        flex-direction: column;
-    }
-
-    .input-group {
-        margin-bottom: 20px;
-        text-align: left;
-    }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #eee;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: none;
-            font-size: 1rem;
-            outline: none;
-            transition: box-shadow 0.3s ease;
-            background: rgba(255,255,255,0.2);
-            color: #fff;
-        }
-
-            .input-group input::placeholder {
-                color: #ddd;
-            }
-
-            .input-group input:focus {
-                box-shadow: 0 0 8px 2px #a29bfe;
-                background: rgba(255,255,255,0.3);
-            }
-
-    .validation-error {
-        color: #ff6b6b;
-        font-size: 0.8rem;
-        margin-top: 4px;
-        display: block;
-    }
-
-    .btn-primary {
-        padding: 14px 0;
-        background: #6c5ce7;
-        border: none;
-        border-radius: 10px;
-        color: white;
-        font-weight: 700;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: background 0.3s ease;
-    }
-
-        .btn-primary:hover {
-            background: #4834d4;
-        }
-
-    .auth-switch {
-        margin-top: 20px;
-        font-size: 0.9rem;
-        color: #dfe6e9;
-    }
-
-        .auth-switch a {
-            color: #81ecec;
-            text-decoration: none;
-            font-weight: 700;
-        }
-
-            .auth-switch a:hover {
-                text-decoration: underline;
-            }
-</style>
