@@ -1,14 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Motorak.BLL.ModelVM.Purchases;
 using Motorak.BLL.Services.Abstractions;
+using System;
+using System.Threading.Tasks;
 
 namespace Motorak.PLL.Controllers
 {
-    public class PurchasesController : Controller
+
+    public class PurchaseController : Controller
     {
         private readonly IPurchaseService _service;
 
-        public PurchasesController(IPurchaseService service)
+        public PurchaseController(IPurchaseService service)
         {
             _service = service;
         }
@@ -35,11 +39,12 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PurchaseCreateDto dto)
         {
             if (!ModelState.IsValid) return View(dto);
             var id = await _service.CreateAsync(dto);
-            return RedirectToAction(nameof(Details), new { id });
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
@@ -58,6 +63,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, PurchaseUpdateDto dto)
         {
             if (id != dto.Id) return BadRequest();
@@ -65,7 +71,7 @@ namespace Motorak.PLL.Controllers
             try
             {
                 await _service.UpdateAsync(dto);
-                return RedirectToAction(nameof(Details), new { id = dto.Id });
+                return RedirectToAction("Index");
             }
             catch (InvalidOperationException)
             {
@@ -81,8 +87,9 @@ namespace Motorak.PLL.Controllers
             return View(existing);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> DeletePost(int id)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
