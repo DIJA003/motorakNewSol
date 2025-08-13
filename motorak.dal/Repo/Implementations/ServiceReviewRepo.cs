@@ -18,17 +18,21 @@ namespace Motorak.DAL.Repo.Implementations
         public async Task CreateAsync(ServiceReview review)
         {
             await db.ServiceReviews.AddAsync(review);
+            await db.SaveChangesAsync();
         }
 
-        public void Delete(ServiceReview review)
+        public async Task Delete(ServiceReview review)
         {
             review.Delete();
             db.ServiceReviews.Update(review);
+            await db.SaveChangesAsync();
         }
 
         public async Task<List<ServiceReview>> GetAllAsync()
         {
-            return await db.ServiceReviews.ToListAsync();
+            return await db.ServiceReviews
+                   .Where(r => !r.IsDeleted)
+                   .ToListAsync();
         }
 
         public async Task<List<ServiceReview>> GetByCustomerIdAsync(int customerId)
@@ -40,7 +44,8 @@ namespace Motorak.DAL.Repo.Implementations
 
         public async Task<ServiceReview?> GetByIdAsync(int id)
         {
-            return await db.ServiceReviews.FirstOrDefaultAsync(r => r.Id == id);
+            return await db.ServiceReviews
+                    .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
         }
 
         public async Task<List<ServiceReview>> GetByRatingAsync(int rating)
@@ -57,9 +62,14 @@ namespace Motorak.DAL.Repo.Implementations
                 .ToListAsync();
         }
 
-        public void Update(ServiceReview review)
+        public async Task Update(ServiceReview review)
         {
-            db.ServiceReviews.Update(review);
+            db.Update(review);
+            await db.SaveChangesAsync();
+        }
+        public async Task SaveChangesAsync()
+        {
+            await db.SaveChangesAsync();
         }
     }
 }

@@ -20,50 +20,40 @@ namespace Motorak.BLL.Services.Implementations
             _serviceRebo = serviceRebo;
             _mapper = mapper;
         }
+        //public async Task<(bool status, string message)> CreateServiceAsync(CreateServiceVM service)
+        //{
+        //    try
+        //    {
+        //        if (service == null) return (false, "Service data is null");
+        //        var result = _mapper.Map<Service>(service);
+        //        await _serviceRebo.CreateAsync(result);
+        //        return (true, "Service Created Successfully");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return (false, $"Error Occurred: {ex.Message}");
+        //    }
+        //}
         public async Task<(bool status, string message)> CreateServiceAsync(CreateServiceVM service)
         {
             try
             {
-                if (service == null) return (false, "Service data is null");
+                if (service == null)
+                    return (false, "Service data is null");
+
                 var result = _mapper.Map<Service>(service);
+
+                // التأكد من قيم FKs
+                if (result.CarId == 0) return (false, "CarId is required.");
+                if (result.MechanicId == 0) return (false, "MechanicId is required.");
+
                 await _serviceRebo.CreateAsync(result);
                 return (true, "Service Created Successfully");
             }
             catch (Exception ex)
             {
-                return (false, $"Error Occurred: {ex.Message}");
-            }
-        }
-        public async Task<(bool status, string message, List<ServiceDTO> services)> GetServicesFilteredAsync(
-        Status? status, int? carId, int? customerId, DateTime? from, DateTime? to, int? mechanicId)
-        {
-            try
-            {
-                var query = _serviceRebo.GetAllQueryable();
-
-                if (status.HasValue)
-                    query = query.Where(s => s.Status == status.Value);
-
-                if (carId.HasValue)
-                    query = query.Where(s => s.CarId == carId.Value);
-
-                if (customerId.HasValue)
-                    query = query.Where(s => s.CustomerId == customerId.Value);
-
-                if (from.HasValue && to.HasValue)
-                    query = query.Where(s => s.RequestDate >= from.Value && s.RequestDate <= to.Value);
-
-                if (mechanicId.HasValue)
-                    query = query.Where(s => s.MechanicId == mechanicId.Value);
-
-                var list = await query.ToListAsync();
-                var dtoList = _mapper.Map<List<ServiceDTO>>(list);
-
-                return (true, "Filtered results", dtoList);
-            }
-            catch (Exception ex)
-            {
-                return (false, $"Error: {ex.Message}", new List<ServiceDTO>());
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                return (false, $"Error Occurred: {innerMessage}");
             }
         }
         public async Task<(bool status, string message)> DeleteServiceAsync(int serviceId)
@@ -100,13 +90,13 @@ namespace Motorak.BLL.Services.Implementations
         {
             try
             {
-                var result = _serviceRebo.GetByIdAsync(id);
+                var result =  await _serviceRebo.GetByIdAsync(id);
                 if (result == null)
                 {
                     return (false, "Service not found", null);
                 }
 
-                return (true, "Service found", _mapper.Map<ServiceDTO>(await result));
+                return (true, "Service found", _mapper.Map<ServiceDTO>(result));
             }
             catch (Exception ex)
             {

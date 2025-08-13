@@ -13,7 +13,9 @@ namespace Motorak.DAL.Repo.Abstractions
         Task<List<ServiceReview>> GetByRatingAsync(int rating);
 
         Task CreateAsync(ServiceReview review);
-        void Update(ServiceReview review);
-        void Delete(ServiceReview review);
+       
+        Task Update(ServiceReview review);
+        Task Delete(ServiceReview review);
+        Task SaveChangesAsync();
     }
 }

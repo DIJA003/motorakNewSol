@@ -2,7 +2,7 @@
 
 namespace Motorak.BLL.ModelVM.ServiceReview
 {
-    public interface ServiceReviewDTO
+    public class ServiceReviewDTO
     {
         public int ReviewId { get; set; }
         public int ServiceId { get; set; }

@@ -14,10 +14,7 @@ namespace Motorak.BLL.Services.Abstractions
         Task<(bool status, string message, List<ServiceDTO> services)> GetServicesByStatusAsync(Status status);
         Task<(bool status, string message, List<ServiceDTO> services)> GetServicesByDateRangeAsync(DateTime from, DateTime to);
         Task<(bool status, string message, List<ServiceDTO> services)> GetServicesByCarIdAsync(int carId);
-        public Task<(bool status, string message, List<ServiceDTO> services)> GetServicesFilteredAsync(
-        Status? status, int? carId, int? customerId, DateTime? from, DateTime? to, int? mechanicId);
-
-
+       
         Task<(bool status, string message)> CreateServiceAsync(CreateServiceVM service);
         Task<(bool status, string message)> UpdateServiceStatusAsync(UpdateServiceVM upService);
         Task<(bool status, string message)> DeleteServiceAsync(int serviceId);

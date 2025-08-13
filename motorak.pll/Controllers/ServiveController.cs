@@ -69,13 +69,18 @@ namespace Motorak.PLL.Controllers
             if (!status || service == null)
             {
                 ViewBag.ErrorMessage = message;
-                //return View("Error");
+                return View("Error"); // أو RedirectToAction("Index")
             }
 
             var updateVM = new UpdateServiceVM
             {
-                ServiceId = service.ServiceId,
+                //MechanicId = service.Mechanic?.Id,
+                ServiceType = service.ServiceType,
+                Status = service.Status,
+               // CustomerId = service.Customer?.Id,  // استخدام null-safe operator
+                //CarId = service.Car?.Id
             };
+
 
             return View(updateVM);
         }

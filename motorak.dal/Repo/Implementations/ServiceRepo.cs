@@ -17,19 +17,17 @@ namespace Motorak.DAL.Repo.Implementations
         {
             this.db = db;
         }
-        public IQueryable<Service> GetAllQueryable()
-        {
-            return db.Services.AsQueryable();
-        }
-
+        
         public async Task CreateAsync(Service service)
         {
             await db.Services.AddAsync(service);
+            await db.SaveChangesAsync();
         }
         public void Delete(Service service)
         {
             service.Delete();
             db.Services.Update(service);
+            db.SaveChangesAsync();
         }
         public async Task<List<Service>> GetAllAsync()
         {
@@ -83,6 +81,7 @@ namespace Motorak.DAL.Repo.Implementations
         public void Update(Service service)
         {
             db.Services.Update(service);
+             db.SaveChangesAsync();
         }
     }
 }
