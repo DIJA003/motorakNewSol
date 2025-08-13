@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using motorak.dal.DataTemp;
 using motorak.dal.Entites;
 using motorak.DAL.DataBase;
 using Motorak.BLL.Mapper.CarMapping;
@@ -21,7 +22,7 @@ namespace motorak.pll
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -36,6 +37,8 @@ namespace motorak.pll
             .AddEntityFrameworkStores<MotorakDbContext>()
             .AddDefaultTokenProviders()
             .AddDefaultUI();
+
+            
 
             builder.Services.ConfigureApplicationCookie(options =>
             {
@@ -92,6 +95,21 @@ namespace motorak.pll
             //});
 
             var app = builder.Build();
+
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                try
+                {
+                    var context = services.GetRequiredService<MotorakDbContext>();
+                    await DbSeeder.SeedAsync(context);
+                }
+                catch (Exception ex)
+                {
+                    var logger = services.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred while seeding the database.");
+                }
+            }
 
 
             // Configure the HTTP request pipeline.

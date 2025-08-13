@@ -2,7 +2,7 @@
 using AutoMapper;
 using motorak.dal.Entites;
 using Motorak.BLL.ModelVM.Car;
-using Motorak.DAL.Entites;
+
 
 namespace Motorak.BLL.Mapper.CarMapping
 {
@@ -14,17 +14,22 @@ namespace Motorak.BLL.Mapper.CarMapping
             CreateMap<Car, CarDetailsModel>()
                 .ForMember(m => m.OwnerName, o => o.MapFrom(c => c.Customer.User.Name));
 
-            CreateMap<CreateCarModel, Car>().ConstructUsing(c => new Car(c.Brand,
-                c.Model,
-                c.Year,
-                c.Color,
-                c.Mileage,
-                c.Type,
-                c.Transmission,
-                c.Condition,
-                c.Price,
-                null));
-            
+            CreateMap<CreateCarModel, Car>()
+    .ConstructUsing(c => new Car(
+        c.Brand,
+        c.Model,
+        c.Year,
+        c.Color,
+        c.Mileage,
+        c.Type,
+        c.Transmission,
+        c.Condition,
+        c.Price,
+        c.DailyRentPrice, 
+        c.Category,       
+        c.ImagePath       
+    ));
+
             CreateMap<EditCarModel,Car>().ReverseMap();
         }
     }

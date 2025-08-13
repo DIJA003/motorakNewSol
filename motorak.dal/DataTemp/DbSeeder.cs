@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using motorak.dal.Entites;
+using motorak.dal.Enums.CarEnums;
 using motorak.DAL.DataBase;
 using Motorak.DAL.Enums.CarEnums;
+
 
 namespace motorak.dal.DataTemp
 {
@@ -19,11 +16,19 @@ namespace motorak.dal.DataTemp
             {
                 var carsToSeed = new List<Car>
                 {
-                    new Car("Tesla", "Model S", 2023, "Red", 15000, CarType.Sedan, CarTransmission.Automatic, CarCondition.New, 75000m, "assets/img/featured1.png"),
-                    new Car("Porsche", "911", 2022, "Yellow", 22000, CarType.Coupe, CarTransmission.Manual, CarCondition.Used, 115000m, "assets/img/featured2.png"),
-                    new Car("Audi", "A8", 2023, "Black", 18000, CarType.Sedan, CarTransmission.Automatic, CarCondition.New, 95000m, "assets/img/featured3.png"),
-                    new Car("BMW", "X5", 2021, "White", 45000, CarType.SUV, CarTransmission.Automatic, CarCondition.Used, 65000m, "assets/img/featured4.png"),
-                    new Car("Mercedes", "G-Class", 2022, "Gray", 31000, CarType.SUV, CarTransmission.Automatic, CarCondition.Used, 135000m, "assets/img/featured5.png")
+                    // RENT Cars
+                    new Car("Porsche", "Turbo S", 2024, "White", 500, CarType.SportsCar, CarTransmission.Automatic, CarCondition.New, 175900m, 499, CarCategory.Rent, "assets/img/popular1.png"),
+                    new Car("Porsche", "Taycan", 2024, "Black", 400, CarType.Electric, CarTransmission.Automatic, CarCondition.New, 114900m, 399, CarCategory.Rent, "assets/img/popular2.png"),
+                    new Car("Porsche", "Turbo S Cross", 2024, "Blue", 300, CarType.SUV, CarTransmission.Automatic, CarCondition.New, 150900m, 459, CarCategory.Rent, "assets/img/popular3.png"),
+                    new Car("Porsche", "Boxster 718", 2024, "Red", 350, CarType.SportsCar, CarTransmission.Automatic, CarCondition.New, 125900m, 429, CarCategory.Rent, "assets/img/popular4.png"),
+                    new Car("Porsche", "Cayman", 2024, "Yellow", 320, CarType.SportsCar, CarTransmission.Automatic, CarCondition.New, 128900m, 439, CarCategory.Rent, "assets/img/popular5.png"),
+
+                    // BUY Cars
+                    new Car("Tesla", "Model X", 2024, "White", 200, CarType.SUV, CarTransmission.Automatic, CarCondition.New, 98900m, null, CarCategory.Buy, "assets/img/featured1.png"),
+                    new Car("Tesla", "Model 3", 2024, "Red", 150, CarType.Sedan, CarTransmission.Automatic, CarCondition.New, 45900m, null, CarCategory.Buy, "assets/img/featured2.png"),
+                    new Car("Audi", "E-tron", 2024, "Gray", 250, CarType.SUV, CarTransmission.Automatic, CarCondition.New, 175900m, null, CarCategory.Buy, "assets/img/featured3.png"),
+                    new Car("Porsche", "Boxster 987", 2024, "Black", 100, CarType.SportsCar, CarTransmission.Automatic, CarCondition.New, 126900m, null, CarCategory.Buy, "assets/img/featured4.png"),
+                    new Car("Porsche", "Panamera", 2024, "Blue", 120, CarType.Sedan, CarTransmission.Automatic, CarCondition.New, 175900m, null, CarCategory.Buy, "assets/img/featured5.png")
                 };
                 await context.Cars.AddRangeAsync(carsToSeed);
                 await context.SaveChangesAsync();

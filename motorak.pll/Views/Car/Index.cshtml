@@ -1,185 +1,95 @@
 ﻿@model List<Motorak.BLL.ModelVM.Car.CarListModel>
+@using Motorak.DAL.Enums.CarEnums
+@using motorak.dal.Enums.CarEnums
+
 @{
     ViewData["Title"] = "Available Cars";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<section class="dashboard" id="cars">
-    <div class="container">
-        <h2 class="section__title">Vehicle Management</h2>
+<h2 class="mb-4">Available Cars</h2>
 
-        @if (TempData["Success"] != null)
+<table class="table table-striped table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th>Image</th>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>Year</th>
+            <th>Price</th>
+            <th>Daily Rent Price</th>
+            <th>Mileage</th>
+            <th>Status</th>
+            <th>Category</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model != null && Model.Any())
         {
-            <div class="alert alert-success">
-                <i class="ri-check-line"></i> @TempData["Success"]
-            </div>
-        }
-        @if (TempData["Error"] != null)
-        {
-            <div class="alert alert-danger">
-                <i class="ri-error-warning-line"></i> @TempData["Error"]
-            </div>
-        }
-
-        <div class="dashboard__nav">
-            <button class="dashboard__tab active" data-tab="buy">Buy Cars</button>
-            <button class="dashboard__tab" data-tab="rent">Rent Cars</button>
-            @if (User.IsInRole("Admin"))
+            foreach (var car in Model)
             {
-                <button class="dashboard__tab" data-tab="manage">Manage Cars</button>
+                <tr>
+                    <td>
+                        @if (!string.IsNullOrEmpty(car.ImagePath))
+                        {
+                            <img src="@Url.Content(car.ImagePath)" alt="@($"{car.Brand} {car.Model}")" width="120" height="80" style="object-fit:cover;" />
+                        }
+                        else
+                        {
+                            <span>No Image</span>
+                        }
+                    </td>
+                    <td>@car.Brand</td>
+                    <td>@car.Model</td>
+                    <td>@car.Year</td>
+                    <td>
+                        @if (car.Category == CarCategory.Buy)
+                        {
+                            @car.Price.ToString("C")
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                    <td>
+                        @if (car.Category == CarCategory.Rent && car.DailyRentPrice.HasValue)
+                        {
+                            @car.DailyRentPrice.Value.ToString("C")
+                        }
+                        else
+                        {
+                            <span>-</span>
+                        }
+                    </td>
+                    <td>@car.Mileage.ToString("N0") km</td>
+                    <td>@car.Status</td>
+                    <td>@car.Category</td>
+                    <td>
+                        <!-- Always show Add to Cart -->
+                        <a asp-controller="Cart" asp-action="Add" asp-route-id="@car.Id" class="btn btn-sm btn-warning mb-1">Add to Cart</a>
+
+                        <!-- Buy button for ForSale cars -->
+                        @if (car.Category == CarCategory.Buy)
+                        {
+                            <a asp-controller="Purchase" asp-action="Buy" asp-route-id="@car.Id" class="btn btn-sm btn-success mb-1">Buy</a>
+                        }
+
+                        <!-- Rent button for ForRent cars -->
+                        @if (car.Category == CarCategory.Rent)
+                        {
+                            <a asp-controller="Rent" asp-action="RentCar" asp-route-id="@car.Id" class="btn btn-sm btn-primary">Rent</a>
+                        }
+                    </td>
+                </tr>
             }
-        </div>
-
-        <!-- Buy Cars Tab -->
-        <div class="dashboard__content active" id="buy-tab">
-            <div class="car__grid">
-                @if (Model != null && Model.Any())
-                {
-                    @foreach (var car in Model.Where(c => c.Status == Motorak.DAL.Enums.CarEnums.CarStatus.Available))
-                    {
-                        <div class="car__card">
-                            <div class="car__image">
-                                @if (!string.IsNullOrEmpty(car.ImagePath))
-                                {
-                                    <img src="@car.ImagePath" alt="@car.Brand @car.Model" style="width: 100%; height: 100%; object-fit: cover;" />
-                                }
-                                else
-                                {
-                                    <i class="ri-car-fill"></i>
-                                }
-                            </div>
-                            <div class="car__content">
-                                <h3 class="car__title">@car.Brand @car.Model</h3>
-                                <div class="car__details">
-                                    <span class="car__detail">
-                                        <i class="ri-calendar-line"></i> @car.Year
-                                    </span>
-                                    <span class="car__detail">
-                                        <i class="ri-road-map-line"></i> @car.Mileage km
-                                    </span>
-                                </div>
-                                <div class="car__price">@car.Price.ToString("C")</div>
-                                <div class="car__actions">
-                                    @if (User.Identity.IsAuthenticated)
-                                    {
-                                        <form asp-action="Sell" method="post" style="display:inline;">
-                                            <input type="hidden" name="carId" value="@car.Id" />
-                                            <button type="submit" class="btn btn-success btn-small">Purchase</button>
-                                        </form>
-                                    }
-                                    <a asp-action="Details" asp-route-id="@car.Id" class="btn btn-info btn-small">Details</a>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <div class="text-center" style="grid-column: 1 / -1;">
-                        <i class="ri-car-line" style="font-size: 4rem; color: var(--text-color-light);"></i>
-                        <h3>No cars available for purchase</h3>
-                        <p style="color: var(--text-color-light);">Check back later for new arrivals</p>
-                    </div>
-                }
-            </div>
-        </div>
-
-        <!-- Rent Cars Tab -->
-        <div class="dashboard__content" id="rent-tab">
-            <div class="car__grid">
-                @if (Model != null && Model.Any())
-                {
-                    @foreach (var car in Model.Where(c => c.Status == Motorak.DAL.Enums.CarEnums.CarStatus.Available))
-                    {
-                        <div class="car__card">
-                            <div class="car__image">
-                                @if (!string.IsNullOrEmpty(car.ImagePath))
-                                {
-                                    <img src="@car.ImagePath" alt="@car.Brand @car.Model" style="width: 100%; height: 100%; object-fit: cover;" />
-                                }
-                                else
-                                {
-                                    <i class="ri-car-line"></i>
-                                }
-                            </div>
-                            <div class="car__content">
-                                <h3 class="car__title">@car.Brand @car.Model</h3>
-                                <div class="car__details">
-                                    <span class="car__detail">
-                                        <i class="ri-calendar-line"></i> @car.Year
-                                    </span>
-                                    <span class="car__detail">
-                                        <i class="ri-road-map-line"></i> @car.Mileage km
-                                    </span>
-                                </div>
-                                <div class="car__price">$@car.Price/day</div>
-                                <div class="car__actions">
-                                    @if (User.Identity.IsAuthenticated)
-                                    {
-                                        <form asp-action="Rent" method="post" style="display:inline;">
-                                            <input type="hidden" name="carId" value="@car.Id" />
-                                            <button type="submit" class="btn btn-warning btn-small">Rent Now</button>
-                                        </form>
-                                    }
-                                    <a asp-action="Details" asp-route-id="@car.Id" class="btn btn-info btn-small">Details</a>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-            </div>
-        </div>
-
-        <!-- Admin Manage Cars Tab -->
-        @if (User.IsInRole("Admin"))
-        {
-            <div class="dashboard__content" id="manage-tab">
-                <div class="car__grid">
-                    <div class="car__card">
-                        <div class="car__image">
-                            <i class="ri-add-line"></i>
-                        </div>
-                        <div class="car__content">
-                            <h3 class="car__title">Add New Vehicle</h3>
-                            <p style="color: var(--text-color-light); font-size: var(--small-font-size);">Click to add a new vehicle to the inventory</p>
-                            <div class="car__actions">
-                                <a asp-action="Create" class="btn btn-primary btn-small" style="width: 100%;">Add Vehicle</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    @foreach (var car in Model ?? new List<Motorak.BLL.ModelVM.Car.CarListModel>())
-                    {
-                        <div class="car__card">
-                            <div class="car__image">
-                                @if (!string.IsNullOrEmpty(car.ImagePath))
-                                {
-                                    <img src="@car.ImagePath" alt="@car.Brand @car.Model" style="width: 100%; height: 100%; object-fit: cover;" />
-                                }
-                                else
-                                {
-                                    <i class="ri-car-fill"></i>
-                                }
-                            </div>
-                            <div class="car__content">
-                                <h3 class="car__title">@car.Brand @car.Model</h3>
-                                <div class="car__details">
-                                    <span class="car__detail">
-                                        <i class="ri-calendar-line"></i> @car.Year
-                                    </span>
-                                    <span class="car__detail">
-                                        <i class="ri-road-map-line"></i> @car.Mileage km
-                                    </span>
-                                </div>
-                                <div class="car__price">@car.Price.ToString("C")</div>
-                                <div class="car__actions">
-                                    <a asp-action="Edit" asp-route-id="@car.Id" class="btn btn-info btn-small">Edit</a>
-                                    <a asp-action="Delete" asp-route-id="@car.Id" class="btn btn-danger btn-small">Delete</a>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
         }
-    </div>
-</section>
+        else
+        {
+            <tr>
+                <td colspan="10" class="text-center">No cars available.</td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using motorak.DAL.DataBase;
 
@@ -11,9 +12,11 @@ using motorak.DAL.DataBase;
 namespace motorak.dal.Migrations
 {
     [DbContext(typeof(MotorakDbContext))]
-    partial class MotorakDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250813214513_addShoppingCart")]
+    partial class addShoppingCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
