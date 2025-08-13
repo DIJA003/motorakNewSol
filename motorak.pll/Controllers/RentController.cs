@@ -1,14 +1,16 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Motorak.BLL.ModelVM.Rents;
 using Motorak.BLL.Services.Abstractions;
+using System;
+using System.Threading.Tasks;
 
 namespace Motorak.PLL.Controllers
 {
-    public class RentsController : Controller
+    public class RentController : Controller
     {
         private readonly IRentService _service;
 
-        public RentsController(IRentService service)
+        public RentController(IRentService service)
         {
             _service = service;
         }
@@ -35,11 +37,12 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RentCreateDto dto)
         {
             if (!ModelState.IsValid) return View(dto);
             var id = await _service.CreateAsync(dto);
-            return RedirectToAction(nameof(Details), new { id });
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
@@ -58,6 +61,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, RentUpdateDto dto)
         {
             if (id != dto.Id) return BadRequest();
@@ -65,7 +69,7 @@ namespace Motorak.PLL.Controllers
             try
             {
                 await _service.UpdateAsync(dto);
-                return RedirectToAction(nameof(Details), new { id = dto.Id });
+                return RedirectToAction(nameof(Index));
             }
             catch (InvalidOperationException)
             {
@@ -81,8 +85,9 @@ namespace Motorak.PLL.Controllers
             return View(existing);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> DeletePost(int id)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {

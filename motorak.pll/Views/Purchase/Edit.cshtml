@@ -1,47 +1,59 @@
-﻿@model Motorak.BLL.ModelVM.Purchases.PurchaseUpdateDto
+﻿@using Motorak.BLL.ModelVM.Purchases
+@model PurchaseUpdateDto
 
 @{
     ViewData["Title"] = "Edit Purchase";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div class="container mt-5">
-    <h1 class="h3 mb-4">Edit Purchase</h1>
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="text-primary">✏️ Edit Purchase</h2>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
 
-    <form asp-action="Edit" method="post" novalidate>
-        <input type="hidden" asp-for="Id" />
+    <div class="card shadow rounded">
+        <div class="card-body">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="Id" />
 
-        <div class="mb-3">
-            <label asp-for="PaymentMethod" class="form-label"></label>
-            <input asp-for="PaymentMethod" class="form-control" />
-            <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                <div class="mb-3">
+                    <label asp-for="PaymentMethod" class="form-label fw-bold"></label>
+                    <input asp-for="PaymentMethod" class="form-control" />
+                    <span asp-validation-for="PaymentMethod" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TotalPrice" class="form-label fw-bold"></label>
+                    <input asp-for="TotalPrice" class="form-control" type="number" step="0.01" />
+                    <span asp-validation-for="TotalPrice" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Status" class="form-label fw-bold"></label>
+                    @* Use the enum type your PurchaseUpdateDto uses. If PurchaseUpdateDto uses your custom enum, replace below accordingly. *@
+                    <select asp-for="Status" class="form-select"
+                            asp-items="Html.GetEnumSelectList<Motorak.DAL.Enums.TransactionEnums.TransactionStatus>()">
+                        <option value="">-- Select Status --</option>
+                    </select>
+                    <span asp-validation-for="Status" class="text-danger"></span>
+                </div>
+
+                <div class="text-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                    <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
+                </div>
+            </form>
         </div>
-
-        <div class="mb-3">
-            <label asp-for="TotalPrice" class="form-label"></label>
-            <input asp-for="TotalPrice" class="form-control" type="number" step="0.01" min="0" />
-            <span asp-validation-for="TotalPrice" class="text-danger"></span>
-        </div>
-
-        <div class="mb-3">
-            <label asp-for="Status" class="form-label"></label>
-            <select asp-for="Status" class="form-select">
-                <option value="">-- Select status --</option>
-                <option selected="@Model.Status == " Pending"">Pending</option>
-                <option selected="@Model.Status == " Completed"">Completed</option>
-                <option selected="@Model.Status == " Cancelled"">Cancelled</option>
-            </select>
-            <span asp-validation-for="Status" class="text-danger"></span>
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            <i class="ri-save-line"></i> Save Changes
-        </button>
-        <a asp-action="Index" class="btn btn-secondary ms-2">Cancel</a>
-    </form>
+    </div>
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 }
