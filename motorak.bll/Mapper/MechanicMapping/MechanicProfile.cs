@@ -55,8 +55,8 @@ namespace Motorak.BLL.Mapper.MechanicMappin
             CreateMap<EditMechanicModel, Mechanic>()
                 .ForMember(m => m.WorkHours, opt => opt.MapFrom(src => src.WorkHours))
                 .ForMember(m => m.Rating, opt => opt.MapFrom(src => src.Rating))
-                .ForMember(m => m.Status, opt => opt.MapFrom(src => src.Status))
-                .ForAllMembers(opt => opt.Ignore());
+                .ForMember(m => m.UserId, opt => opt.Ignore())
+                .ForMember(m => m.User, opt => opt.Ignore());
 
             CreateMap<EditMechanicModel, User>().ReverseMap();
         }
