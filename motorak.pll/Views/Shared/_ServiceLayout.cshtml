@@ -1,0 +1,316 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Motorak.PLL - Dark Purple Layout</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1b2b;
+            color: #d1c4e9;
+            overflow-x: hidden;
+        }
+
+        /* Navbar */
+        nav.navbar {
+            background: #3f2a56;
+            color: #d1c4e9;
+            padding: 0.7rem 2rem;
+            box-shadow: 0 6px 20px rgba(63, 42, 86, 0.8);
+            position: fixed;
+            width: 100%;
+            z-index: 1200;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            user-select: none;
+        }
+
+            nav.navbar .navbar-brand {
+                font-weight: 700;
+                font-size: 1.8rem;
+                color: #b39ddb !important;
+                display: flex;
+                align-items: center;
+                gap: 0.6rem;
+                filter: drop-shadow(0 0 4px #b39ddbaa);
+                cursor: default;
+                position: relative;
+            }
+
+                nav.navbar .navbar-brand i {
+                    font-size: 2rem;
+                    color: #b39ddb;
+                }
+
+        #sidebarToggleBtn {
+            background: #b39ddb;
+            border-radius: 50%;
+            border: none;
+            color: #3f2a56;
+            font-size: 1.7rem;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            margin-right: 1.5rem;
+            box-shadow: 0 0 10px #b39ddbcc;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            #sidebarToggleBtn:hover {
+                transform: scale(1.15);
+                box-shadow: 0 0 22px #b39ddbff;
+            }
+
+            #sidebarToggleBtn:focus {
+                outline: none;
+                box-shadow: 0 0 24px #b39ddbff;
+            }
+
+        /* Sidebar */
+        #sidebarMenu {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            width: 280px;
+            height: calc(100vh - 56px);
+            background: linear-gradient(145deg, #4b367c, #3f2a56);
+            color: #d1c4e9;
+            overflow-y: auto;
+            padding-top: 2.2rem;
+            box-shadow: inset 5px 0 15px rgba(179, 157, 219, 0.7), 5px 0 30px rgba(63, 42, 86, 0.9);
+            border-top-right-radius: 25px;
+            border-bottom-right-radius: 25px;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(0);
+            z-index: 1150;
+        }
+
+            #sidebarMenu.hidden {
+                transform: translateX(-320px);
+            }
+
+            #sidebarMenu a {
+                display: flex;
+                align-items: center;
+                gap: 16px;
+                padding: 15px 32px;
+                font-weight: 700;
+                font-size: 1.15rem;
+                color: #b39ddb;
+                text-decoration: none;
+                transition: background-color 0.3s ease, color 0.3s ease, transform 0.3s ease;
+                user-select: none;
+                border-radius: 12px;
+            }
+
+                #sidebarMenu a i {
+                    font-size: 1.6rem;
+                    color: #b39ddb;
+                    transition: transform 0.35s ease, filter 0.3s ease;
+                }
+
+                #sidebarMenu a:hover {
+                    background-color: #5c4b8a;
+                    color: #e6deff;
+                    transform: scale(1.07);
+                    box-shadow: 0 0 15px #ab96d6aa;
+                }
+
+                    #sidebarMenu a:hover i {
+                        transform: rotate(18deg);
+                        filter: drop-shadow(0 0 6px #e6deff);
+                    }
+
+                #sidebarMenu a.active {
+                    background-color: #6a5aa0;
+                    color: #e6deff !important;
+                    box-shadow: inset 8px 0 25px #917cc9;
+                }
+
+        /* Content */
+        .content-wrapper {
+            margin-left: 280px;
+            margin-top: 56px;
+            padding: 40px 70px;
+            background: linear-gradient(145deg, #2c2640, #1e1b2b);
+            border-radius: 25px;
+            min-height: calc(100vh - 56px);
+            box-shadow: 0 22px 45px rgba(63, 42, 86, 0.35), inset 0 0 60px rgba(255, 255, 255, 0.1);
+            color: #d1c4e9;
+            transition: margin-left 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+            .content-wrapper.fullwidth {
+                margin-left: 0;
+            }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #b39ddb, #6a5aa0);
+            color: #eee;
+            padding: 80px 50px;
+            border-radius: 30px;
+            margin-bottom: 50px;
+            text-align: center;
+            font-weight: 800;
+            box-shadow: 0 28px 70px rgba(106, 90, 160, 0.6);
+            user-select: none;
+        }
+
+            .hero h1 {
+                font-size: 3.7rem;
+                margin-bottom: 30px;
+                letter-spacing: 3px;
+                text-shadow: 0 0 10px #6a5aa0;
+            }
+
+            .hero p {
+                font-size: 1.4rem;
+                max-width: 720px;
+                margin-left: auto;
+                margin-right: auto;
+                margin-bottom: 45px;
+                line-height: 1.5;
+            }
+
+            .hero .btn-primary {
+                background-color: #3f2a56;
+                color: #d1c4e9;
+                padding: 18px 60px;
+                font-size: 1.3rem;
+                border-radius: 50px;
+                font-weight: 900;
+                box-shadow: 0 15px 45px rgba(63, 42, 86, 0.9);
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+                user-select: none;
+            }
+
+                .hero .btn-primary:hover {
+                    background-color: #5c4b8a;
+                    box-shadow: 0 22px 60px rgba(92, 75, 138, 1);
+                }
+
+        /* Footer */
+        footer.footer {
+            background: #3f2a56;
+            color: #b39ddb;
+            font-weight: 700;
+            text-align: center;
+            padding: 22px 15px;
+            letter-spacing: 1.5px;
+            margin-top: 60px;
+            font-size: 1rem;
+            user-select: none;
+            box-shadow: inset 0 3px 12px rgba(179, 157, 219, 0.3);
+            border-radius: 15px;
+        }
+
+            footer.footer a {
+                color: #e6deff;
+                text-decoration: none;
+                font-weight: 700;
+            }
+
+                footer.footer a:hover {
+                    text-decoration: underline;
+                    color: #b39ddb;
+                }
+
+        /* Scrollbar for sidebar */
+        #sidebarMenu::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #sidebarMenu::-webkit-scrollbar-thumb {
+            background: #b39ddbbb;
+            border-radius: 10px;
+        }
+
+        #sidebarMenu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <button id="sidebarToggleBtn" aria-label="Toggle sidebar" title="Toggle sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
+            <i class="fas fa-car-side"></i> Motorak.PLL
+        </a>
+    </nav>
+
+    <nav id="sidebarMenu">
+        <a asp-controller="Dashboard" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
+            <i class="fas fa-tachometer-alt"></i> Dashboard
+        </a>
+        <a asp-controller="Services" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Services" ? "active" : "")">
+            <i class="fas fa-cogs"></i> Services
+        </a>
+        <a asp-controller="Service" asp-action="Details" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Details" ? "active" : "")">
+            <i class="fas fa-cogs"></i> Details
+        </a>
+        <a asp-controller="Service" asp-action="Create" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Service" && ViewContext.RouteData.Values["action"]?.ToString() == "Create" ? "active" : "")">
+            <i class="fas fa-users"></i> Create Service
+        </a>
+        <a asp-controller="Service" asp-action="Edit" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Service" && ViewContext.RouteData.Values["action"]?.ToString() == "Edit" ? "active" : "")">
+            <i class="fas fa-chart-line"></i> Edit Service
+        </a>
+        <a asp-controller="Service" asp-action="Delete" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Service" && ViewContext.RouteData.Values["action"]?.ToString() == "Delete" ? "active" : "")">
+            <i class="fas fa-life-ring"></i> Delete Service
+        </a>
+    </nav>
+
+
+    <div class="content-wrapper">
+        <section class="hero">
+            <h1>Welcome to Motorak.PLL</h1>
+            <p>Your trusted partner in vehicle management and service solutions.</p>
+            <a href="#" class="btn btn-primary btn-lg">
+                Get Started <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </section>
+
+        <div class="container">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            &copy; 2025 - Motorak.PLL - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        const contentWrapper = document.querySelector('.content-wrapper');
+
+        sidebarToggleBtn.addEventListener('click', () => {
+          sidebarMenu.classList.toggle('hidden');
+          contentWrapper.classList.toggle('fullwidth');
+        });
+    </script>
+
+</body>
+</html>

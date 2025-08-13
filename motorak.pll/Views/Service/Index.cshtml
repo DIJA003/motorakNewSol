@@ -1,0 +1,134 @@
+﻿@using Motorak.BLL.ModelVM.Service
+@using Motorak.DAL.Enums.SeviceEnums
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model List<ServiceDTO>
+
+@{
+    ViewData["Title"] = "Services List";
+}
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+
+<style>
+    body {
+        background-color: #f4f6f9;
+    }
+
+    .page-title {
+        font-weight: 700;
+        color: #0d6efd;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .table thead {
+        background-color: #0d6efd;
+        color: white;
+    }
+
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.05);
+    }
+
+    .badge {
+        font-size: 0.9rem;
+        padding: 0.5em 0.8em;
+    }
+
+    .btn {
+        border-radius: 8px;
+        padding: 5px 10px;
+    }
+
+        .btn i {
+            margin-right: 4px;
+        }
+</style>
+
+<div class="container mt-5">
+    <h1 class="mb-4 page-title">Our Services</h1>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger shadow-sm">@ViewBag.ErrorMessage</div>
+    }
+    else
+    {
+        <a href="@Url.Action("Create")" class="btn btn-success mb-3 shadow-sm">
+            <i class="bi bi-plus-circle"></i> Add New Service
+        </a>
+
+        <div class="card shadow-lg border-0 rounded-4">
+            <div class="card-body p-4">
+                <table class="table table-striped table-hover align-middle mb-0">
+                    <thead>
+                        <tr>
+                            <th>Service ID</th>
+                            <th>Mechanic ID</th>
+                            <th>Status</th>
+                            <th>Service Type</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@item.ServiceId</td>
+                                    <td>@item.MechanicId</td>
+                                    <td>
+                                        @switch (item.Status)
+                                        {
+                                            case Status.pending:
+                                                <span class="badge bg-warning text-dark"><i class="bi bi-hourglass-split"></i> Pending</span>
+                                                ;
+                                                break;
+                                            case Status.completed:
+                                                <span class="badge bg-success"><i class="bi bi-check-circle-fill"></i> Completed</span>
+                                                ;
+                                                break;
+                                            case Status.cancelled:
+                                                <span class="badge bg-danger"><i class="bi bi-x-circle-fill"></i> Cancelled</span>
+                                                ;
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary">Unknown</span>
+                                                ;
+                                                break;
+                                        }
+                                    </td>
+                                    <td>@item.ServiceType</td>
+                                    <td>@item.CreatedDate.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        <a class="btn btn-sm btn-info" href="@Url.Action("Details", new { id = item.ServiceId })">
+                                            <i class="bi bi-eye"></i> View
+                                        </a>
+                                        <a class="btn btn-sm btn-primary" href="@Url.Action("Edit", new { id = item.ServiceId })">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </a>
+                                        <a class="btn btn-sm btn-danger" href="@Url.Action("Delete", new { id = item.ServiceId })">
+                                            <i class="bi bi-trash"></i> Delete
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="6" class="text-center text-muted">No services available</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+
+    
+</div>
