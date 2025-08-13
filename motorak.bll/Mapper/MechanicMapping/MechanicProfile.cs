@@ -15,6 +15,9 @@ namespace Motorak.BLL.Mapper.MechanicMappin
             CreateMap<Mechanic, MechanicListModel>()
                 .ForMember(m => m.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(m => m.Name, opt => opt.MapFrom(src => src.User.Name))
+                .ForMember(m => m.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(m => m.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
+                .ForMember(m => m.WorkHours, opt => opt.MapFrom(src => src.WorkHours))
                 .ForMember(m => m.Rating, opt => opt.MapFrom(src => src.Rating))
                 .ForMember(m => m.Status, opt => opt.MapFrom(src => src.Status))
                 .ForMember(m => m.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
@@ -44,7 +47,7 @@ namespace Motorak.BLL.Mapper.MechanicMappin
 
             CreateMap<CreateMechanicModel, Mechanic>()
                 .ForMember(m => m.WorkHours, opt => opt.MapFrom(src => src.WorkHours))
-                .ForMember(m => m   .Status, opt => opt.MapFrom(src => Enum.Parse<MechanicStatus>(src.Status)))
+                .ForMember(m => m.Status, opt => opt.MapFrom(src => Enum.Parse<MechanicStatus>(src.Status)))
                 .ForMember(m => m.Rating, opt => opt.MapFrom(src => 0)) 
                 .ForMember(m => m.UserId, opt => opt.Ignore())
                 .ForMember(m => m.User, opt => opt.Ignore());

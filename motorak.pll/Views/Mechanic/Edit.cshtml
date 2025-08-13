@@ -1,5 +1,5 @@
-﻿@using Motorak.BLL.ModelVM.Customer
-@model CustomerDetailsModel
+﻿@using Motorak.BLL.ModelVM.Mechanic
+@model MechanicDetailsModel
 
 <style>
     /* Custom card style for this view only */
@@ -31,10 +31,10 @@
 
 <div class="card text-center">
     <div>
-        <b>Edit Customer</b>
+        <b>Edit Mechanic</b>
     </div>
     <div class="card-body">
-       
+
         <form asp-controller="Customer" asp-action="Edit">
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -47,11 +47,18 @@
                 <input asp-for="Email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter Email" />
                 <br />
             </div>
-            <div class="form-group">
-                <div style="text-align: left;" for="exampleInputPhone">Phone</div>
-                <input asp-for="PhoneNumber" type="text" class="form-control" id="exampleInputPhone" placeholder="Enter Phone Number">
+            <select input asp-for="WorkHours" type="text" class="form-select" aria-label="Default select example">
+                <option selected>Work Horus</option>
+                <option value="1">7AM - 4PM</option>
+                <option value="2">4PM - 1AM</option>
                 <br>
-            </div>
+            </select>
+            <select input asp-for="Status" type="text" class="form-select" aria-label="Default select example">
+                <option selected>Status</option>
+                <option value="1">Free</option>
+                <option value="2">Busy</option>
+                <br>
+            </select>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>

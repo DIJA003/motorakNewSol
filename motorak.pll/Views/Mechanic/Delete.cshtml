@@ -1,5 +1,5 @@
-﻿@using Motorak.BLL.ModelVM.Customer
-@model CustomerDetailsModel
+﻿@using Motorak.BLL.ModelVM.Mechanic
+@model MechanicDetailsModel
 
 <style>
     /* Custom card style for this view only */
@@ -29,12 +29,12 @@
 </style>
 
 <div class="card">
-	<h5 class="card-header">Delete</h5>
-	<div class="card-body">
-        <form asp-controller="Customer" asp-action="Delete">
-                <input type="hidden" asp-for="Id">
-			<p class="card-text">Are You Sure You Want To Delete</p><a asp-controller="Home" asp-action="Index" class="btn btn-dark">Back</a>
-			<a asp-controller="Customer" asp-action="Delete" asp-route-id="@Model.Id" type="button" class="btn btn-danger">Delete</a>
-		</form>
-	</div>
+    <h5 class="card-header">Delete</h5>
+    <div class="card-body">
+        <form asp-controller="Mechanic" asp-action="Delete">
+            <input type="hidden" asp-for="Id">
+            <p class="card-text">Are You Sure You Want To Delete</p><a asp-controller="Home" asp-action="Index" class="btn btn-dark">Back</a>
+            <a asp-controller="Mechanic" asp-action="Delete" asp-route-id="@Model.Id" type="button" class="btn btn-danger">Delete</a>
+        </form>
+    </div>
 </div>

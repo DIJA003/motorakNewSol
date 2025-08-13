@@ -8,7 +8,7 @@ namespace Motorak.BLL.ModelVM.Mechanic
         [Required]
         public string Name { get; set; }
 
-        [Required,EmailAddress]
+        [Required, EmailAddress, MinLength(8)]
         public string Email { get; set; }
 
         [Required,DataType(DataType.Password)]
@@ -21,10 +21,10 @@ namespace Motorak.BLL.ModelVM.Mechanic
         public string WorkHours { get; set; }
 
         [Required]
-        public string Status { get; set; }
-        public bool IsDeleted { get; set; } //= false;
+        public string Status { get; set; } = "Free";
+        public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedAt { get; set; }
-        public DateTime CreatedAt { get; private set; } //= DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
 
 
     }
