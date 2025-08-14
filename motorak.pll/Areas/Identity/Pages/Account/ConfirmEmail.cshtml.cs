@@ -18,10 +18,14 @@ namespace motorak.pll.Areas.Identity.Pages.Account
     public class ConfirmEmailModel : PageModel
     {
         private readonly UserManager<User> _userManager;
+        private readonly ILogger<ConfirmEmailModel> _logger;
+        private readonly SignInManager<User> _signInManager;
 
-        public ConfirmEmailModel(UserManager<User> userManager)
+        public ConfirmEmailModel(UserManager<User> userManager, ILogger<ConfirmEmailModel> logger, SignInManager<User> signInManager)
         {
             _userManager = userManager;
+            _logger = logger;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -45,7 +49,19 @@ namespace motorak.pll.Areas.Identity.Pages.Account
 
             code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(code));
             var result = await _userManager.ConfirmEmailAsync(user, code);
-            StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    _logger.LogError(error.Description);
+                }
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+
+            // Automatically sign in the user after confirmation
+            await _signInManager.SignInAsync(user, isPersistent: false);
+
             return Page();
         }
     }

@@ -1,65 +1,82 @@
-﻿
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
+using System.Threading.Tasks;
 
 namespace Motorak.Utility
 {
-    public class SendGridEmailSender : IEmailSender
+    public class EmailSender : IEmailSender
     {
-        private readonly ILogger<SendGridEmailSender> _logger;
-        public SendGridOptions Options { get; }
+        private readonly IConfiguration _configuration;
+        private readonly ILogger<EmailSender> _logger;
+        private readonly string _sendGridKey;
 
-        public SendGridEmailSender(
-            IOptions<SendGridOptions> optionsAccessor,
-            ILogger<SendGridEmailSender> logger)
+        public EmailSender(IConfiguration configuration, ILogger<EmailSender> logger)
         {
-            Options = optionsAccessor.Value;
+            _configuration = configuration;
             _logger = logger;
+            _sendGridKey = _configuration["SendGrid:ApiKey"];
         }
 
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            if (string.IsNullOrEmpty(Options.ApiKey))
+            if (string.IsNullOrEmpty(_sendGridKey))
             {
-                throw new Exception("SendGrid API Key is missing");
+                _logger.LogError("SendGrid API Key not configured");
+                throw new Exception("SendGrid API Key not configured");
             }
 
-            await Execute(Options.ApiKey, subject, htmlMessage, email);
+            var client = new SendGridClient(_sendGridKey);
+
+
+            var fromEmail = _configuration["SendGrid:FromEmail"] ?? "your-verified-email@yourdomain.com";
+            var fromName = _configuration["SendGrid:FromName"] ?? "Motorak Support";
+
+            var from = new EmailAddress(fromEmail, fromName);
+            var to = new EmailAddress(email);
+
+            var plainTextContent = StripHtml(htmlMessage);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, plainTextContent, htmlMessage);
+
+            var replyToEmail = _configuration["SendGrid:ReplyToEmail"] ?? fromEmail;
+            if (!string.IsNullOrEmpty(replyToEmail))
+            {
+                msg.ReplyTo = new EmailAddress(replyToEmail, fromName);
+            }
+
+            try
+            {
+                _logger.LogInformation($"Sending email to {email} with subject: {subject}");
+                var response = await client.SendEmailAsync(msg);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.Accepted)
+                {
+                    _logger.LogInformation($"Email sent successfully to {email}");
+                }
+                else
+                {
+                    var responseBody = await response.Body.ReadAsStringAsync();
+                    _logger.LogError($"Failed to send email to {email}. Status: {response.StatusCode}, Body: {responseBody}");
+
+                    throw new Exception($"Failed to send email. Status: {response.StatusCode}, Body: {responseBody}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error sending email to {email}");
+                throw new Exception($"Error sending email: {ex.Message}", ex);
+            }
         }
 
-        private async Task Execute(string apiKey, string subject, string htmlMessage, string email)
+        private string StripHtml(string htmlString)
         {
-            var client = new SendGridClient(apiKey);
-            var msg = new SendGridMessage()
-            {
-                From = new EmailAddress(Options.FromEmail, Options.FromName),
-                Subject = subject,
-                PlainTextContent = "Please view this email in a modern email client.",
-                HtmlContent = htmlMessage
-            };
-            msg.AddTo(new EmailAddress(email));
+            if (string.IsNullOrEmpty(htmlString))
+                return string.Empty;
 
-            // Disable click tracking
-            msg.SetClickTracking(false, false);
-
-            var response = await client.SendEmailAsync(msg);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var errorMessage = await response.Body.ReadAsStringAsync();
-                _logger.LogError($"SendGrid email failed. Status: {response.StatusCode}. Error: {errorMessage}");
-            }
+            // Simple HTML tag removal - you might want to use HtmlAgilityPack for more robust stripping
+            return System.Text.RegularExpressions.Regex.Replace(htmlString, "<.*?>", string.Empty);
         }
-    }
-
-    public class SendGridOptions
-    {
-        public string ApiKey { get; set; }
-        public string FromEmail { get; set; } = "noreply@motorak.com";
-        public string FromName { get; set; } = "Motorak Support";
     }
 }

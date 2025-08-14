@@ -1,36 +1,22 @@
 ﻿<header class="header" id="header">
     <nav class="nav container">
-        <a href="/" class="nav__logo">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="nav__logo">
             <i class="ri-steering-fill"></i>
             Motorak
         </a>
         <div class="nav__menu" id="nav-menu">
             <ul class="nav__list">
                 <li class="nav__item">
-                    <a asp-controller="Home" asp-action="Index" class="nav__link active-link">
-                        <i class="ri-home-5-fill"></i> Home
-                    </a>
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="nav__link">Home</a>
                 </li>
                 <li class="nav__item">
-                    <a asp-controller="Servive" asp-action="Index" class="nav__link">
-                        <i class="ri-service-fill"></i> Services
-                    </a>
+                    <a asp-area="" asp-controller="Servives" asp-action="Index" class="nav__link">Services</a>
                 </li>
                 <li class="nav__item">
-                    <a asp-controller="Mechanic" asp-action="Index" class="nav__link">
-                        <i class="ri-tools-fill"></i> Mechanics
-                    </a>
+                    <a asp-area="" asp-controller="Car" asp-action="Index" class="nav__link">Cars</a>
                 </li>
                 <li class="nav__item">
-                    <a asp-controller="Car" asp-action="Index" class="nav__link">
-                        <i class="ri-car-fill"></i> Cars
-                    </a>
-                </li>
-                <li class="nav__item">
-                    <a asp-controller="Purchase" asp-action="Index" class="nav__link">Purchases</a>
-                </li>
-                <li class="nav__item">
-                    <a asp-controller="Rent" asp-action="Index" class="nav__link">Rents</a>
+                    <a asp-area="" asp-controller="Mechanic" asp-action="Index" class="nav__link">Mechanic</a>
                 </li>
             </ul>
 

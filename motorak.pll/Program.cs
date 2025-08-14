@@ -29,6 +29,8 @@ namespace motorak.pll
             builder.Services.AddDbContext<MotorakDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
+            
+
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
                 options.SignIn.RequireConfirmedAccount = true;
@@ -53,6 +55,9 @@ namespace motorak.pll
 
             builder.Services.AddRazorPages();
 
+            //emailsender
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
+
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
@@ -76,9 +81,7 @@ namespace motorak.pll
             builder.Services.AddScoped<IServiceReviewService, ServiceReviewSercice>();
             builder.Services.AddScoped<IServiceServicecs, ServiceServices>();
 
-            //emailsender
-            builder.Services.Configure<SendGridOptions>(builder.Configuration.GetSection("SendGrid"));
-            builder.Services.AddTransient<IEmailSender, SendGridEmailSender>();
+            
 
 
             builder.Services.AddAutoMapper(cfg =>
