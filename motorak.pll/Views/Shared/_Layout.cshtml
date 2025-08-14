@@ -45,6 +45,26 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        $(document).on("click", ".add-to-cart", function () {
+            var id = $(this).data("id");
+            $.ajax({
+                url: '/Cart/AddToCart',
+                type: 'POST',
+                data: { id: id },
+                success: function (res) {
+                    $("#cart-count").text(res.count);
+                },
+                error: function () {
+                    alert("Failed to add to cart.");
+                }
+            });
+        });
+    </script>
+
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

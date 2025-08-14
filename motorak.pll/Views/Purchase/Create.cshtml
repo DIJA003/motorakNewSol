@@ -25,8 +25,14 @@
                 </div>
 
                 <div class="mb-3">
+                    <label asp-for="CarId" class="form-label fw-bold"></label>
+                    <input asp-for="CarId" class="form-control" type="number" readonly />
+                    <span asp-validation-for="CarId" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
                     <label asp-for="TotalPrice" class="form-label fw-bold"></label>
-                    <input asp-for="TotalPrice" class="form-control" type="number" placeholder="Enter Total Price" />
+                    <input asp-for="TotalPrice" class="form-control" type="number" readonly />
                     <span asp-validation-for="TotalPrice" class="text-danger"></span>
                 </div>
 
@@ -37,14 +43,8 @@
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="CarId" class="form-label fw-bold"></label>
-                    <input asp-for="CarId" class="form-control" type="number" placeholder="Enter Car ID" />
-                    <span asp-validation-for="CarId" class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
                     <label asp-for="Status" class="form-label fw-bold"></label>
-                    <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<System.Transactions.TransactionStatus>()">
+                    <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<Motorak.DAL.Enums.TransactionEnums.TransactionStatus>()">
                         <option value="">-- Select Status --</option>
                     </select>
                     <span asp-validation-for="Status" class="text-danger"></span>

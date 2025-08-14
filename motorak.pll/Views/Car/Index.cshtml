@@ -44,42 +44,28 @@
                     <td>@car.Model</td>
                     <td>@car.Year</td>
                     <td>
-                        @if (car.Category == CarCategory.Buy)
-                        {
-                            @car.Price.ToString("C")
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
+                        @(car.Category == CarCategory.Buy ? car.Price.ToString("C") : "-")
                     </td>
                     <td>
-                        @if (car.Category == CarCategory.Rent && car.DailyRentPrice.HasValue)
-                        {
-                            @car.DailyRentPrice.Value.ToString("C")
-                        }
-                        else
-                        {
-                            <span>-</span>
-                        }
+                        @(car.Category == CarCategory.Rent && car.DailyRentPrice.HasValue ? car.DailyRentPrice.Value.ToString("C") : "-")
                     </td>
                     <td>@car.Mileage.ToString("N0") km</td>
                     <td>@car.Status</td>
                     <td>@car.Category</td>
                     <td>
-                        <!-- Always show Add to Cart -->
-                        <a asp-controller="Cart" asp-action="Add" asp-route-id="@car.Id" class="btn btn-sm btn-warning mb-1">Add to Cart</a>
+                        <!-- Add to Cart button (always available) -->
+                        <button type="button" class="btn btn-sm btn-warning mb-1 add-to-cart" data-id="@car.Id">Add to Cart</button>
 
-                        <!-- Buy button for ForSale cars -->
+                        <!-- Buy button -->
                         @if (car.Category == CarCategory.Buy)
                         {
-                            <a asp-controller="Purchase" asp-action="Buy" asp-route-id="@car.Id" class="btn btn-sm btn-success mb-1">Buy</a>
+                            <a asp-controller="Purchase" asp-action="Create" asp-route-carId="@car.Id" class="btn btn-sm btn-success mb-1">Buy</a>
                         }
 
-                        <!-- Rent button for ForRent cars -->
+                        <!-- Rent button -->
                         @if (car.Category == CarCategory.Rent)
                         {
-                            <a asp-controller="Rent" asp-action="RentCar" asp-route-id="@car.Id" class="btn btn-sm btn-primary">Rent</a>
+                            <a asp-controller="Rent" asp-action="Create" asp-route-carId="@car.Id" class="btn btn-sm btn-primary">Rent</a>
                         }
                     </td>
                 </tr>
@@ -93,3 +79,24 @@
         }
     </tbody>
 </table>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).on("click", ".add-to-cart", function () {
+            var id = $(this).data("id");
+            $.ajax({
+                url: '/Cart/AddToCart',
+                type: 'POST',
+                data: { id: id },
+                success: function (res) {
+                    $("#cart-count").text(res.count);
+                    alert("Added to cart!");
+                },
+                error: function () {
+                    alert("Failed to add to cart.");
+                }
+            });
+        });
+    </script>
+}

@@ -1,4 +1,7 @@
-﻿<header class="header" id="header">
+﻿@using Motorak.BLL.Helper
+@inject IHttpContextAccessor HttpContextAccessor
+
+<header class="header" id="header">
     <nav class="nav container">
         <a href="/" class="nav__logo">
             <i class="ri-steering-fill"></i>
@@ -26,10 +29,9 @@
                         <i class="ri-car-fill"></i> Cars
                     </a>
                 </li>
-                <li class="nav__item">
-                    <a asp-controller="Cart" asp-action="Index" class="nav__link">
-                        <i class="ri-shopping-cart-2-fill"></i>
-                        <span id="cartCount" style="font-weight:bold;">0</span>
+                <li class="nav-item">
+                    <a class="nav-link" href="/Cart/Index">
+                        Cart (<span id="cart-count">@((HttpContextAccessor.HttpContext?.Session.GetObjectFromJson<List<Motorak.DAL.Entites.CartItem>>("Cart")?.Sum(c => c.Quantity) ?? 0))</span>)
                     </a>
                 </li>
             </ul>
@@ -45,4 +47,15 @@
             <i class="ri-menu-line"></i>
         </div>
     </nav>
+    <!--=============== SCROLL REVEAL - PAGE ANNIMATION ===============-->
+    <script src="~/assets/js/scrollrevealAnimation.min.js"></script>
+
+    <!--=============== SWIPER JS - PRODUCT SLIDER ===============-->
+    <script src="~/assets/js/swiper-bundle.min.js"></script>
+
+    <!--=============== MIXITUP JS - FILTER PRODUCT ===============-->
+    <script src="~/assets/js/mixitup.min.js"></script>
+
+    <!--=============== MAIN JS ===============-->
+    <script src="~/assets/js/main.js"></script>
 </header>

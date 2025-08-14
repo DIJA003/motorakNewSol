@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Motorak.BLL.ModelVM.Rents;
 using Motorak.BLL.Services.Abstractions;
-using System;
-using System.Threading.Tasks;
+
 
 namespace Motorak.PLL.Controllers
 {
@@ -31,9 +30,16 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(int? carId = null, int? price = null)
         {
-            return View(new RentCreateDto());
+            var model = new RentCreateDto();
+            if (carId.HasValue) model.CarId = carId.Value;
+            if (price.HasValue) model.TotalPrice = price.Value;
+
+            model.StartDate = DateTime.Today;
+            model.EndDate = DateTime.Today.AddDays(1);
+
+            return View(model);
         }
 
         [HttpPost]
@@ -41,7 +47,8 @@ namespace Motorak.PLL.Controllers
         public async Task<IActionResult> Create(RentCreateDto dto)
         {
             if (!ModelState.IsValid) return View(dto);
-            var id = await _service.CreateAsync(dto);
+
+            await _service.CreateAsync(dto);
             return RedirectToAction(nameof(Index));
         }
 
@@ -50,6 +57,7 @@ namespace Motorak.PLL.Controllers
         {
             var existing = await _service.GetByIdAsync(id);
             if (existing == null) return NotFound();
+
             var dto = new RentUpdateDto
             {
                 Id = existing.Id,
@@ -66,6 +74,7 @@ namespace Motorak.PLL.Controllers
         {
             if (id != dto.Id) return BadRequest();
             if (!ModelState.IsValid) return View(dto);
+
             try
             {
                 await _service.UpdateAsync(dto);

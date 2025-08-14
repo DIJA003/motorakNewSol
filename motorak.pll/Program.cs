@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using motorak.dal.DataTemp;
 using motorak.dal.Entites;
+using motorak.dal.Repo.Abstractions;
+using motorak.dal.Repo.Implementations;
 using motorak.DAL.DataBase;
 using Motorak.BLL.Mapper.CarMapping;
 using Motorak.BLL.Mapper.CustomerMapping;
@@ -61,6 +63,7 @@ namespace motorak.pll
             builder.Services.AddScoped<IRentRepo, RentRepo>();
             builder.Services.AddScoped<IServiceReviewRepo, ServiceReviewRepo>();
             builder.Services.AddScoped<IServiceRepo, ServiceRepo>();
+            builder.Services.AddScoped<ICartRepo,CartRepo>();
 
             //Services
             builder.Services.AddScoped<ICarServicecs, CarService>();
@@ -93,6 +96,16 @@ namespace motorak.pll
             //    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
             //    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
             //});
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(2);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            builder.Services.AddHttpContextAccessor();
+
+
 
             var app = builder.Build();
 
@@ -127,6 +140,9 @@ namespace motorak.pll
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
+
             app.MapRazorPages();
 
             app.MapControllerRoute(
