@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using motorak.dal.Entites;
 using Motorak.BLL.ModelVM.Customer;
 using Motorak.BLL.Services.Abstractions;
@@ -70,8 +71,12 @@ namespace Motorak.BLL.Services.Implementations
             {
                 if (customerModel == null) 
                     return (false, "Customer Null");
-                var result = _mapper.Map<Customer>(customerModel);
-                await _customerRepo.CreateAsync(result);
+                var customer = _mapper.Map<Customer>(customerModel);
+                var user = _mapper.Map<User>(customerModel);
+                customer.UserId = user.Id;
+                customer.User = user;
+                await _customerRepo.CreateAsync(customer);
+                await _customerRepo.SaveChangesAsync();
                 return (true, "Customer Created Successfully!");
             }
             catch (Exception ex)

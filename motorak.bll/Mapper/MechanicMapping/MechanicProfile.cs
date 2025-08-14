@@ -1,6 +1,7 @@
 ﻿
 using AutoMapper;
 using motorak.dal.Entites;
+using Motorak.BLL.ModelVM.Customer;
 using Motorak.BLL.ModelVM.Mechanic;
 using Motorak.DAL.Entites;
 using Motorak.DAL.Enums.MechaincEnums;
@@ -43,14 +44,22 @@ namespace Motorak.BLL.Mapper.MechanicMappin
                 .ForMember(m => m.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
                 .ForMember(m => m.DeletedAt, opt => opt.MapFrom(src => src.DeletedAt));
 
-
-
             CreateMap<CreateMechanicModel, Mechanic>()
+                .ForMember(m => m.UserId, opt => opt.Ignore())
+                .ForMember(m => m.User, opt => opt.Ignore())
                 .ForMember(m => m.WorkHours, opt => opt.MapFrom(src => src.WorkHours))
                 .ForMember(m => m.Status, opt => opt.MapFrom(src => Enum.Parse<MechanicStatus>(src.Status)))
-                .ForMember(m => m.Rating, opt => opt.MapFrom(src => 0)) 
-                .ForMember(m => m.UserId, opt => opt.Ignore())
-                .ForMember(m => m.User, opt => opt.Ignore());
+                .ForMember(m => m.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(m => m.IsDeleted, opt => opt.MapFrom(src => src.IsDeleted))
+                .ForMember(m => m.DeletedAt, opt => opt.MapFrom(src => src.DeletedAt));
+
+
+            CreateMap<CreateMechanicModel, User>()
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
+                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password))
+                .ForMember(dest => dest.ImagePath, opt => opt.Ignore());
 
             CreateMap<EditMechanicModel, Mechanic>()
                 .ForMember(m => m.WorkHours, opt => opt.MapFrom(src => src.WorkHours))
