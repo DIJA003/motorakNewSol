@@ -32,9 +32,18 @@ namespace motorak.pll
             builder.Services.AddDbContext<MotorakDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
+            
+
             builder.Services.AddIdentity<User, IdentityRole>(options =>
             {
-                options.SignIn.RequireConfirmedAccount = false;
+                options.SignIn.RequireConfirmedAccount = true;
+                options.SignIn.RequireConfirmedEmail = true;
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequiredLength = 6;
+                options.Password.RequiredUniqueChars = 0;
             })
             .AddEntityFrameworkStores<MotorakDbContext>()
             .AddDefaultTokenProviders()
@@ -50,6 +59,9 @@ namespace motorak.pll
             });
 
             builder.Services.AddRazorPages();
+
+            //emailsender
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
@@ -75,9 +87,7 @@ namespace motorak.pll
             builder.Services.AddScoped<IServiceReviewService, ServiceReviewService>();
             builder.Services.AddScoped<IServiceServicecs, ServiceServices>();
 
-            //emailsender
-            builder.Services.AddScoped<IEmailSender, EmailSender>();
-
+            
 
 
             builder.Services.AddAutoMapper(cfg =>
@@ -90,21 +100,18 @@ namespace motorak.pll
                 cfg.AddProfile(new TransactionsProfile());
             });
 
-            //builder.Services.AddAuthentication()  
-            //.AddGoogle(options =>
-            //{
-            //    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-            //    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-            //});
-            builder.Services.AddDistributedMemoryCache();
-            builder.Services.AddSession(options =>
+            builder.Services.AddAuthentication()
+            .AddGoogle(options =>
             {
-                options.IdleTimeout = TimeSpan.FromHours(2);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
+                options.ClientId = "367275960270-k61vvo1n6opfak2b94km9ki769d23o90.apps.googleusercontent.com";
+                options.ClientSecret = "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";
             });
-            builder.Services.AddHttpContextAccessor();
-
+            builder.Services.AddAuthentication()
+            .AddFacebook(options =>
+            {
+                options.AppId = "866662105870365";
+                options.AppSecret = "1273d4869397bd9f897cc371af7cc752";
+            });
 
 
             var app = builder.Build();

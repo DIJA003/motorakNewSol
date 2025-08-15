@@ -3,16 +3,14 @@
 
 <header class="header" id="header">
     <nav class="nav container">
-        <a href="/" class="nav__logo">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="nav__logo">
             <i class="ri-steering-fill"></i>
             Motorak
         </a>
         <div class="nav__menu" id="nav-menu">
             <ul class="nav__list">
                 <li class="nav__item">
-                    <a asp-controller="Home" asp-action="Index" class="nav__link active-link">
-                        <i class="ri-home-5-fill"></i> Home
-                    </a>
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="nav__link">Home</a>
                 </li>
                 <li class="nav__item">
                     <a asp-controller="Service" asp-action="Index" class="nav__link">
