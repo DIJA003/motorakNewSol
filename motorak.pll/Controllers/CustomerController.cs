@@ -93,7 +93,6 @@ namespace Motorak.PLL.Controllers
             {
                 Id = customer.Id,
                 Name = customer.Name,
-                Email = customer.Email,
                 PhoneNumber = customer.PhoneNumber
             };
             return View(model);
