@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Motorak.BLL.ModelVM.Service;
 using Motorak.BLL.Services.Abstractions;
+using Motorak.DAL.Enums.SeviceEnums;
+using Motorak.Utility;
 
 namespace Motorak.PLL.Controllers
 {
@@ -116,6 +119,97 @@ namespace Motorak.PLL.Controllers
 
             ViewBag.Error = message;
             return RedirectToAction(nameof(Delete), new { id = serviceId });
+        }
+        [HttpGet]
+        [Authorize(Roles = Seed.Role_Mechanic)]
+        public async Task<IActionResult> Accept(int id)
+        {
+            try
+            {
+                var (getStatus, getMessage, service) = await _serviceService.GetServiceByIdAsync(id);
+
+                if (!getStatus || service == null)
+                {
+                    TempData["ErrorMessage"] = "Service not found.";
+                    return RedirectToAction("Index");
+                }
+
+                if (service.Status != Status.pending)
+                {
+                    TempData["ErrorMessage"] = "This service is not pending and cannot be accepted.";
+                    return RedirectToAction("Index");
+                }
+
+                var updateModel = new UpdateServiceVM
+                {
+                    ServiceId = service.ServiceId,
+                    Status = Status.completed,
+                    RequestDate = service.CreatedDate,
+                    ServiceType = service.ServiceType
+                };
+
+                var (updateStatus, updateMessage) = await _serviceService.UpdateServiceStatusAsync(updateModel);
+
+                if (!updateStatus)
+                {
+                    TempData["ErrorMessage"] = updateMessage;
+                    return RedirectToAction("Index");
+                }
+
+                TempData["SuccessMessage"] = $"Service #{service.ServiceId} has been accepted successfully!";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occurred while accepting the service. Please try again.";
+                return RedirectToAction("Index");
+            }
+        }
+
+        [HttpGet]
+        [Authorize(Roles = Seed.Role_Mechanic)]
+        public async Task<IActionResult> Reject(int id)
+        {
+            try
+            {
+                var (getStatus, getMessage, service) = await _serviceService.GetServiceByIdAsync(id);
+
+                if (!getStatus || service == null)
+                {
+                    TempData["ErrorMessage"] = "Service not found.";
+                    return RedirectToAction("Index");
+                }
+
+                if (service.Status != Status.pending)
+                {
+                    TempData["ErrorMessage"] = "This service is not pending and cannot be rejected.";
+                    return RedirectToAction("Index");
+                }
+
+                var updateModel = new UpdateServiceVM
+                {
+                    ServiceId = service.ServiceId,
+                    Status = Status.cancelled,
+                    RequestDate = service.CreatedDate,
+                    ServiceType = service.ServiceType
+                };
+
+                var (updateStatus, updateMessage) = await _serviceService.UpdateServiceStatusAsync(updateModel);
+
+                if (!updateStatus)
+                {
+                    TempData["ErrorMessage"] = updateMessage;
+                    return RedirectToAction("Index");
+                }
+
+                TempData["SuccessMessage"] = $"Service #{service.ServiceId} has been rejected.";
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "An error occurred while rejecting the service. Please try again.";
+                return RedirectToAction("Index");
+            }
         }
 
     }

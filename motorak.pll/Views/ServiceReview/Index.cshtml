@@ -493,14 +493,12 @@
 
 </style>
 
-<!-- Floating Orbs Background -->
 <div class="floating-orbs">
     <div class="orb"></div>
     <div class="orb"></div>
     <div class="orb"></div>
 </div>
 
-<!-- Particles Container -->
 <div class="particles-container" id="particles"></div>
 
 <div class="container py-5">
@@ -584,7 +582,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Create dynamic particles
         const particlesContainer = document.getElementById('particles');
         const particleCount = 40;
 
@@ -601,7 +598,6 @@
             particlesContainer.appendChild(particle);
         }
 
-        // Animate particles
         function animateParticles() {
             const particles = document.querySelectorAll('.particle');
             particles.forEach((particle, index) => {
@@ -617,7 +613,6 @@
         }
         animateParticles();
 
-        // Load animations
         setTimeout(() => {
             document.querySelector('.hero-container').classList.add('loaded');
         }, 100);
@@ -630,7 +625,6 @@
             document.querySelector('.controls-section').classList.add('loaded');
         }, 600);
 
-        // Staggered card animations
         const reviewCards = document.querySelectorAll('.review-card');
         reviewCards.forEach((card, index) => {
             setTimeout(() => {
@@ -638,7 +632,6 @@
             }, 800 + (index * 200));
         });
 
-        // No reviews animation
         const noReviews = document.querySelector('.no-reviews');
         if (noReviews) {
             setTimeout(() => {
@@ -646,7 +639,6 @@
             }, 1000);
         }
 
-        // Enhanced interactions
         reviewCards.forEach((card, index) => {
             card.addEventListener('mouseenter', function() {
                 // Slightly lift other cards down

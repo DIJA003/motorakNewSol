@@ -21,20 +21,7 @@ namespace Motorak.BLL.Services.Implementations
             _serviceRebo = serviceRebo;
             _mapper = mapper;
         }
-        //public async Task<(bool status, string message)> CreateServiceAsync(CreateServiceVM service)
-        //{
-        //    try
-        //    {
-        //        if (service == null) return (false, "Service data is null");
-        //        var result = _mapper.Map<Service>(service);
-        //        await _serviceRebo.CreateAsync(result);
-        //        return (true, "Service Created Successfully");
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return (false, $"Error Occurred: {ex.Message}");
-        //    }
-        //}
+        
         public async Task<(bool status, string message)> CreateServiceAsync(CreateServiceVM service)
         {
             try

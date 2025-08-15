@@ -588,7 +588,7 @@
             }
             animateParticles();
 
-            // Load animations
+            
             setTimeout(() => {
                 document.querySelector('.hero-section').classList.add('loaded');
             }, 100);
@@ -597,7 +597,6 @@
                 document.querySelector('.form-container').classList.add('loaded');
             }, 400);
 
-            // Staggered form group animations
             const formGroups = document.querySelectorAll('.form-group');
             formGroups.forEach((group, index) => {
                 setTimeout(() => {
@@ -605,7 +604,6 @@
                 }, 800 + (index * 150));
             });
 
-            // Enhanced form interactions
             const formInputs = document.querySelectorAll('.form-control-enhanced');
             formInputs.forEach(input => {
                 const formGroup = input.closest('.form-group');
@@ -618,7 +616,7 @@
                     }
                 }
 
-                // Initial check
+                
                 updateLabel();
 
                 input.addEventListener('focus', function() {
@@ -633,7 +631,6 @@
                 input.addEventListener('input', updateLabel);
             });
 
-            // Star Rating System with Enhanced Effects
             const stars = document.querySelectorAll('#starRating .star');
             const ratingValue = document.getElementById('ratingValue');
             const ratingDisplay = document.getElementById('ratingDisplay');
@@ -666,7 +663,6 @@
                     highlightStars(currentRating);
                     updateRatingDisplay(currentRating, false);
 
-                    // Celebration effect
                     createStarBurst(star);
                     updateFormProgress();
                 });
@@ -732,15 +728,13 @@
                 }
             }
 
-            // Form Progress Bar
             function updateFormProgress() {
                 const form = document.getElementById('reviewForm');
                 const formData = new FormData(form);
                 const progressBar = document.getElementById('progressBar');
                 let filledFields = 0;
-                let totalFields = 4; // ServiceId, CustomerId, Rating, Comments
+                let totalFields = 4; 
 
-                // Check each field
                 if (formData.get('ServiceId')?.trim()) filledFields++;
                 if (formData.get('CustomerId')?.trim()) filledFields++;
                 if (formData.get('Rating')) filledFields++;
@@ -750,12 +744,10 @@
                 progressBar.style.width = progress + '%';
             }
 
-            // Update progress on input
             formInputs.forEach(input => {
                 input.addEventListener('input', updateFormProgress);
             });
 
-            // Parallax effect for orbs
             document.addEventListener('mousemove', function(e) {
                 const orbs = document.querySelectorAll('.orb');
                 const mouseX = e.clientX / window.innerWidth;
@@ -772,7 +764,6 @@
                 });
             });
 
-            // Dynamic gradient for cosmic title
             const cosmicTitle = document.querySelector('.cosmic-title');
             let gradientAngle = 135;
 
@@ -790,7 +781,6 @@
             }
             updateCosmicGradient();
 
-            // Enhanced button ripple effects
             const buttons = document.querySelectorAll('.btn-cosmic');
             buttons.forEach(button => {
                 button.addEventListener('click', function(e) {
@@ -828,7 +818,6 @@
                 });
             });
 
-            // Form submission handling
             const form = document.getElementById('reviewForm');
             form.addEventListener('submit', function(e) {
                 //e.preventDefault();
@@ -840,25 +829,21 @@
                 const rating = document.querySelector('[name="Rating"]').value;
                 const comments = document.querySelector('[name="Comments"]').value;
 
-                // Clear previous errors
                 document.querySelectorAll('.validation-error').forEach(error => {
                     error.textContent = '';
                     error.classList.remove('show');
                 });
 
-                // Validate Service ID
                 if (!serviceId.trim()) {
                     showError('[name="ServiceId"]', 'Service ID is required');
                     isValid = false;
                 }
 
-                // Validate Customer ID
                 if (!customerId.trim()) {
                     showError('[name="CustomerId"]', 'Customer ID is required');
                     isValid = false;
                 }
 
-                // Validate Rating
                 if (!rating) {
                     const ratingError = document.querySelector('.rating-section').parentNode.querySelector('.validation-error');
                     ratingError.textContent = 'Please select a rating';
@@ -866,14 +851,12 @@
                     isValid = false;
                 }
 
-                // Validate Comments
                 if (!comments.trim()) {
                     showError('[name="Comments"]', 'Comments are required');
                     isValid = false;
                 }
 
                 if (isValid) {
-                    // Show success animation
                     showSuccessAnimation();
                 }
             });
@@ -892,7 +875,6 @@
                 submitBtn.innerHTML = '<i class="bi bi-check-circle btn-icon"></i><span>Review Submitted!</span>';
                 submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
 
-                // Create celebration effect
                 createCelebrationEffect();
 
                 setTimeout(() => {
@@ -927,7 +909,6 @@
                 }
             }
 
-            // Initialize form progress
             updateFormProgress();
         });
     </script>

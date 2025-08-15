@@ -423,7 +423,6 @@
 </div>
 
 <script>
-    // Add loaded class after page loads for animations
     window.addEventListener('load', function() {
         setTimeout(() => {
             document.querySelector('.review-container').classList.add('loaded');
@@ -433,7 +432,6 @@
             document.querySelector('.card-header').classList.add('loaded');
             document.querySelector('.back-button').classList.add('loaded');
 
-            // Add loaded class to rows with staggered delay
             const rows = document.querySelectorAll('.detail-row');
             rows.forEach((row, index) => {
                 setTimeout(() => {

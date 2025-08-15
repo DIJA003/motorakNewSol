@@ -31,6 +31,7 @@
             background: radial-gradient(ellipse at top left, rgba(139, 92, 246, 0.15) 0%, transparent 50%), radial-gradient(ellipse at top right, rgba(168, 85, 247, 0.12) 0%, transparent 50%), radial-gradient(ellipse at bottom left, rgba(124, 58, 237, 0.18) 0%, transparent 50%), radial-gradient(ellipse at bottom right, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
             pointer-events: none;
             z-index: -1;
+            animation: backgroundPulse 8s ease-in-out infinite alternate;
         }
 
         body::after {
@@ -45,18 +46,22 @@
             pointer-events: none;
             z-index: -1;
             opacity: 0.3;
+            animation: gridFloat 20s linear infinite;
         }
+
+
 
     .container {
         position: relative;
         z-index: 1;
         max-width: 800px;
+        margin-top: 2rem;
     }
 
     .page-header {
         text-align: center;
-        padding: 3rem 0 2rem 0;
-        margin-bottom: 2rem;
+        padding: 3rem 0 3rem 0;
+        margin-bottom: 3rem;
     }
 
     .page-title {
@@ -102,8 +107,14 @@
         position: relative;
         overflow: hidden;
         box-shadow: 0 32px 64px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(139, 92, 246, 0.1);
-        margin-bottom: 2rem;
+        margin-bottom: 4rem;
+        transition: all 0.4s ease;
     }
+
+        .form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(139, 92, 246, 0.2);
+        }
 
         .form-container::before {
             content: '';
@@ -112,7 +123,7 @@
             left: 0;
             right: 0;
             height: 3px;
-            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.8), rgba(124, 58, 237, 0.8), rgba(168, 85, 247, 0.8), transparent );
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.8), rgba(124, 58, 237, 0.8), rgba(168, 85, 247, 0.8), transparent);
         }
 
     .form-group {
@@ -130,12 +141,14 @@
         display: flex;
         align-items: center;
         gap: 0.5rem;
+        transition: all 0.3s ease;
     }
 
         .form-label i {
             color: #8b5cf6;
             font-size: 1.1rem;
             text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+            transition: all 0.3s ease;
         }
 
     .form-control,
@@ -147,9 +160,10 @@
         color: white;
         font-weight: 500;
         font-size: 1rem;
-        transition: all 0.3s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         backdrop-filter: blur(10px);
         box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
+        position: relative;
     }
 
         .form-control:focus,
@@ -158,11 +172,28 @@
             border-color: rgba(139, 92, 246, 0.8);
             box-shadow: 0 0 0 0.2rem rgba(139, 92, 246, 0.25), 0 8px 25px rgba(139, 92, 246, 0.3), inset 0 2px 10px rgba(0, 0, 0, 0.2);
             color: white;
+            transform: translateY(-2px) scale(1.01);
+        }
+
+        .form-control:hover,
+        .form-select:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            transform: translateY(-1px);
         }
 
         .form-control::placeholder {
             color: rgba(255, 255, 255, 0.4);
             font-weight: 400;
+        }
+
+    input[type="number"] {
+        -moz-appearance: textfield;
+    }
+
+        input[type="number"]::-webkit-outer-spin-button,
+        input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
         }
 
     .form-select {
@@ -185,6 +216,7 @@
         font-size: 1.2rem;
         pointer-events: none;
         margin-top: 1.2rem;
+        transition: all 0.3s ease;
     }
 
     .text-danger {
@@ -245,7 +277,7 @@
         padding: 1rem 2.5rem;
         font-weight: 800;
         color: white;
-        transition: all 0.4s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 0 12px 24px rgba(16, 185, 129, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         text-decoration: none;
         display: inline-flex;
@@ -276,8 +308,8 @@
         }
 
         .btn-create:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 18px 36px rgba(16, 185, 129, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.2);
             color: white;
             border-color: rgba(16, 185, 129, 0.5);
         }
@@ -285,6 +317,11 @@
         .btn-create i {
             font-size: 1.1rem;
             filter: drop-shadow(0 0 8px currentColor);
+            transition: all 0.3s ease;
+        }
+
+        .btn-create:hover i {
+            transform: rotate(360deg);
         }
 
     .btn-cancel {
@@ -294,7 +331,7 @@
         padding: 1rem 2.5rem;
         font-weight: 700;
         color: white;
-        transition: all 0.4s ease;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         box-shadow: 0 8px 20px rgba(107, 114, 128, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
         text-decoration: none;
         display: inline-flex;
@@ -324,24 +361,19 @@
         }
 
         .btn-cancel:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 12px 28px rgba(107, 114, 128, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 35px rgba(107, 114, 128, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             color: white;
             border-color: rgba(107, 114, 128, 0.5);
         }
 
         .btn-cancel i {
             font-size: 1.1rem;
+            transition: all 0.3s ease;
         }
 
-    .floating-label {
-        position: relative;
-    }
-
-        .floating-label .form-control:focus + .form-label,
-        .floating-label .form-control:not(:placeholder-shown) + .form-label {
-            transform: translateY(-25px) scale(0.8);
-            color: #8b5cf6;
+        .btn-cancel:hover i {
+            transform: rotate(180deg);
         }
 
     .form-section {
@@ -351,7 +383,14 @@
         padding: 2rem;
         margin-bottom: 2rem;
         position: relative;
+        transition: all 0.3s ease;
     }
+
+        .form-section:hover {
+            background: rgba(139, 92, 246, 0.08);
+            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-2px);
+        }
 
         .form-section::before {
             content: '';
@@ -362,6 +401,12 @@
             height: 2px;
             background: linear-gradient(90deg, #8b5cf6, #7c3aed, #a855f7);
             border-radius: 20px 20px 0 0;
+            transition: all 0.3s ease;
+        }
+
+        .form-section:hover::before {
+            height: 3px;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
         }
 
     .section-title {
@@ -372,13 +417,139 @@
         display: flex;
         align-items: center;
         gap: 0.75rem;
+        transition: all 0.3s ease;
     }
 
         .section-title i {
             color: #8b5cf6;
             font-size: 1.4rem;
             text-shadow: 0 0 15px rgba(139, 92, 246, 0.5);
+            transition: all 0.3s ease;
         }
+
+    .form-section:hover .section-title i {
+        transform: scale(1.1);
+        color: #a78bfa;
+    }
+
+    .floating-elements {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .floating-particle {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        background: linear-gradient(45deg, #8b5cf6, #a78bfa);
+        border-radius: 50%;
+        opacity: 0.6;
+    }
+
+    .custom-date-wrapper {
+        position: relative;
+        display: block;
+    }
+
+    .custom-date-input {
+        background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.08) 100%);
+        border: 2px solid rgba(139, 92, 246, 0.4);
+        border-radius: 20px;
+        padding: 1.2rem 4rem 1.2rem 1.5rem;
+        color: white;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        backdrop-filter: blur(20px);
+        box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2), 0 4px 20px rgba(139, 92, 246, 0.2);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .custom-date-input::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .custom-date-input:hover::before {
+            left: 100%;
+        }
+
+        .custom-date-input:focus {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(124, 58, 237, 0.15) 100%);
+            border-color: rgba(139, 92, 246, 0.8);
+            box-shadow: 0 0 0 0.3rem rgba(139, 92, 246, 0.3), 0 12px 30px rgba(139, 92, 246, 0.4), inset 0 2px 10px rgba(0, 0, 0, 0.2), 0 0 60px rgba(139, 92, 246, 0.3);
+            color: white;
+            transform: translateY(-3px) scale(1.02);
+        }
+
+        .custom-date-input:hover {
+            border-color: rgba(139, 92, 246, 0.6);
+            transform: translateY(-2px) scale(1.01);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2), 0 8px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .custom-date-input::-webkit-calendar-picker-indicator {
+            background: transparent;
+            bottom: 0;
+            color: transparent;
+            cursor: pointer;
+            height: auto;
+            left: 0;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: auto;
+            opacity: 0;
+        }
+
+    .date-icon-overlay {
+        position: absolute;
+        right: 1.5rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: rgba(139, 92, 246, 0.8);
+        font-size: 1.5rem;
+        pointer-events: none;
+        text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+        transition: all 0.3s ease;
+    }
+
+    .custom-date-wrapper:hover .date-icon-overlay {
+        color: rgba(168, 85, 247, 0.9);
+        text-shadow: 0 0 30px rgba(168, 85, 247, 0.7);
+        transform: translateY(-50%) scale(1.1);
+    }
+
+    .custom-date-input:focus + .date-icon-overlay {
+        color: #a78bfa;
+        text-shadow: 0 0 40px rgba(167, 139, 250, 0.8);
+        transform: translateY(-50%) scale(1.2) rotate(10deg);
+    }
+
+    .custom-date-input::-webkit-datetime-edit-text,
+    .custom-date-input::-webkit-datetime-edit-month-field,
+    .custom-date-input::-webkit-datetime-edit-day-field,
+    .custom-date-input::-webkit-datetime-edit-year-field {
+        color: white;
+        font-weight: 600;
+    }
+
+    .custom-date-input::-webkit-datetime-edit-text {
+        color: rgba(139, 92, 246, 0.8);
+        font-weight: 700;
+    }
 </style>
 
 <div class="container mt-4">
@@ -402,6 +573,7 @@
 
     <div class="form-container">
         <form asp-action="Create" method="post" novalidate>
+            <input type="hidden" asp-for="Status" value="Pending" />
 
             <div class="form-section">
                 <div class="section-title">
@@ -416,7 +588,12 @@
                                 <i class="bi bi-calendar-date"></i>
                                 Request Date
                             </label>
-                            <input asp-for="RequestDate" class="form-control" type="date" />
+                            <div class="custom-date-wrapper">
+                                <input asp-for="RequestDate" class="form-control custom-date-input" type="date" />
+                                <div class="date-icon-overlay">
+                                    <i class="bi bi-calendar-heart"></i>
+                                </div>
+                            </div>
                             <span asp-validation-for="RequestDate" class="text-danger"></span>
                         </div>
                     </div>
@@ -434,17 +611,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label asp-for="Status" class="form-label">
-                        <i class="bi bi-flag"></i>
-                        Service Status
-                    </label>
-                    <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<Status>()">
-                        <option value="">-- Select Status --</option>
-                    </select>
-                    <span asp-validation-for="Status" class="text-danger"></span>
-                </div>
             </div>
 
             <div class="form-section">
@@ -460,7 +626,7 @@
                                 <i class="bi bi-person-gear"></i>
                                 Mechanic ID
                             </label>
-                            <input asp-for="MechanicId" class="form-control" type="number" placeholder="Enter mechanic ID" />
+                            <input asp-for="MechanicId" class="form-control" type="number" min="1" placeholder="Enter mechanic ID" />
                             <span asp-validation-for="MechanicId" class="text-danger"></span>
                         </div>
                     </div>
@@ -471,7 +637,7 @@
                                 <i class="bi bi-car-front"></i>
                                 Car ID
                             </label>
-                            <input asp-for="CarId" class="form-control" type="number" placeholder="Enter car ID" />
+                            <input asp-for="CarId" class="form-control" type="number" min="1" placeholder="Enter car ID" />
                             <span asp-validation-for="CarId" class="text-danger"></span>
                         </div>
                     </div>
@@ -497,26 +663,79 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const formContainer = document.querySelector('.form-container');
-            formContainer.style.opacity = '0';
-            formContainer.style.transform = 'translateY(30px)';
+            const numberInputs = document.querySelectorAll('input[type="number"]');
+            numberInputs.forEach(input => {
+                input.addEventListener('input', function(e) {
+                    if (this.value < 0) {
+                        this.value = '';
+                    }
+                });
 
-            setTimeout(() => {
-                formContainer.style.transition = 'all 0.8s cubic-bezier(0.4, 0, 0.2, 1)';
-                formContainer.style.opacity = '1';
-                formContainer.style.transform = 'translateY(0)';
-            }, 200);
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === '-' || e.key === 'e' || e.key === 'E' || e.key === '+') {
+                        e.preventDefault();
+                    }
+                });
+
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    let paste = (e.clipboardData || window.clipboardData).getData('text');
+                    if (!isNaN(paste) && paste >= 0) {
+                        this.value = paste;
+                    }
+                });
+            });
 
             const inputs = document.querySelectorAll('.form-control, .form-select');
-            inputs.forEach(input => {
+            inputs.forEach((input, index) => {
+
                 input.addEventListener('focus', function() {
-                    this.parentElement.style.transform = 'scale(1.01)';
+                    this.parentElement.style.transform = 'scale(1.02) translateY(-5px)';
+                    const label = this.parentElement.querySelector('.form-label');
+                    if (label) {
+                        label.style.color = '#8b5cf6';
+                        const icon = label.querySelector('i');
+                        if (icon) {
+                            icon.style.transform = 'scale(1.2) rotate(15deg)';
+                            icon.style.color = '#a78bfa';
+                        }
+                    }
                 });
 
                 input.addEventListener('blur', function() {
-                    this.parentElement.style.transform = 'scale(1)';
+                    this.parentElement.style.transform = 'scale(1) translateY(0)';
+                    const label = this.parentElement.querySelector('.form-label');
+                    if (label) {
+                        label.style.color = 'rgba(255, 255, 255, 0.9)';
+                        const icon = label.querySelector('i');
+                        if (icon) {
+                            icon.style.transform = 'scale(1) rotate(0deg)';
+                            icon.style.color = '#8b5cf6';
+                        }
+                    }
+                });
+
+                input.addEventListener('focus', function() {
+                    createSparkles(this);
                 });
             });
+
+            function createSparkles(element) {
+                element.style.boxShadow = '0 0 20px rgba(139, 92, 246, 0.5)';
+                setTimeout(() => {
+                    element.style.boxShadow = '';
+                }, 2000);
+            }
+
+            function createSimpleFloat() {
+                const container = document.querySelector('.container');
+                container.style.transform = 'translateY(-2px)';
+                setTimeout(() => {
+                    container.style.transform = 'translateY(0)';
+                }, 2000);
+            }
+
+            setInterval(createSimpleFloat, 5000);
         });
     </script>
 }
