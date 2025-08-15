@@ -58,16 +58,22 @@ namespace Motorak.DAL.Entites
             IsDeleted = true;
             DeletedAt = DateTime.Now;
         }
-        public void UpdateStatus(Status newStatus)
+        public void UpdateStatus(Status status)
         {
-            Status = newStatus;
-            UpdatedAt = DateTime.Now;
-        }
-        public void UpdateRequestDate(DateTime newRequestDate)
-        {
-            RequestDate = newRequestDate;
+            Status = status;
             UpdatedAt = DateTime.Now;
         }
 
+        public void UpdateServiceType(ServiceType serviceType)
+        {
+            ServiceType = serviceType;
+            UpdatedAt = DateTime.Now;
+        }
+
+        public void UpdateRequestDate(DateTime requestDate)
+        {
+            RequestDate = requestDate;
+            UpdatedAt = DateTime.Now;
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Motorak.BLL.ModelVM.Service;
 using Motorak.BLL.Services.Abstractions;
 using Motorak.DAL.Entites;
@@ -43,7 +44,6 @@ namespace Motorak.BLL.Services.Implementations
 
                 var result = _mapper.Map<Service>(service);
 
-                // التأكد من قيم FKs
                 if (result.CarId == 0) return (false, "CarId is required.");
                 if (result.MechanicId == 0) return (false, "MechanicId is required.");
 
@@ -62,8 +62,8 @@ namespace Motorak.BLL.Services.Implementations
             {
                 var result = await _serviceRebo.GetByIdAsync(serviceId);
                 if (result == null) return (false, "Service not Found");
-                _serviceRebo.Delete(result);
-                await _serviceRebo.SaveChangesAsync();
+                await _serviceRebo.Delete(result);
+                //await _serviceRebo.SaveChangesAsync();
                 return (true, "Deleted Successfully");
             }
             catch (Exception ex)
@@ -169,20 +169,23 @@ namespace Motorak.BLL.Services.Implementations
             }
         }
 
-        public async Task<(bool status, string message)> UpdateServiceStatusAsync(UpdateServiceVM service)
+        public async Task<(bool status, string message)> UpdateServiceStatusAsync(UpdateServiceVM model)
         {
             try
             {
-                var result = await _serviceRebo.GetByIdAsync(service.ServiceId);
-                if (result == null) return (false, "Service not found");
-                _mapper.Map(service, result);
-                _serviceRebo.Update(result);
-                await _serviceRebo.SaveChangesAsync();
-                return (true, "Service status updated successfully");
+                var existingReview = await _serviceRebo.GetByIdAsync(model.ServiceId);
+                if (existingReview == null)
+                    return (false, "Service review not found.");
+
+                _mapper.Map(model, existingReview);
+
+                await _serviceRebo.Update(existingReview);
+
+                return (true, "Service review updated successfully.");
             }
             catch (Exception ex)
             {
-                return (false, $"Error Occurred: {ex.Message}");
+                return (false, ex.Message);
             }
         }
     }

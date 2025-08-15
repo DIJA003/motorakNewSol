@@ -1,83 +1,935 @@
-﻿@using Motorak.BLL.ModelVM.ServiceReview
-@model CreateServiceReviewVM
+﻿<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Service Review</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-@{
-    ViewBag.Title = "Create Service Review";
-}
+        body {
+            background: linear-gradient(135deg, #0d1117 0%, #161b22 25%, #21262d 50%, #30363d 75%, #1a1d29 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', 'SF Pro Display', -apple-system, system-ui, sans-serif;
+            overflow-x: hidden;
+            color: #e6edf3;
+            position: relative;
+        }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+        .cosmic-particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
 
-<div class="container py-5">
-    <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white">
-            <h4><i class="bi bi-plus-circle"></i> Add New Service Review</h4>
+        .particle {
+            position: absolute;
+            background: linear-gradient(45deg, #8b5cf6, #a855f7);
+            border-radius: 50%;
+            opacity: 0.1;
+            filter: blur(1px);
+            transition: all 2s ease-in-out;
+        }
+
+        .floating-orbs {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.12), transparent);
+            filter: blur(2px);
+            transition: all 1.5s ease-in-out;
+        }
+
+            .orb:nth-child(1) {
+                width: 200px;
+                height: 200px;
+                top: 10%;
+                left: 15%;
+            }
+
+            .orb:nth-child(2) {
+                width: 150px;
+                height: 150px;
+                top: 70%;
+                right: 10%;
+            }
+
+            .orb:nth-child(3) {
+                width: 120px;
+                height: 120px;
+                bottom: 20%;
+                left: 25%;
+            }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero-section {
+            text-align: center;
+            margin-bottom: 3rem;
+            transform: translateY(30px);
+            opacity: 0;
+            transition: all 1.2s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+            .hero-section.loaded {
+                transform: translateY(0);
+                opacity: 1;
+            }
+
+        .cosmic-title {
+            background: linear-gradient(135deg, #8b5cf6, #a855f7, #c084fc, #ddd6fe);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 900;
+            font-size: 3.5rem;
+            letter-spacing: -2px;
+            text-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+            position: relative;
+            margin-bottom: 1rem;
+            transition: all 0.5s ease;
+        }
+
+            .cosmic-title:hover {
+                transform: scale(1.05);
+                filter: brightness(1.2);
+            }
+
+        .cosmic-subtitle {
+            color: rgba(230, 237, 243, 0.7);
+            font-size: 1.3rem;
+            font-weight: 300;
+            margin-bottom: 0.5rem;
+        }
+
+        .cosmic-description {
+            color: rgba(230, 237, 243, 0.5);
+            font-size: 1rem;
+            font-style: italic;
+        }
+
+        .form-container {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(25px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 32px;
+            padding: 3rem;
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            transform: translateY(50px) scale(0.95);
+            opacity: 0;
+            transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+            .form-container.loaded {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+            }
+
+            .form-container::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.08), transparent);
+                transition: left 3s ease;
+            }
+
+            .form-container:hover::before {
+                left: 100%;
+            }
+
+            .form-container:hover {
+                border-color: rgba(139, 92, 246, 0.4);
+                box-shadow: 0 40px 80px rgba(139, 92, 246, 0.1);
+            }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+            position: relative;
+        }
+
+        .form-title {
+            color: #e6edf3;
+            font-weight: 700;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .form-icon {
+            color: #a855f7;
+            font-size: 2rem;
+            transition: all 0.3s ease;
+        }
+
+            .form-icon:hover {
+                transform: scale(1.2) rotate(10deg);
+                color: #c084fc;
+            }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 2rem;
+            transform: translateX(30px);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.320, 1);
+        }
+
+            .form-group.loaded {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+        .floating-label {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            color: rgba(230, 237, 243, 0.6);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            font-weight: 500;
+            z-index: 2;
+            background: transparent;
+            padding: 0;
+        }
+
+        .form-group.focused .floating-label,
+        .form-group.has-value .floating-label {
+            top: -12px;
+            left: 15px;
+            font-size: 12px;
+            color: #a855f7;
+            background: rgba(26, 26, 46, 0.9);
+            padding: 4px 12px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+        }
+
+        .form-control-enhanced {
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            color: #e6edf3;
+            font-size: 16px;
+            padding: 18px 20px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            width: 100%;
+            outline: none;
+        }
+
+            .form-control-enhanced:focus {
+                background: rgba(255, 255, 255, 0.05);
+                border-color: #a855f7;
+                box-shadow: 0 0 30px rgba(139, 92, 246, 0.2);
+                transform: scale(1.02);
+            }
+
+            .form-control-enhanced:hover {
+                border-color: rgba(139, 92, 246, 0.3);
+                background: rgba(255, 255, 255, 0.04);
+            }
+
+        .textarea-enhanced {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .rating-section {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(139, 92, 246, 0.03);
+            border-radius: 24px;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .rating-section::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(139, 92, 246, 0.05), transparent);
+                transition: all 0.8s ease;
+                transform: scale(0);
+                opacity: 0;
+            }
+
+            .rating-section:hover::before {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+        .rating-label {
+            color: #a855f7;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .star-container {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .star {
+            font-size: 2.5rem;
+            color: #6b7280;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+            .star:hover {
+                transform: scale(1.3) rotate(10deg);
+                color: #fcd34d;
+                text-shadow: 0 0 20px rgba(252, 211, 77, 0.8);
+            }
+
+            .star.filled {
+                color: #fbbf24;
+                text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+                transform: scale(1.1);
+            }
+
+                .star.filled:hover {
+                    color: #fcd34d;
+                    transform: scale(1.4) rotate(-10deg);
+                }
+
+        .rating-display {
+            color: rgba(230, 237, 243, 0.7);
+            font-size: 1rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+
+            .rating-display.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        .button-group {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(139, 92, 246, 0.1);
+        }
+
+        .btn-cosmic {
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            padding: 15px 35px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+        }
+
+            .btn-save:hover {
+                transform: translateY(-4px) scale(1.05);
+                box-shadow: 0 15px 35px rgba(16, 185, 129, 0.4);
+                background: linear-gradient(135deg, #059669, #047857);
+                color: white;
+                text-decoration: none;
+            }
+
+        .btn-back {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            color: #e6edf3;
+            backdrop-filter: blur(10px);
+        }
+
+            .btn-back:hover {
+                background: rgba(255, 255, 255, 0.08);
+                border-color: rgba(139, 92, 246, 0.5);
+                transform: translateY(-4px) scale(1.05);
+                box-shadow: 0 15px 35px rgba(139, 92, 246, 0.1);
+                color: #ffffff;
+                text-decoration: none;
+            }
+
+        .btn-cosmic::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .btn-cosmic:hover::before {
+            left: 100%;
+        }
+
+        .btn-icon {
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .btn-cosmic:hover .btn-icon {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        .validation-error {
+            color: #f87171;
+            font-size: 14px;
+            margin-top: 8px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+            .validation-error.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        .form-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #8b5cf6, #a855f7);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            z-index: 10;
+        }
+
+    </style>
+</head>
+<body>
+    <!-- Floating Orbs Background -->
+    <div class="floating-orbs">
+        <div class="orb"></div>
+        <div class="orb"></div>
+        <div class="orb"></div>
+    </div>
+
+    <!-- Cosmic Particles -->
+    <div class="cosmic-particles" id="particles"></div>
+
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <h1 class="cosmic-title">✨ Create Service Review ✨</h1>
+            <p class="cosmic-subtitle">Share your experience with our services</p>
+            <p class="cosmic-description">Your feedback helps us improve and serve you better</p>
         </div>
-        <div class="card-body">
-            <form asp-action="Create" method="post">
-				<div class="mb-3">
-					<label asp-for="ServiceId" class="form-label"></label>
-					<input asp-for="ServiceId" class="form-control" />
-					<span asp-validation-for="ServiceId" class="text-danger"></span>
-				</div>
 
-				<div class="mb-3">
-					<label asp-for="CustomerId" class="form-label"></label>
-					<input asp-for="CustomerId" class="form-control" />
-					<span asp-validation-for="CustomerId" class="text-danger"></span>
-				</div>
-                <div class="mb-3">
-                    <label class="form-label">Rating</label>
-                    <div id="starRating">
-                        @for (int i = 1; i <= 5; i++)
-                        {
-                            <i class="bi bi-star text-warning fs-4" data-value="@i" style="cursor:pointer;"></i>
-                        }
+        <!-- Form Container -->
+        <div class="form-container">
+            <div class="form-progress" id="progressBar"></div>
+
+            <div class="form-header">
+                <h2 class="form-title">
+                    <i class="bi bi-star-fill form-icon"></i>
+                    <span>Service Review Form</span>
+                    <i class="bi bi-star-fill form-icon"></i>
+                </h2>
+            </div>
+
+            <form id="reviewForm" asp-action="Create" method="post">
+                <!-- Service ID -->
+                <div class="form-group">
+                    <label class="floating-label">Service ID</label>
+                    <input name="ServiceId" class="form-control-enhanced" type="number" />
+                    <span class="validation-error"></span>
+                </div>
+
+                <!-- Customer ID -->
+                <div class="form-group">
+                    <label class="floating-label">Customer ID</label>
+                    <input name="CustomerId" class="form-control-enhanced" type="number" />
+                    <span class="validation-error"></span>
+                </div>
+
+                <!-- Rating Section -->
+                <div class="form-group">
+                    <div class="rating-section">
+                        <div class="rating-label">Rate Your Experience</div>
+                        <div class="star-container" id="starRating">
+                            <i class="bi bi-star star" data-value="1"></i>
+                            <i class="bi bi-star star" data-value="2"></i>
+                            <i class="bi bi-star star" data-value="3"></i>
+                            <i class="bi bi-star star" data-value="4"></i>
+                            <i class="bi bi-star star" data-value="5"></i>
+                        </div>
+                        <div class="rating-display" id="ratingDisplay">Click a star to rate</div>
+                        <input type="hidden" name="Rating" id="ratingValue" />
                     </div>
-                    <input type="hidden" asp-for="Rating" id="ratingValue" />
+                    <span class="validation-error"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Comments" class="form-label"></label>
-                    <textarea asp-for="Comments" class="form-control"></textarea>
-                    <span asp-validation-for="Comments" class="text-danger"></span>
+                <!-- Comments -->
+                <div class="form-group">
+                    <label class="floating-label">Share Your Thoughts</label>
+                    <textarea name="Comments" class="form-control-enhanced textarea-enhanced"
+                              placeholder="Tell us about your experience..."></textarea>
+                    <span class="validation-error"></span>
                 </div>
 
-                @* <div class="mb-3">
-                    <label asp-for="Status" class="form-label"></label>
-                    <select asp-for="Status" class="form-select">
-                        <option value="Pending">Pending</option>
-                        <option value="Completed">Completed</option>
-                        <option value="Cancelled">Cancelled</option>
-                    </select>
-                    <span asp-validation-for="Status" class="text-danger"></span>
-                </div> *@
-
-                <button type="submit" class="btn btn-success"><i class="bi bi-save"></i> Save</button>
-                <a asp-action="Index" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back</a>
+                <!-- Button Group -->
+                <div class="button-group">
+                    <button type="submit" class="btn-cosmic btn-save">
+                        <i class="bi bi-rocket-takeoff btn-icon"></i>
+                        <span>Launch Review</span>
+                    </button>
+                    <button type="button" class="btn-cosmic btn-back" onclick="history.back()">
+                        <i class="bi bi-arrow-left-circle btn-icon"></i>
+                        <span>Return</span>
+                    </button>
+                </div>
             </form>
+
         </div>
     </div>
-</div>
 
-@section Scripts {
     <script>
-        const stars = document.querySelectorAll('#starRating i');
-        const ratingValue = document.getElementById('ratingValue');
+        document.addEventListener('DOMContentLoaded', function() {
+            // Create cosmic particles
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 60;
 
-        stars.forEach(star => {
-            star.addEventListener('click', () => {
-                const val = star.getAttribute('data-value');
-                ratingValue.value = val;
-                stars.forEach(s => {
-                    s.classList.remove('bi-star-fill');
-                    s.classList.add('bi-star');
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+
+                const size = Math.random() * 6 + 2;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+
+                particlesContainer.appendChild(particle);
+            }
+
+            // Animate particles with cosmic movement
+            function animateParticles() {
+                const particles = document.querySelectorAll('.particle');
+                const time = Date.now() * 0.0005;
+
+                particles.forEach((particle, index) => {
+                    const x = Math.sin(time + index * 0.5) * 50;
+                    const y = Math.cos(time + index * 0.7) * 30;
+                    const opacity = 0.05 + Math.sin(time + index) * 0.05;
+                    const scale = 0.8 + Math.sin(time + index * 0.3) * 0.2;
+
+                    particle.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+                    particle.style.opacity = opacity;
                 });
-                for (let i = 0; i < val; i++) {
-                    stars[i].classList.remove('bi-star');
-                    stars[i].classList.add('bi-star-fill');
+
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+
+            // Load animations
+            setTimeout(() => {
+                document.querySelector('.hero-section').classList.add('loaded');
+            }, 100);
+
+            setTimeout(() => {
+                document.querySelector('.form-container').classList.add('loaded');
+            }, 400);
+
+            // Staggered form group animations
+            const formGroups = document.querySelectorAll('.form-group');
+            formGroups.forEach((group, index) => {
+                setTimeout(() => {
+                    group.classList.add('loaded');
+                }, 800 + (index * 150));
+            });
+
+            // Enhanced form interactions
+            const formInputs = document.querySelectorAll('.form-control-enhanced');
+            formInputs.forEach(input => {
+                const formGroup = input.closest('.form-group');
+
+                function updateLabel() {
+                    if (input.value.trim() !== '') {
+                        formGroup.classList.add('has-value');
+                    } else {
+                        formGroup.classList.remove('has-value');
+                    }
+                }
+
+                // Initial check
+                updateLabel();
+
+                input.addEventListener('focus', function() {
+                    formGroup.classList.add('focused');
+                });
+
+                input.addEventListener('blur', function() {
+                    formGroup.classList.remove('focused');
+                    updateLabel();
+                });
+
+                input.addEventListener('input', updateLabel);
+            });
+
+            // Star Rating System with Enhanced Effects
+            const stars = document.querySelectorAll('#starRating .star');
+            const ratingValue = document.getElementById('ratingValue');
+            const ratingDisplay = document.getElementById('ratingDisplay');
+            let currentRating = 0;
+
+            const ratingMessages = [
+                'Click a star to rate',
+                '😞 Poor - We need to improve',
+                '😐 Fair - Could be better',
+                '😊 Good - Thanks for the feedback',
+                '😃 Great - We\'re glad you enjoyed it',
+                '🌟 Excellent - You made our day!'
+            ];
+
+            stars.forEach((star, index) => {
+                star.addEventListener('mouseenter', function() {
+                    const hoverRating = index + 1;
+                    highlightStars(hoverRating);
+                    updateRatingDisplay(hoverRating, true);
+                });
+
+                star.addEventListener('mouseleave', function() {
+                    highlightStars(currentRating);
+                    updateRatingDisplay(currentRating, false);
+                });
+
+                star.addEventListener('click', function() {
+                    currentRating = index + 1;
+                    ratingValue.value = currentRating;
+                    highlightStars(currentRating);
+                    updateRatingDisplay(currentRating, false);
+
+                    // Celebration effect
+                    createStarBurst(star);
+                    updateFormProgress();
+                });
+            });
+
+            function highlightStars(rating) {
+                stars.forEach((star, index) => {
+                    if (index < rating) {
+                        star.classList.remove('bi-star');
+                        star.classList.add('bi-star-fill', 'filled');
+                    } else {
+                        star.classList.remove('bi-star-fill', 'filled');
+                        star.classList.add('bi-star');
+                    }
+                });
+            }
+
+            function updateRatingDisplay(rating, isHover) {
+                ratingDisplay.textContent = ratingMessages[rating];
+                ratingDisplay.classList.add('show');
+
+                if (rating > 0 && !isHover) {
+                    ratingDisplay.style.color = rating >= 4 ? '#10b981' : rating >= 3 ? '#f59e0b' : '#ef4444';
+                } else {
+                    ratingDisplay.style.color = 'rgba(230, 237, 243, 0.7)';
+                }
+            }
+
+            function createStarBurst(clickedStar) {
+                const rect = clickedStar.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                for (let i = 0; i < 8; i++) {
+                    const burst = document.createElement('div');
+                    burst.innerHTML = '✨';
+                    burst.style.position = 'fixed';
+                    burst.style.left = centerX + 'px';
+                    burst.style.top = centerY + 'px';
+                    burst.style.fontSize = '1rem';
+                    burst.style.color = '#fbbf24';
+                    burst.style.pointerEvents = 'none';
+                    burst.style.zIndex = '9999';
+                    burst.style.transition = 'all 0.8s ease-out';
+
+                    document.body.appendChild(burst);
+
+                    setTimeout(() => {
+                        const angle = (i * 45) * (Math.PI / 180);
+                        const distance = 100;
+                        const x = Math.cos(angle) * distance;
+                        const y = Math.sin(angle) * distance;
+
+                        burst.style.transform = `translate(${x}px, ${y}px) scale(0)`;
+                        burst.style.opacity = '0';
+                    }, 50);
+
+                    setTimeout(() => {
+                        if (burst.parentNode) {
+                            burst.remove();
+                        }
+                    }, 850);
+                }
+            }
+
+            // Form Progress Bar
+            function updateFormProgress() {
+                const form = document.getElementById('reviewForm');
+                const formData = new FormData(form);
+                const progressBar = document.getElementById('progressBar');
+                let filledFields = 0;
+                let totalFields = 4; // ServiceId, CustomerId, Rating, Comments
+
+                // Check each field
+                if (formData.get('ServiceId')?.trim()) filledFields++;
+                if (formData.get('CustomerId')?.trim()) filledFields++;
+                if (formData.get('Rating')) filledFields++;
+                if (formData.get('Comments')?.trim()) filledFields++;
+
+                const progress = (filledFields / totalFields) * 100;
+                progressBar.style.width = progress + '%';
+            }
+
+            // Update progress on input
+            formInputs.forEach(input => {
+                input.addEventListener('input', updateFormProgress);
+            });
+
+            // Parallax effect for orbs
+            document.addEventListener('mousemove', function(e) {
+                const orbs = document.querySelectorAll('.orb');
+                const mouseX = e.clientX / window.innerWidth;
+                const mouseY = e.clientY / window.innerHeight;
+
+                orbs.forEach((orb, index) => {
+                    const speed = (index + 1) * 20;
+                    const x = mouseX * speed;
+                    const y = mouseY * speed;
+                    const scale = 1 + mouseX * 0.1;
+
+                    orb.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
+                    orb.style.opacity = 0.12 + mouseY * 0.05;
+                });
+            });
+
+            // Dynamic gradient for cosmic title
+            const cosmicTitle = document.querySelector('.cosmic-title');
+            let gradientAngle = 135;
+
+            function updateCosmicGradient() {
+                gradientAngle += 0.5;
+                if (gradientAngle >= 360) gradientAngle = 0;
+
+                cosmicTitle.style.background = `linear-gradient(${gradientAngle}deg, #8b5cf6, #a855f7, #c084fc, #ddd6fe)`;
+                cosmicTitle.style.backgroundSize = '300% 300%';
+                cosmicTitle.style.webkitBackgroundClip = 'text';
+                cosmicTitle.style.webkitTextFillColor = 'transparent';
+                cosmicTitle.style.backgroundClip = 'text';
+
+                requestAnimationFrame(updateCosmicGradient);
+            }
+            updateCosmicGradient();
+
+            // Enhanced button ripple effects
+            const buttons = document.querySelectorAll('.btn-cosmic');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    const ripple = document.createElement('span');
+                    const rect = this.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size / 2;
+                    const y = e.clientY - rect.top - size / 2;
+
+                    ripple.style.width = ripple.style.height = size + 'px';
+                    ripple.style.left = x + 'px';
+                    ripple.style.top = y + 'px';
+                    ripple.style.position = 'absolute';
+                    ripple.style.borderRadius = '50%';
+                    ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                    ripple.style.transform = 'scale(0)';
+                    ripple.style.pointerEvents = 'none';
+                    ripple.style.transition = 'transform 0.6s ease-out, opacity 0.6s ease-out';
+                    ripple.style.opacity = '1';
+
+                    this.style.position = 'relative';
+                    this.style.overflow = 'hidden';
+                    this.appendChild(ripple);
+
+                    setTimeout(() => {
+                        ripple.style.transform = 'scale(4)';
+                        ripple.style.opacity = '0';
+                    }, 10);
+
+                    setTimeout(() => {
+                        if (ripple.parentNode) {
+                            ripple.remove();
+                        }
+                    }, 600);
+                });
+            });
+
+            // Form submission handling
+            const form = document.getElementById('reviewForm');
+            form.addEventListener('submit', function(e) {
+                //e.preventDefault();
+
+                // Simple validation
+                let isValid = true;
+                const serviceId = document.querySelector('[name="ServiceId"]').value;
+                const customerId = document.querySelector('[name="CustomerId"]').value;
+                const rating = document.querySelector('[name="Rating"]').value;
+                const comments = document.querySelector('[name="Comments"]').value;
+
+                // Clear previous errors
+                document.querySelectorAll('.validation-error').forEach(error => {
+                    error.textContent = '';
+                    error.classList.remove('show');
+                });
+
+                // Validate Service ID
+                if (!serviceId.trim()) {
+                    showError('[name="ServiceId"]', 'Service ID is required');
+                    isValid = false;
+                }
+
+                // Validate Customer ID
+                if (!customerId.trim()) {
+                    showError('[name="CustomerId"]', 'Customer ID is required');
+                    isValid = false;
+                }
+
+                // Validate Rating
+                if (!rating) {
+                    const ratingError = document.querySelector('.rating-section').parentNode.querySelector('.validation-error');
+                    ratingError.textContent = 'Please select a rating';
+                    ratingError.classList.add('show');
+                    isValid = false;
+                }
+
+                // Validate Comments
+                if (!comments.trim()) {
+                    showError('[name="Comments"]', 'Comments are required');
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    // Show success animation
+                    showSuccessAnimation();
                 }
             });
+
+            function showError(selector, message) {
+                const field = document.querySelector(selector);
+                const errorElement = field.parentNode.querySelector('.validation-error');
+                errorElement.textContent = message;
+                errorElement.classList.add('show');
+            }
+
+            function showSuccessAnimation() {
+                const submitBtn = document.querySelector('.btn-save');
+                const originalText = submitBtn.innerHTML;
+
+                submitBtn.innerHTML = '<i class="bi bi-check-circle btn-icon"></i><span>Review Submitted!</span>';
+                submitBtn.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+
+                // Create celebration effect
+                createCelebrationEffect();
+
+                setTimeout(() => {
+                    submitBtn.innerHTML = originalText;
+                }, 3000);
+            }
+
+            function createCelebrationEffect() {
+                for (let i = 0; i < 20; i++) {
+                    const confetti = document.createElement('div');
+                    confetti.innerHTML = ['🎉', '✨', '🌟', '🎊'][Math.floor(Math.random() * 4)];
+                    confetti.style.position = 'fixed';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.top = '-20px';
+                    confetti.style.fontSize = Math.random() * 20 + 15 + 'px';
+                    confetti.style.pointerEvents = 'none';
+                    confetti.style.zIndex = '9999';
+                    confetti.style.transition = 'all 3s ease-out';
+
+                    document.body.appendChild(confetti);
+
+                    setTimeout(() => {
+                        confetti.style.transform = `translateY(${window.innerHeight + 100}px) rotate(${Math.random() * 360}deg)`;
+                        confetti.style.opacity = '0';
+                    }, 100);
+
+                    setTimeout(() => {
+                        if (confetti.parentNode) {
+                            confetti.remove();
+                        }
+                    }, 3100);
+                }
+            }
+
+            // Initialize form progress
+            updateFormProgress();
         });
     </script>
-}
+</body>
+</html>

@@ -66,23 +66,20 @@ namespace Motorak.PLL.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var (status, message, service) = await _serviceService.GetServiceByIdAsync(id);
-            if (!status || service == null)
-            {
-                ViewBag.ErrorMessage = message;
-                return View("Error"); // أو RedirectToAction("Index")
-            }
 
-            var updateVM = new UpdateServiceVM
+            if (!status || service == null)
+                return NotFound(message);
+
+
+            var model = new UpdateServiceVM
             {
-                //MechanicId = service.Mechanic?.Id,
-                ServiceType = service.ServiceType,
+                ServiceId = service.ServiceId, 
+                RequestDate = service.CreatedDate,
                 Status = service.Status,
-               // CustomerId = service.Customer?.Id,  // استخدام null-safe operator
-                //CarId = service.Car?.Id
+                ServiceType = service.ServiceType
             };
 
-
-            return View(updateVM);
+            return View(model);
         }
 
         [HttpPost]
@@ -105,25 +102,21 @@ namespace Motorak.PLL.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var (status, message, service) = await _serviceService.GetServiceByIdAsync(id);
-            if (!status || service == null)
-            {
-                ViewBag.ErrorMessage = message;
-                return View("Error");
-            }
+            if (!status || service == null) return NotFound(message);
             return View(service);
         }
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int serviceId)
         {
-            var (status, message) = await _serviceService.DeleteServiceAsync(id);
-            if (!status)
-            {
-                ViewBag.ErrorMessage = message;
-                return View("Error");
-            }
-            return RedirectToAction(nameof(Index));
+            var (status, message) = await _serviceService.DeleteServiceAsync(serviceId);
+            if (status)
+                return RedirectToAction(nameof(Index));
+
+            ViewBag.Error = message;
+            return RedirectToAction(nameof(Delete), new { id = serviceId });
         }
+
     }
 }

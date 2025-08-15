@@ -1,64 +1,602 @@
 ﻿@using Motorak.BLL.ModelVM.Service
 @using Motorak.DAL.Enums.SeviceEnums
 @model ServiceDTO
-
 @{
     ViewData["Title"] = "Service Details";
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<div class="container mt-5">
-    <h1 class="mb-4 text-primary">Service Details - ID @Model.ServiceId</h1>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-info text-white">
+    body {
+        background: linear-gradient(135deg, #0d0d1f 0%, #0f1629 25%, #0a1f3a 50%, #2d1b4e 75%, #4a2c70 100%);
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+        color: #ffffff;
+        overflow-x: hidden;
+        position: relative;
+    }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 80%, rgba(80, 79, 140, 0.2) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(180, 79, 140, 0.2) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(80, 79, 140, 0.15) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.1), transparent), radial-gradient(2px 2px at 40px 70px, rgba(139, 95, 191, 0.2), transparent), radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.15), transparent), radial-gradient(1px 1px at 130px 80px, rgba(139, 95, 191, 0.1), transparent);
+            background-size: 200px 100px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+    .main-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+    }
+
+    .details-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(25px) saturate(180%);
+        border: 2px solid;
+        border-image: linear-gradient(45deg, rgba(139, 95, 191, 0.6), rgba(100, 70, 150, 0.4), rgba(75, 60, 180, 0.6)) 1;
+        border-radius: 24px;
+        padding: 0;
+        max-width: 800px;
+        width: 100%;
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(100, 70, 150, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1), inset 0 -1px 0 rgba(0, 0, 0, 0.2);
+        position: relative;
+        overflow: hidden;
+        transform: perspective(1000px) rotateX(0deg) translateY(50px) scale(0.9);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        opacity: 0;
+    }
+
+        .details-card.loaded {
+            transform: perspective(1000px) rotateX(0deg) translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .details-card:hover {
+            transform: perspective(1000px) rotateX(2deg) translateY(-10px);
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.8), 0 0 60px rgba(100, 70, 150, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.2), inset 0 -2px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .details-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(from 0deg, transparent, rgba(139, 95, 191, 0.1), transparent, rgba(100, 70, 150, 0.05), transparent);
+            z-index: -1;
+            opacity: 0.6;
+        }
+
+        .details-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 20%, transparent 80%, rgba(139, 95, 191, 0.05) 100%);
+            border-radius: 24px;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+    .page-title {
+        text-align: center;
+        margin-bottom: 0;
+        padding: 2rem 3rem;
+        font-weight: 700;
+        font-size: 2.5rem;
+        background: linear-gradient(135deg, #d946b8, #9333ea, #6b46c1, #4338ca);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        text-shadow: 0 0 30px rgba(100, 70, 150, 0.5);
+        position: relative;
+        filter: drop-shadow(0 4px 8px rgba(147, 51, 234, 0.3));
+        transition: all 0.3s ease;
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+
+        .page-title.loaded {
+            transform: translateY(0);
+            opacity: 1;
+            transition-delay: 0.3s;
+        }
+
+        .page-title:hover {
+            transform: scale(1.05);
+            filter: drop-shadow(0 8px 16px rgba(147, 51, 234, 0.5));
+        }
+
+        .page-title::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        .page-title:hover::before {
+            transform: scale(1.2);
+            background: radial-gradient(ellipse at center, rgba(147, 51, 234, 0.2) 0%, transparent 70%);
+        }
+
+    .card-header {
+        background: linear-gradient(135deg, rgba(100, 70, 150, 0.8), rgba(75, 60, 180, 0.8));
+        border: none;
+        padding: 1.5rem 3rem;
+        font-size: 1.3rem;
+        font-weight: 600;
+        text-align: center;
+        color: white;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border-top-left-radius: 22px;
+        border-top-right-radius: 22px;
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+        .card-header.loaded {
+            transform: translateX(0);
+            opacity: 1;
+            transition-delay: 0.5s;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 2s ease;
+        }
+
+        .card-header:hover::before {
+            left: 100%;
+        }
+
+    .card-body {
+        padding: 3rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .details-list {
+        margin: 0;
+    }
+
+    .detail-row {
+        display: flex;
+        align-items: center;
+        padding: 1rem 0;
+        border-bottom: 1px solid rgba(100, 70, 150, 0.2);
+        transition: all 0.3s ease;
+        position: relative;
+        transform: translateX(100px);
+        opacity: 0;
+    }
+
+        .detail-row.loaded {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .detail-row:nth-child(1).loaded {
+            transition-delay: 0.7s;
+        }
+
+        .detail-row:nth-child(2).loaded {
+            transition-delay: 0.9s;
+        }
+
+        .detail-row:nth-child(3).loaded {
+            transition-delay: 1.1s;
+        }
+
+        .detail-row:nth-child(4).loaded {
+            transition-delay: 1.3s;
+        }
+
+        .detail-row::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 0;
+            height: 1px;
+            background: linear-gradient(90deg, #9333ea, #6b46c1);
+            transition: width 0.4s ease;
+        }
+
+        .detail-row:hover::before {
+            width: 100%;
+        }
+
+        .detail-row:hover {
+            transform: translateX(10px);
+            color: #e2e8f0;
+            border-bottom-color: rgba(139, 95, 191, 0.4);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+    .detail-label {
+        font-weight: 600;
+        color: #c1c1c1;
+        min-width: 140px;
+        margin-right: 2rem;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .detail-row:hover .detail-label {
+        color: #9333ea;
+        text-shadow: 0 0 10px rgba(147, 51, 234, 0.5);
+    }
+
+    .detail-value {
+        flex: 1;
+        font-size: 1.1rem;
+        font-weight: 500;
+    }
+
+    .service-id-value {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #9333ea;
+        text-shadow: 0 0 15px rgba(147, 51, 234, 0.4);
+        transition: all 0.3s ease;
+    }
+
+        .service-id-value:hover {
+            color: #a855f7;
+            text-shadow: 0 0 25px rgba(168, 85, 247, 0.7);
+            transform: scale(1.05);
+        }
+
+    .status-badge {
+        padding: 0.6rem 1.2rem;
+        border-radius: 25px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-block;
+    }
+
+        .status-badge::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            opacity: 0;
+        }
+
+        .status-badge:hover::before {
+            opacity: 1;
+            transform: rotate(45deg) translate(50%, 50%);
+        }
+
+        .status-badge:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+    .status-pending {
+        background: linear-gradient(135deg, #f39c12, #f1c40f);
+        color: #2c3e50;
+    }
+
+    .status-completed {
+        background: linear-gradient(135deg, #27ae60, #2ecc71);
+        color: white;
+    }
+
+    .status-cancelled {
+        background: linear-gradient(135deg, #e74c3c, #c0392b);
+        color: white;
+    }
+
+    .status-unknown {
+        background: linear-gradient(135deg, #95a5a6, #7f8c8d);
+        color: white;
+    }
+
+    .card-footer {
+        background: linear-gradient(135deg, rgba(50, 35, 80, 0.5), rgba(40, 30, 70, 0.5));
+        border: none;
+        padding: 2rem 3rem;
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        border-bottom-left-radius: 22px;
+        border-bottom-right-radius: 22px;
+        transform: translateY(50px);
+        opacity: 0;
+        transition: all 0.5s ease;
+    }
+
+        .card-footer.loaded {
+            transform: translateY(0);
+            opacity: 1;
+            transition-delay: 1.5s;
+        }
+
+    .btn-back {
+        background: linear-gradient(135deg, rgba(100, 70, 150, 0.7), rgba(75, 60, 180, 0.7));
+        border: 2px solid rgba(100, 70, 150, 0.4);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 25px rgba(100, 70, 150, 0.3);
+        position: relative;
+        overflow: hidden;
+        transform: perspective(1000px) rotateY(0deg);
+    }
+
+        .btn-back::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s ease;
+            transform: skewX(-25deg);
+        }
+
+        .btn-back::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: linear-gradient(135deg, rgba(100, 70, 150, 0.7), rgba(75, 60, 180, 0.7));
+            border-radius: 13px;
+            z-index: -1;
+        }
+
+        .btn-back:hover::before {
+            left: 100%;
+        }
+
+        .btn-back:hover {
+            transform: perspective(1000px) rotateY(-5deg) translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(100, 70, 150, 0.5), 0 0 30px rgba(100, 70, 150, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+            border-color: rgba(139, 95, 191, 0.6);
+        }
+
+        .btn-back:active {
+            transform: perspective(1000px) rotateY(-2deg) translateY(-2px) scale(1.02);
+        }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #9333ea, #7c3aed, #6b46c1);
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 15px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 25px rgba(147, 51, 234, 0.4);
+        position: relative;
+        overflow: hidden;
+        transform: perspective(1000px) rotateY(0deg);
+        text-decoration: none;
+    }
+
+        .btn-edit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+            transform: skewX(-25deg);
+        }
+
+        .btn-edit::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: linear-gradient(135deg, #9333ea, #7c3aed, #6b46c1);
+            border-radius: 13px;
+            z-index: -1;
+            transition: all 0.3s ease;
+        }
+
+        .btn-edit:hover::before {
+            left: 100%;
+        }
+
+        .btn-edit:hover {
+            transform: perspective(1000px) rotateY(5deg) translateY(-5px) scale(1.05);
+            box-shadow: 0 20px 50px rgba(147, 51, 234, 0.6), 0 0 30px rgba(147, 51, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-edit:active {
+            transform: perspective(1000px) rotateY(2deg) translateY(-2px) scale(1.02);
+        }
+
+    .btn i {
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
+</style>
+
+<div class="main-container">
+    <div class="details-card">
+        <h1 class="page-title">
+            <i class="bi bi-info-circle-fill"></i>
+            Service Details
+        </h1>
+
+        <div class="card-header">
+            <i class="bi bi-gear-fill"></i>
             Service Information
         </div>
+
         <div class="card-body">
-            <dl class="row">
-                <dt class="col-sm-3">ID</dt>
-                <dd class="col-sm-9">@Model.ServiceId</dd>
+            <dl class="details-list">
+                <div class="detail-row">
+                    <dt class="detail-label">
+                        <i class="bi bi-hash"></i>
+                        Service ID
+                    </dt>
+                    <dd class="detail-value service-id-value">@Model.ServiceId</dd>
+                </div>
 
-                <dt class="col-sm-3">MechanicId</dt>
-                <dd class="col-sm-9">@Model.MechanicId</dd>
+                <div class="detail-row">
+                    <dt class="detail-label">
+                        <i class="bi bi-person-gear"></i>
+                        Mechanic ID
+                    </dt>
+                    <dd class="detail-value">@Model.MechanicId</dd>
+                </div>
 
-                <dt class="col-sm-3">Status:</dt>
-                <dd class="col-sm-9">
-                    @switch (Model.Status)
-                    {
-                        case Status.Pending:
-                            <span class="badge bg-warning text-dark">Pending</span>
-                            ;
-                            break;
-                        case Status.completed:
-                            <span class="badge bg-success">Completed</span>
-                            ;
-                            break;
-                        case Status.cancelled:
-                            <span class="badge bg-danger">Cancelled</span>
-                            ;
-                            break;
-                        default:
-                            <span class="badge bg-secondary">Unknown</span>
-                            ;
-                            break;
-                    }
-                </dd>
+                <div class="detail-row">
+                    <dt class="detail-label">
+                        <i class="bi bi-flag-fill"></i>
+                        Status
+                    </dt>
+                    <dd class="detail-value">
+                        @switch (Model.Status)
+                        {
+                            case Status.Pending:
+                                <span class="status-badge status-pending">
+                                    <i class="bi bi-clock-fill"></i> Pending
+                                </span>
+                                break;
+                            case Status.completed:
+                                <span class="status-badge status-completed">
+                                    <i class="bi bi-check-circle-fill"></i> Completed
+                                </span>
+                                break;
+                            case Status.cancelled:
+                                <span class="status-badge status-cancelled">
+                                    <i class="bi bi-x-circle-fill"></i> Cancelled
+                                </span>
+                                break;
+                            default:
+                                <span class="status-badge status-unknown">
+                                    <i class="bi bi-question-circle-fill"></i> Unknown
+                                </span>
+                                break;
+                        }
+                    </dd>
+                </div>
 
-                <dt class="col-sm-3">Created Date:</dt>
-                <dd class="col-sm-9">@Model.CreatedDate.ToString("yyyy-MM-dd")</dd>
+                <div class="detail-row">
+                    <dt class="detail-label">
+                        <i class="bi bi-calendar-event"></i>
+                        Created Date
+                    </dt>
+                    <dd class="detail-value">@Model.CreatedDate.ToString("yyyy-MM-dd")</dd>
+                </div>
             </dl>
         </div>
 
         <div class="card-footer">
-            <a href="@Url.Action("Index")" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back to List
+            <a href="@Url.Action("Index")" class="btn-back">
+                <i class="bi bi-arrow-left"></i>
+                Back to List
             </a>
-            <a href="@Url.Action("Edit", new { id = Model.ServiceId })" class="btn btn-primary">
-                <i class="bi bi-pencil-square"></i> Edit Service
+            <a href="@Url.Action("Edit", new { id = Model.ServiceId })" class="btn-edit">
+                <i class="bi bi-pencil-square"></i>
+                Edit Service
             </a>
         </div>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+            const detailsCard = document.querySelector('.details-card');
+            if (detailsCard) {
+                detailsCard.classList.add('loaded');
+            }
+
+            const pageTitle = document.querySelector('.page-title');
+            if (pageTitle) {
+                pageTitle.classList.add('loaded');
+            }
+
+            const cardHeader = document.querySelector('.card-header');
+            if (cardHeader) {
+                cardHeader.classList.add('loaded');
+            }
+
+            const detailRows = document.querySelectorAll('.detail-row');
+            detailRows.forEach(function(row) {
+                row.classList.add('loaded');
+            });
+
+            const cardFooter = document.querySelector('.card-footer');
+            if (cardFooter) {
+                cardFooter.classList.add('loaded');
+            }
+        }, 100);
+    });
+</script>

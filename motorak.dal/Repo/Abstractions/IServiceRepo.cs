@@ -17,8 +17,8 @@ namespace Motorak.DAL.Repo.Abstractions
         Task<List<Service>> GetByCarIdAsync(int carId);
 
         Task CreateAsync(Service service);
-        void Update(Service service);
-        void Delete(Service service);
+        Task Update(Service service);
+        Task Delete(Service service);
         Task<int> SaveChangesAsync();
     }
 }

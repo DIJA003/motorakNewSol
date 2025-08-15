@@ -1,80 +1,778 @@
 ﻿@using Motorak.BLL.ModelVM.ServiceReview
 @model List<ServiceReviewDTO>
-
 @{
     ViewBag.Title = "Service Reviews";
 }
 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0d1117 0%, #161b22 25%, #21262d 50%, #30363d 75%, #1a1d29 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', 'SF Pro Display', -apple-system, system-ui, sans-serif;
+        overflow-x: hidden;
+        color: #e6edf3;
+        position: relative;
+    }
+
+    .particles-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+        overflow: hidden;
+    }
+
+    .particle {
+        position: absolute;
+        background: linear-gradient(45deg, #8b5cf6, #a855f7);
+        border-radius: 50%;
+        opacity: 0.1;
+        filter: blur(1px);
+        transition: all 3s ease-in-out;
+    }
+
+    .hero-container {
+        transform: translateY(30px);
+        opacity: 0;
+        transition: all 1.2s cubic-bezier(0.23, 1, 0.320, 1);
+    }
+
+        .hero-container.loaded {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+    .hero-title {
+        background: linear-gradient(135deg, #8b5cf6, #a855f7, #c084fc, #ddd6fe);
+        background-size: 300% 300%;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-weight: 900;
+        font-size: 3.5rem;
+        letter-spacing: -2px;
+        text-shadow: 0 0 30px rgba(139, 92, 246, 0.3);
+        position: relative;
+        transition: all 0.5s ease;
+    }
+
+        .hero-title:hover {
+            transform: scale(1.05);
+            filter: brightness(1.2);
+        }
+
+    .hero-subtitle {
+        color: rgba(230, 237, 243, 0.7);
+        font-size: 1.2rem;
+        font-weight: 400;
+        margin-top: 1rem;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 1s ease-out;
+    }
+
+        .hero-subtitle.loaded {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+    .controls-section {
+        margin-bottom: 2rem;
+        transform: translateY(20px);
+        opacity: 0;
+        transition: all 0.8s ease-out;
+    }
+
+        .controls-section.loaded {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+    .btn-add-review {
+        background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        border: none;
+        border-radius: 50px;
+        color: white;
+        font-weight: 600;
+        padding: 15px 30px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        box-shadow: 0 10px 25px rgba(139, 92, 246, 0.3);
+        font-size: 1.1rem;
+    }
+
+        .btn-add-review::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .btn-add-review:hover {
+            transform: translateY(-5px) scale(1.08);
+            box-shadow: 0 20px 40px rgba(139, 92, 246, 0.5);
+            color: white;
+            text-decoration: none;
+        }
+
+            .btn-add-review:hover::before {
+                left: 100%;
+            }
+
+    .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .review-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(25px);
+        border: 1px solid rgba(139, 92, 246, 0.2);
+        border-radius: 24px;
+        padding: 2rem;
+        position: relative;
+        overflow: hidden;
+        transform: translateY(30px) scale(0.95);
+        opacity: 0;
+        transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+
+        .review-card.loaded {
+            transform: translateY(0) scale(1);
+            opacity: 1;
+        }
+
+        .review-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+            transition: left 2s ease;
+            pointer-events: none;
+        }
+
+        .review-card:hover::before {
+            left: 100%;
+        }
+
+        .review-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(139, 92, 246, 0.2);
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+    .review-header {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    .review-id {
+        background: linear-gradient(135deg, #8b5cf6, #a855f7);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        display: inline-block;
+        box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        transition: all 0.3s ease;
+    }
+
+        .review-id:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 18px rgba(139, 92, 246, 0.4);
+        }
+
+    .service-id {
+        color: rgba(230, 237, 243, 0.7);
+        font-size: 0.95rem;
+        background: rgba(255, 255, 255, 0.05);
+        padding: 6px 12px;
+        border-radius: 15px;
+        margin-left: auto;
+    }
+
+    .rating-section {
+        margin: 1.5rem 0;
+        text-align: center;
+    }
+
+    .rating-stars {
+        display: flex;
+        justify-content: center;
+        gap: 4px;
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .star-filled {
+        color: #fbbf24;
+        text-shadow: 0 0 15px rgba(251, 191, 36, 0.6);
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .star-filled:hover {
+            transform: scale(1.3) rotate(15deg);
+            color: #fcd34d;
+            text-shadow: 0 0 20px rgba(252, 211, 77, 0.8);
+        }
+
+    .star-empty {
+        color: #6b7280;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .star-empty:hover {
+            color: #9ca3af;
+            transform: scale(1.1);
+        }
+
+    .rating-text {
+        color: rgba(230, 237, 243, 0.8);
+        font-size: 0.9rem;
+        font-weight: 500;
+    }
+
+    .comment-section {
+        margin: 1.5rem 0;
+    }
+
+    .comment-label {
+        color: #a855f7;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+
+    .comment-text {
+        background: rgba(139, 92, 246, 0.08);
+        padding: 1rem 1.2rem;
+        border-radius: 16px;
+        border-left: 4px solid #a855f7;
+        color: #e6edf3;
+        font-style: italic;
+        line-height: 1.6;
+        position: relative;
+        transition: all 0.3s ease;
+        min-height: 60px;
+    }
+
+        .comment-text:hover {
+            background: rgba(139, 92, 246, 0.12);
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.1);
+        }
+
+        .comment-text::before {
+            content: '"';
+            position: absolute;
+            top: -5px;
+            left: 10px;
+            font-size: 2rem;
+            color: #a855f7;
+            opacity: 0.5;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(139, 92, 246, 0.1);
+    }
+
+    .btn-action {
+        border: none;
+        border-radius: 50px;
+        padding: 12px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+        font-weight: 600;
+        font-size: 0.9rem;
+        min-width: 45px;
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, #06b6d4, #0891b2);
+        color: white;
+        box-shadow: 0 6px 20px rgba(6, 182, 212, 0.3);
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        color: white;
+        box-shadow: 0 6px 20px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        box-shadow: 0 6px 20px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-action:hover {
+        transform: translateY(-4px) scale(1.1);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-view:hover {
+        box-shadow: 0 12px 30px rgba(6, 182, 212, 0.5);
+        background: linear-gradient(135deg, #0891b2, #06b6d4);
+    }
+
+    .btn-edit:hover {
+        box-shadow: 0 12px 30px rgba(245, 158, 11, 0.5);
+        background: linear-gradient(135deg, #d97706, #f59e0b);
+    }
+
+    .btn-delete:hover {
+        box-shadow: 0 12px 30px rgba(239, 68, 68, 0.5);
+        background: linear-gradient(135deg, #dc2626, #ef4444);
+    }
+
+    .btn-action::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.6s ease;
+    }
+
+    .btn-action:hover::before {
+        left: 100%;
+    }
+
+    .no-reviews {
+        text-align: center;
+        padding: 4rem 2rem;
+        grid-column: 1 / -1;
+        background: rgba(255, 255, 255, 0.02);
+        backdrop-filter: blur(15px);
+        border: 2px dashed rgba(139, 92, 246, 0.3);
+        border-radius: 24px;
+        transform: scale(0.95);
+        opacity: 0;
+        transition: all 0.8s ease;
+    }
+
+        .no-reviews.loaded {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+    .no-reviews-icon {
+        font-size: 4rem;
+        color: rgba(139, 92, 246, 0.4);
+        margin-bottom: 1rem;
+        display: block;
+        transition: all 0.5s ease;
+    }
+
+    .no-reviews:hover .no-reviews-icon {
+        transform: scale(1.2) rotate(10deg);
+        color: rgba(139, 92, 246, 0.6);
+    }
+
+    .no-reviews-text {
+        color: rgba(230, 237, 243, 0.7);
+        font-style: italic;
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .no-reviews-subtitle {
+        color: rgba(230, 237, 243, 0.5);
+        font-size: 1rem;
+    }
+
+    .floating-orbs {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: -1;
+    }
+
+    .orb {
+        position: absolute;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent);
+        filter: blur(2px);
+        transition: all 2s ease-in-out;
+    }
+
+        .orb:nth-child(1) {
+            width: 150px;
+            height: 150px;
+            top: 15%;
+            left: 10%;
+        }
+
+        .orb:nth-child(2) {
+            width: 120px;
+            height: 120px;
+            top: 60%;
+            right: 15%;
+        }
+
+        .orb:nth-child(3) {
+            width: 100px;
+            height: 100px;
+            bottom: 20%;
+            left: 20%;
+        }
+
+    .stats-badge {
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.8rem;
+        font-weight: bold;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        transition: all 0.3s ease;
+    }
+
+        .stats-badge:hover {
+            transform: scale(1.2);
+            box-shadow: 0 6px 18px rgba(239, 68, 68, 0.6);
+        }
+
+</style>
+
+<!-- Floating Orbs Background -->
+<div class="floating-orbs">
+    <div class="orb"></div>
+    <div class="orb"></div>
+    <div class="orb"></div>
+</div>
+
+<!-- Particles Container -->
+<div class="particles-container" id="particles"></div>
 
 <div class="container py-5">
-    <div class="text-center mb-4">
-        <h2 class="text-primary fw-bold">Service Reviews</h2>
-        <p class="text-muted">Browse and manage all customer service reviews</p>
+    <div class="text-center mb-5 hero-container">
+        <h2 class="hero-title">✨ Service Reviews Galaxy ✨</h2>
+        <p class="hero-subtitle">Explore the universe of customer feedback and reviews</p>
     </div>
 
-    <div class="card shadow-lg">
-        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-            <span><i class="bi bi-list-stars"></i> Reviews List</span>
-            <a asp-action="Create" class="btn btn-light btn-sm">
-                <i class="bi bi-plus-circle"></i> Add Review
-            </a>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover table-bordered align-middle text-center">
-                    <thead class="table-primary">
-                        <tr>
-                            <th>Review ID</th>
-                            <th>Service ID</th>
-                            <th>Rating</th>
-                            <th>Comment</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var review in Model)
-                        {
-                            <tr>
-                                <td>@review.ReviewId</td>
-                                <td>@review.ServiceId</td>
-                                <td>
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        if (i <= review.Rating)
-                                        {
-                                            <i class="bi bi-star-fill text-warning"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="bi bi-star text-warning"></i>
-                                        }
-                                    }
-                                </td>
-                                <td style="white-space: normal; word-break: break-word;">@review.Comments</td>
-                                <td>
-                                    <a asp-action="Details" asp-route-id="@review.ReviewId" class="btn btn-info btn-sm me-1">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                    <a asp-action="Edit" asp-route-id="@review.ReviewId" class="btn btn-warning btn-sm me-1">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a asp-action="Delete" asp-route-id="@review.ReviewId" class="btn btn-danger btn-sm">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="5" class="text-muted">No reviews found</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
+    <div class="controls-section text-center">
+        <a asp-action="Create" class="btn-add-review">
+            <i class="bi bi-plus-circle"></i>
+            <span>Create New Review</span>
+        </a>
+    </div>
+
+    <div class="reviews-grid">
+        @if (Model.Any())
+        {
+            @for (int index = 0; index < Model.Count; index++)
+            {
+                var review = Model[index];
+                <div class="review-card" data-index="@index">
+                    <div class="stats-badge">@review.Rating</div>
+
+                    <div class="review-header">
+                        <div class="review-id">Review #@review.ReviewId</div>
+                        <div class="service-id">Service: @review.ServiceId</div>
+                    </div>
+
+                    <div class="rating-section">
+                        <div class="rating-stars">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= review.Rating)
+                                {
+                                    <i class="bi bi-star-fill star-filled" data-rating="@i"></i>
+                                }
+                                else
+                                {
+                                    <i class="bi bi-star star-empty" data-rating="@i"></i>
+                                }
+                            }
+                        </div>
+                        <div class="rating-text">@review.Rating out of 5 stars</div>
+                    </div>
+
+                    <div class="comment-section">
+                        <span class="comment-label">Customer Feedback</span>
+                        <div class="comment-text">
+                            @(string.IsNullOrEmpty(review.Comments) ? "No comment provided by the customer." : review.Comments)
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a asp-action="Details" asp-route-id="@review.ReviewId" class="btn-action btn-view" title="View Details">
+                            <i class="bi bi-eye"></i>
+                            <span>View</span>
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@review.ReviewId" class="btn-action btn-edit" title="Edit Review">
+                            <i class="bi bi-pencil"></i>
+                            <span>Edit</span>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@review.ReviewId" class="btn-action btn-delete" title="Delete Review">
+                            <i class="bi bi-trash"></i>
+                            <span>Delete</span>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="no-reviews">
+                <i class="bi bi-stars no-reviews-icon"></i>
+                <div class="no-reviews-text">No reviews in the galaxy yet!</div>
+                <div class="no-reviews-subtitle">Be the first to add a stellar review</div>
             </div>
-        </div>
+        }
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create dynamic particles
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 40;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+
+            const size = Math.random() * 6 + 2;
+            particle.style.width = size + 'px';
+            particle.style.height = size + 'px';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+
+            particlesContainer.appendChild(particle);
+        }
+
+        // Animate particles
+        function animateParticles() {
+            const particles = document.querySelectorAll('.particle');
+            particles.forEach((particle, index) => {
+                const x = Math.sin(Date.now() * 0.001 + index) * 20;
+                const y = Math.cos(Date.now() * 0.0015 + index) * 30;
+                const opacity = 0.1 + Math.sin(Date.now() * 0.002 + index) * 0.05;
+
+                particle.style.transform = `translate(${x}px, ${y}px)`;
+                particle.style.opacity = opacity;
+            });
+
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Load animations
+        setTimeout(() => {
+            document.querySelector('.hero-container').classList.add('loaded');
+        }, 100);
+
+        setTimeout(() => {
+            document.querySelector('.hero-subtitle').classList.add('loaded');
+        }, 400);
+
+        setTimeout(() => {
+            document.querySelector('.controls-section').classList.add('loaded');
+        }, 600);
+
+        // Staggered card animations
+        const reviewCards = document.querySelectorAll('.review-card');
+        reviewCards.forEach((card, index) => {
+            setTimeout(() => {
+                card.classList.add('loaded');
+            }, 800 + (index * 200));
+        });
+
+        // No reviews animation
+        const noReviews = document.querySelector('.no-reviews');
+        if (noReviews) {
+            setTimeout(() => {
+                noReviews.classList.add('loaded');
+            }, 1000);
+        }
+
+        // Enhanced interactions
+        reviewCards.forEach((card, index) => {
+            card.addEventListener('mouseenter', function() {
+                // Slightly lift other cards down
+                reviewCards.forEach((otherCard, otherIndex) => {
+                    if (otherIndex !== index) {
+                        otherCard.style.transform = 'translateY(10px) scale(0.98)';
+                        otherCard.style.opacity = '0.7';
+                    }
+                });
+            });
+
+            card.addEventListener('mouseleave', function() {
+                // Reset all cards
+                reviewCards.forEach(otherCard => {
+                    otherCard.style.transform = '';
+                    otherCard.style.opacity = '';
+                });
+            });
+        });
+
+        // Parallax effect for orbs
+        document.addEventListener('mousemove', function(e) {
+            const orbs = document.querySelectorAll('.orb');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+
+            orbs.forEach((orb, index) => {
+                const speed = (index + 1) * 15;
+                const x = mouseX * speed;
+                const y = mouseY * speed;
+
+                orb.style.transform = `translate(${x}px, ${y}px) scale(${1 + mouseX * 0.1})`;
+                orb.style.opacity = 0.15 + mouseY * 0.05;
+            });
+        });
+
+        // Dynamic gradient background for title
+        const title = document.querySelector('.hero-title');
+        let hue = 250;
+
+        function updateTitleGradient() {
+            hue += 0.5;
+            if (hue >= 360) hue = 0;
+
+            title.style.background = `linear-gradient(135deg,
+                hsl(${hue}, 70%, 65%),
+                hsl(${hue + 20}, 70%, 70%),
+                hsl(${hue + 40}, 70%, 75%),
+                hsl(${hue + 60}, 70%, 85%))`;
+
+            requestAnimationFrame(updateTitleGradient);
+        }
+        updateTitleGradient();
+
+        // Ripple effect for buttons
+        const buttons = document.querySelectorAll('.btn-action, .btn-add-review');
+        buttons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.background = 'rgba(255, 255, 255, 0.5)';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.pointerEvents = 'none';
+                ripple.style.transition = 'transform 0.6s ease-out, opacity 0.6s ease-out';
+                ripple.style.opacity = '1';
+
+                this.style.position = 'relative';
+                this.style.overflow = 'hidden';
+                this.appendChild(ripple);
+
+                setTimeout(() => {
+                    ripple.style.transform = 'scale(4)';
+                    ripple.style.opacity = '0';
+                }, 10);
+
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+
+        // Star hover effects with color transition
+        const stars = document.querySelectorAll('.star-filled, .star-empty');
+        stars.forEach(star => {
+            star.addEventListener('mouseenter', function() {
+                const rating = parseInt(this.getAttribute('data-rating'));
+                const card = this.closest('.review-card');
+                const allStars = card.querySelectorAll('.star-filled, .star-empty');
+
+                allStars.forEach((s, index) => {
+                    if (index < rating) {
+                        s.style.color = '#fcd34d';
+                        s.style.transform = 'scale(1.2)';
+                        s.style.textShadow = '0 0 20px rgba(252, 211, 77, 0.8)';
+                    }
+                });
+            });
+
+            star.addEventListener('mouseleave', function() {
+                const card = this.closest('.review-card');
+                const filledStars = card.querySelectorAll('.star-filled');
+                const emptyStars = card.querySelectorAll('.star-empty');
+
+                filledStars.forEach(s => {
+                    s.style.color = '#fbbf24';
+                    s.style.transform = 'scale(1)';
+                    s.style.textShadow = '0 0 15px rgba(251, 191, 36, 0.6)';
+                });
+
+                emptyStars.forEach(s => {
+                    s.style.color = '#6b7280';
+                    s.style.transform = 'scale(1)';
+                    s.style.textShadow = 'none';
+                });
+            });
+        });
+    });
+</script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
