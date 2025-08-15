@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.AspNetCore.Http;
+using motorak.dal.Enums.CarEnums;
 using Motorak.DAL.Enums.CarEnums;
 using System.ComponentModel.DataAnnotations;
 
@@ -7,25 +8,22 @@ namespace Motorak.BLL.ModelVM.Car
 {
     public class CreateCarModel
     {
-        [Required,MaxLength(50)]
-        public string Brand { get; set; }
+        [Required, MaxLength(50)]
+        public string Brand { get; set; } = null!;
 
-        [Required,MaxLength(50)]
-        public string Model { get; set; }
+        [Required, MaxLength(50)]
+        public string Model { get; set; } = null!;
 
         [Required]
-        public decimal Price { get; set; }
-
-        [Required,Range(1900, 2100)]
         public int Year { get; set; }
 
-        [Required,MaxLength(30)]
-        public string Color { get; set; }
+        [Required, MaxLength(30)]
+        public string Color { get; set; } = null!;
 
-        [Required, Range(0, int.MaxValue)]
+        [Required]
         public int Mileage { get; set; }
 
-        [Required, Display(Name = "Car Type")]
+        [Required]
         public CarType Type { get; set; }
 
         [Required]
@@ -34,7 +32,14 @@ namespace Motorak.BLL.ModelVM.Car
         [Required]
         public CarCondition Condition { get; set; }
 
-        [Display(Name = "Image")]
-        public IFormFile? ImageFile { get; set; }
+        [Required]
+        public decimal Price { get; set; }
+
+        public decimal? DailyRentPrice { get; set; }
+
+        [Required]
+        public CarCategory Category { get; set; }
+
+        public string? ImagePath { get; set; }
     }
 }

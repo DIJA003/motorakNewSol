@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using motorak.dal.Entites;
 using motorak.dal.Entities;
+using Motorak.DAL;
 using Motorak.DAL.Entites;
 using Motorak.DAL.Entities;
 
@@ -24,6 +25,7 @@ namespace motorak.DAL.DataBase
         public DbSet<Transactions> Transactions { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
         public DbSet<Rent> Rents { get; set; }
+        public DbSet<CartItem> CartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

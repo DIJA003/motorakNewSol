@@ -2,13 +2,14 @@
 using Motorak.BLL.ModelVM.Rents;
 using Motorak.BLL.Services.Abstractions;
 
+
 namespace Motorak.PLL.Controllers
 {
-    public class RentsController : Controller
+    public class RentController : Controller
     {
         private readonly IRentService _service;
 
-        public RentsController(IRentService service)
+        public RentController(IRentService service)
         {
             _service = service;
         }
@@ -29,17 +30,26 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult Create(int? carId = null, int? price = null)
         {
-            return View(new RentCreateDto());
+            var model = new RentCreateDto();
+            if (carId.HasValue) model.CarId = carId.Value;
+            if (price.HasValue) model.TotalPrice = price.Value;
+
+            model.StartDate = DateTime.Today;
+            model.EndDate = DateTime.Today.AddDays(1);
+
+            return View(model);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RentCreateDto dto)
         {
             if (!ModelState.IsValid) return View(dto);
-            var id = await _service.CreateAsync(dto);
-            return RedirectToAction(nameof(Details), new { id });
+
+            await _service.CreateAsync(dto);
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
@@ -47,6 +57,7 @@ namespace Motorak.PLL.Controllers
         {
             var existing = await _service.GetByIdAsync(id);
             if (existing == null) return NotFound();
+
             var dto = new RentUpdateDto
             {
                 Id = existing.Id,
@@ -58,14 +69,16 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, RentUpdateDto dto)
         {
             if (id != dto.Id) return BadRequest();
             if (!ModelState.IsValid) return View(dto);
+
             try
             {
                 await _service.UpdateAsync(dto);
-                return RedirectToAction(nameof(Details), new { id = dto.Id });
+                return RedirectToAction(nameof(Index));
             }
             catch (InvalidOperationException)
             {
@@ -81,8 +94,9 @@ namespace Motorak.PLL.Controllers
             return View(existing);
         }
 
-        [HttpPost]
-        public async Task<IActionResult> DeletePost(int id)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {

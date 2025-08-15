@@ -1,21 +1,27 @@
-﻿@using Motorak.BLL.ModelVM.Purchases
-@model PurchaseCreateDto
+﻿@using Motorak.BLL.ModelVM.Rents
+@model RentCreateDto
 
 @{
-    ViewData["Title"] = "Create Purchase";
+    ViewData["Title"] = "Create Rent";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="container mt-4">
-    <h2 class="text-primary mb-4">🛒 Create New Purchase</h2>
+    <h2 class="text-primary mb-4">🚗 Create New Rent</h2>
 
     <div class="card shadow rounded">
         <div class="card-body">
             <form asp-action="Create" method="post">
                 <div class="mb-3">
-                    <label asp-for="SellerName" class="form-label fw-bold"></label>
-                    <input asp-for="SellerName" class="form-control" placeholder="Enter Seller Name" />
-                    <span asp-validation-for="SellerName" class="text-danger"></span>
+                    <label asp-for="StartDate" class="form-label fw-bold"></label>
+                    <input asp-for="StartDate" class="form-control" type="date" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EndDate" class="form-label fw-bold"></label>
+                    <input asp-for="EndDate" class="form-control" type="date" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
@@ -42,20 +48,12 @@
                     <span asp-validation-for="CustomerId" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Status" class="form-label fw-bold"></label>
-                    <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<Motorak.DAL.Enums.TransactionEnums.TransactionStatus>()">
-                        <option value="">-- Select Status --</option>
-                    </select>
-                    <span asp-validation-for="Status" class="text-danger"></span>
-                </div>
-
                 <div class="d-flex justify-content-between mt-4">
                     <a asp-action="Index" class="btn btn-secondary">
                         <i class="bi bi-arrow-left"></i> Back to List
                     </a>
                     <button type="submit" class="btn btn-success">
-                        <i class="bi bi-check-circle"></i> Save Purchase
+                        <i class="bi bi-check-circle"></i> Save Rent
                     </button>
                 </div>
             </form>
