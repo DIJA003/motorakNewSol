@@ -2,39 +2,44 @@
 using Microsoft.AspNetCore.Mvc;
 using Motorak.BLL.ModelVM.Service;
 using Motorak.BLL.Services.Abstractions;
-using Motorak.BLL.Services.Implementations;
-using Motorak.DAL.Enums.SeviceEnums;
 
 namespace Motorak.PLL.Controllers
 {
-    public class ServiveController : Controller
+    public class ServiceController : Controller
     {
-        private readonly IServiceServicecs servicecs;
-        private readonly IMapper _mapper;
-        public ServiveController (IServiceServicecs servicecs,IMapper mapper)
-        {
-            this.servicecs = servicecs;
-            _mapper = mapper;
-        }
-        public async Task<IActionResult> Index(
-        Status? status, int? carId, int? customerId, DateTime? from, DateTime? to, int? mechanicId)
-        {
-            var (success, message, services) = await servicecs.GetServicesFilteredAsync(status, carId, customerId, from, to, mechanicId);
+        private readonly IServiceServicecs _serviceService;
 
-            if (!success)
-                ViewBag.Error = message;
+        public ServiceController(IServiceServicecs serviceService)
+        {
+            _serviceService = serviceService;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var (status, message, services) = await _serviceService.GetAllServicesAsync();
+
+            if (!status)
+            {
+                ViewBag.ErrorMessage = message;
+                return View(new List<ServiceDTO>());
+            }
 
             return View(services);
         }
 
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
-            var (status, message, service) = await servicecs.GetServiceByIdAsync(id);
+            var (status, message, service) = await _serviceService.GetServiceByIdAsync(id);
             if (!status || service == null)
-                return NotFound(message);
-
+            {
+                ViewBag.ErrorMessage = message;
+                return NotFound();
+            }
             return View(service);
         }
+
         [HttpGet]
         public IActionResult Create()
         {
@@ -45,33 +50,44 @@ namespace Motorak.PLL.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateServiceVM model)
         {
-            if(!ModelState.IsValid) return View(model);
-            var (status, message) = await servicecs.CreateServiceAsync(model);
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var (status, message) = await _serviceService.CreateServiceAsync(model);
             if (!status)
             {
                 ModelState.AddModelError("", message);
                 return View(model);
             }
-
             return RedirectToAction(nameof(Index));
         }
-        [HttpGet]
-        public async Task<IActionResult> EditStatus(int id)
-        {
-            var (status, message, service) = await servicecs.GetServiceByIdAsync(id);
-            if (!status || service == null)
-                return NotFound(message);
 
-            var updateModel = _mapper.Map<UpdateServiceVM>(service);
-            return View(updateModel);
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var (status, message, service) = await _serviceService.GetServiceByIdAsync(id);
+            if (!status || service == null)
+            {
+                ViewBag.ErrorMessage = message;
+                //return View("Error");
+            }
+
+            var updateVM = new UpdateServiceVM
+            {
+                ServiceId = service.ServiceId,
+            };
+
+            return View(updateVM);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditStatus(UpdateServiceVM model)
+        public async Task<IActionResult> Edit(UpdateServiceVM model)
         {
-            if (!ModelState.IsValid) return View(model);
-            var (status, message) = await servicecs.UpdateServiceStatusAsync(model);
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var (status, message) = await _serviceService.UpdateServiceStatusAsync(model);
             if (!status)
             {
                 ModelState.AddModelError("", message);
@@ -83,13 +99,25 @@ namespace Motorak.PLL.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
-            var (status, message) = await servicecs.DeleteServiceAsync(id);
+            var (status, message, service) = await _serviceService.GetServiceByIdAsync(id);
+            if (!status || service == null)
+            {
+                ViewBag.ErrorMessage = message;
+                return View("Error");
+            }
+            return View(service);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var (status, message) = await _serviceService.DeleteServiceAsync(id);
             if (!status)
             {
-                TempData["Error"] = message;
-                return RedirectToAction(nameof(Index));
+                ViewBag.ErrorMessage = message;
+                return View("Error");
             }
-            TempData["Success"] = message;
             return RedirectToAction(nameof(Index));
         }
     }

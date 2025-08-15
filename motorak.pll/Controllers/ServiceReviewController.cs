@@ -8,36 +8,19 @@ namespace Motorak.PLL.Controllers
     public class ServiceReviewController : Controller
     {
         private readonly IServiceReviewService _serviceReviewService;
-        private readonly IMapper _mapper;
 
-        public ServiceReviewController(IServiceReviewService serviceReviewService, IMapper mapper)
+        public ServiceReviewController(IServiceReviewService serviceReviewService)
         {
             _serviceReviewService = serviceReviewService;
-            _mapper = mapper;
         }
-
         [HttpGet]
         public async Task<IActionResult> Index()
         {
             var (status, message, reviews) = await _serviceReviewService.GetAllAsync();
-            if (!status)
-            {
-                ViewBag.Error = message;
-                return View(new List<ServiceReviewDTO>());
-            }
+            if (!status) ViewBag.Error = message;
             return View(reviews);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Details(int id)
-        {
-            var (status, message, review) = await _serviceReviewService.GetByIdAsync(id);
-            if (!status || review == null)
-            {
-                return NotFound(message);
-            }
-            return View(review);
-        }
         [HttpGet]
         public IActionResult Create()
         {
@@ -48,35 +31,35 @@ namespace Motorak.PLL.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateServiceReviewVM model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            var (status, message) = await _serviceReviewService.CreateAsync(model);
-                if (!status)
-                {
-                    ModelState.AddModelError("", message);
-                    return View(model);
-                }
-                return RedirectToAction(nameof(Index));
+            if (ModelState.IsValid)
+            {
+                var (status, message) = await _serviceReviewService.CreateAsync(model);
+                if (status) return RedirectToAction(nameof(Index));
+                ViewBag.Error = message;
+            }
+            return View(model);
         }
-        [HttpGet]
 
+        [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
             var (status, message, review) = await _serviceReviewService.GetByIdAsync(id);
-            if (!status || review == null)
-            {
-                return NotFound(message);
-            }
+            if (!status || review == null) return NotFound(message);
 
-            var updateVM = _mapper.Map<UpdateServiceReviewVM>(review);
-            return View(updateVM);
+            var model = new UpdateServiceReviewVM
+            {
+                ReviewId = review.ReviewId,
+                Rating = review.Rating,
+                Comments = review.Comments
+            };
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UpdateServiceReviewVM model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (ModelState.IsValid) return View(model);
 
             var (status, message) = await _serviceReviewService.UpdateAsync(model);
             if (!status)
@@ -84,68 +67,33 @@ namespace Motorak.PLL.Controllers
                 ModelState.AddModelError("", message);
                 return View(model);
             }
-
             return RedirectToAction(nameof(Index));
         }
 
-        [HttpGet] 
+        [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
             var (status, message, review) = await _serviceReviewService.GetByIdAsync(id);
-            if (!status || review == null)
-            {
-                return NotFound(message);
-            }
+            if (!status || review == null) return NotFound(message);
             return View(review);
         }
 
-        [HttpPost] 
-        [ActionName("Delete")]
+        [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int reviewId)
         {
-            var (status, message) = await _serviceReviewService.DeleteAsync(id);
-            if (!status)
-            {
-                ViewBag.Error = message;
-            }
-            return RedirectToAction(nameof(Index));
+            var (status, message) = await _serviceReviewService.DeleteAsync(reviewId);
+            if (status) return RedirectToAction(nameof(Index));
+            ViewBag.Error = message;
+            return RedirectToAction(nameof(Delete), new { id = reviewId });
         }
 
         [HttpGet]
-        public async Task<IActionResult> ByService(int serviceId)
+        public async Task<IActionResult> Details(int id)
         {
-            var (status, message, reviews) = await _serviceReviewService.GetByServiceIdAsync(serviceId);
-            if (!status)
-            {
-                ViewBag.Error = message;
-                return View(new List<ServiceReviewDTO>());
-            }
-            return View("Index", reviews);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ByCustomer(int customerId)
-        {
-            var (status, message, reviews) = await _serviceReviewService.GetByCustomerIdAsync(customerId);
-            if (!status)
-            {
-                ViewBag.Error = message;
-                return View(new List<ServiceReviewDTO>());
-            }
-            return View("Index", reviews);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> ByRating(int rating)
-        {
-            var (status, message, reviews) = await _serviceReviewService.GetByRatingAsync(rating);
-            if (!status)
-            {
-                ViewBag.Error = message;
-                return View(new List<ServiceReviewDTO>());
-            }
-            return View("Index", reviews);
+            var (status, message, review) = await _serviceReviewService.GetByIdAsync(id);
+            if (!status || review == null) return NotFound(message);
+            return View(review);
         }
     }
 }
