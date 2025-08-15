@@ -13,8 +13,8 @@ namespace Motorak.BLL.Mapper.ServiceMapping
             CreateMap<Service, ServiceDTO>()
             .ForMember(dest => dest.ServiceId, opt => opt.MapFrom(src => src.Id))
             .ForMember(dest => dest.MechanicId, opt => opt.MapFrom(src => src.MechanicId))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status)) // Enum
-            .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => src.ServiceType)) // Enum
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status)) 
+            .ForMember(dest => dest.ServiceType, opt => opt.MapFrom(src => src.ServiceType)) 
             .ForMember(dest => dest.CreatedDate, opt => opt.MapFrom(src => src.CreatedAt));
 
             CreateMap<CreateServiceVM, Service>()

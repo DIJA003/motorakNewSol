@@ -30,7 +30,7 @@ namespace Motorak.PLL.Controllers
             return View();
         }
 
-        [Authorize(Roles = Seed.Role_Admin)]
+        //[Authorize(Roles = Seed.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateServiceReviewVM model)

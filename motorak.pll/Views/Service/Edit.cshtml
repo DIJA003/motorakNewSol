@@ -388,13 +388,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Animate container on page load
         const container = document.querySelector('.animated-container');
         setTimeout(() => {
             container.classList.add('loaded');
         }, 100);
 
-        // Animate title on page load
         setTimeout(() => {
             document.querySelector('.title-animated').style.transform = 'translateX(0)';
             document.querySelector('.title-animated').style.opacity = '1';
@@ -405,12 +403,10 @@
             document.querySelector('.form-group-animated').style.opacity = '1';
         }, 400);
 
-        // Enhanced form interactions for select
         const selectControl = document.querySelector('.select-enhanced');
         const formGroup = selectControl.parentElement;
         const label = formGroup.querySelector('.form-label-floating');
 
-        // Check if select has value on page load
         function updateLabelPosition() {
             if (selectControl.value !== '') {
                 formGroup.classList.add('has-value');
@@ -419,7 +415,6 @@
             }
         }
 
-        // Initial check
         updateLabelPosition();
 
         selectControl.addEventListener('focus', function() {
@@ -435,7 +430,6 @@
             updateLabelPosition();
         });
 
-        // Floating circles movement with mouse interaction
         document.addEventListener('mousemove', (e) => {
             const circles = document.querySelectorAll('.floating-circle');
             circles.forEach((circle, index) => {
@@ -449,7 +443,6 @@
             });
         });
 
-        // Show validation errors with animation
         const validationErrors = document.querySelectorAll('.validation-error');
         validationErrors.forEach(error => {
             if (error.textContent.trim()) {
@@ -457,7 +450,6 @@
             }
         });
 
-        // Button ripple effect
         const buttons = document.querySelectorAll('.btn-enhanced, .btn-secondary-enhanced');
         buttons.forEach(button => {
             button.addEventListener('click', function(e) {
@@ -490,7 +482,6 @@
             });
         });
 
-        // Add continuous subtle animations
         setInterval(() => {
             const circles = document.querySelectorAll('.floating-circle');
             circles.forEach((circle, index) => {

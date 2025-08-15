@@ -1,9 +1,12 @@
 ﻿@using Motorak.BLL.ModelVM.Service
 @using Motorak.DAL.Enums.SeviceEnums
+@using Motorak.Utility
 @model List<ServiceDTO>
 
 @{
     ViewData["Title"] = "Services List";
+    var userRole = User.IsInRole(Seed.Role_Admin) ? Seed.Role_Admin :
+                   User.IsInRole(Seed.Role_Mechanic) ? Seed.Role_Mechanic : Seed.Role_Customer;
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -98,7 +101,7 @@
         font-weight: 500;
     }
 
-    .add-service-btn {
+    .add-service-btn, .create-service-btn {
         background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         border: none;
         border-radius: 20px;
@@ -116,7 +119,7 @@
         font-size: 0.9rem;
     }
 
-        .add-service-btn:hover {
+        .add-service-btn:hover, .create-service-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 16px 32px rgba(139, 92, 246, 0.6);
             color: white;
@@ -268,6 +271,7 @@
         display: flex;
         gap: 8px;
         justify-content: center;
+        flex-wrap: wrap;
     }
 
     .action-btn {
@@ -324,6 +328,42 @@
             color: white;
         }
 
+    .btn-accept {
+        background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+        .btn-accept:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.5);
+            color: white;
+        }
+
+    .btn-reject {
+        background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+    }
+
+        .btn-reject:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.5);
+            color: white;
+        }
+
+    .btn-review {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+    }
+
+        .btn-review:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.5);
+            color: white;
+        }
+
     .no-data-container {
         text-align: center;
         padding: 4rem 2rem;
@@ -357,6 +397,33 @@
         box-shadow: 0 10px 25px rgba(239, 68, 68, 0.2);
         backdrop-filter: blur(10px);
     }
+
+    .customer-actions {
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .alert {
+        border-radius: 20px;
+        padding: 1.5rem 2rem;
+        margin-bottom: 2rem;
+        font-weight: 600;
+        border: none;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(4, 120, 87, 0.15) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        color: #6ee7b7;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(185, 28, 28, 0.15) 100%);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        color: #fca5a5;
+    }
 </style>
 
 <div class="container mt-4">
@@ -364,6 +431,24 @@
         <h1 class="page-title">Services Dashboard</h1>
         <p class="page-subtitle">Advanced management system for all your services</p>
     </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
 
     @if (Model != null && Model.Any())
     {
@@ -396,12 +481,25 @@
     }
     else
     {
-        <div class="d-flex justify-content-end mb-4">
-            <a href="@Url.Action("Create")" class="add-service-btn">
-                <i class="bi bi-plus-circle"></i>
-                Add New Service
-            </a>
-        </div>
+        @if (userRole == Seed.Role_Admin)
+        {
+            <div class="d-flex justify-content-end mb-4">
+                <a href="@Url.Action("Create")" class="add-service-btn">
+                    <i class="bi bi-plus-circle"></i>
+                    Add New Service
+                </a>
+            </div>
+        }
+
+        @if (userRole == Seed.Role_Customer)
+        {
+            <div class="customer-actions">
+                <a href="@Url.Action("Create")" class="create-service-btn">
+                    <i class="bi bi-plus-circle"></i>
+                    Create New Service Request
+                </a>
+            </div>
+        }
 
         @if (Model != null && Model.Any())
         {
@@ -412,29 +510,25 @@
                         <div class="service-header">
                             <div class="service-id">#@item.ServiceId</div>
                             <div class="service-status @(item.Status == Status.pending ? "status-pending" :
-                                                                                      item.Status == Status.completed ? "status-completed" :
-                                                                                      item.Status == Status.cancelled ? "status-cancelled" :
-                                                                                      "status-unknown")">
+                                  item.Status == Status.completed ? "status-completed" :
+                                 item.Status == Status.cancelled ? "status-cancelled" :
+                                   "status-unknown")">
                     @switch (item.Status)
                                 {
                                     case Status.pending:
                                         <i class="bi bi-hourglass-split"></i>
-                    
                                         <span>Pending</span>
                                         break;
                                     case Status.completed:
                                         <i class="bi bi-check-circle-fill"></i>
-                    
                                         <span>Completed</span>
                                         break;
                                     case Status.cancelled:
                                         <i class="bi bi-x-circle-fill"></i>
-                    
                                         <span>Cancelled</span>
                                         break;
                                     default:
                                         <i class="bi bi-question-circle"></i>
-                    
                                         <span>Unknown</span>
                                         break;
                                 }
@@ -474,15 +568,63 @@
                         </div>
 
                         <div class="service-actions">
-                            <a class="action-btn btn-view" href="@Url.Action("Details", new { id = item.ServiceId })">
-                                <i class="bi bi-eye"></i> View
-                            </a>
-                            <a class="action-btn btn-edit" href="@Url.Action("Edit", new { id = item.ServiceId })">
-                                <i class="bi bi-pencil-square"></i> Edit
-                            </a>
-                            <a class="action-btn btn-delete" href="@Url.Action("Delete", new { id = item.ServiceId })">
-                                <i class="bi bi-trash"></i> Delete
-                            </a>
+                            @if (userRole == Seed.Role_Admin)
+                            {
+                                <a class="action-btn btn-view" href="@Url.Action("Details", new { id = item.ServiceId })">
+                                    <i class="bi bi-eye"></i> View
+                                </a>
+                                <a class="action-btn btn-edit" href="@Url.Action("Edit", new { id = item.ServiceId })">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a class="action-btn btn-delete" href="@Url.Action("Delete", new { id = item.ServiceId })">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            }
+                            else if (userRole == Seed.Role_Mechanic)
+                            {
+                                @if (item.Status == Status.pending)
+                                {
+                                    <a class="action-btn btn-accept" href="@Url.Action("Accept", new { id = item.ServiceId })">
+                                        <i class="bi bi-check-circle"></i> Accept
+                                    </a>
+                                    <a class="action-btn btn-reject" href="@Url.Action("Reject", new { id = item.ServiceId })">
+                                        <i class="bi bi-x-circle"></i> Reject
+                                    </a>
+                                }
+                                else
+                                {
+                                    <div class="text-center text-muted" style="color: rgba(255,255,255,0.5) !important;">
+                                        <small>Service already processed</small>
+                                    </div>
+                                }
+                            }
+                            else if (userRole == Seed.Role_Customer)
+                            {
+                                @if (item.Status == Status.completed)
+                                {
+                                    <a class="action-btn btn-review" href="@Url.Action("Create", "ServiceReview", new { serviceId = item.ServiceId })">
+                                        <i class="bi bi-star-fill"></i> Rate Service
+                                    </a>
+                                }
+                                else if (item.Status == Status.pending)
+                                {
+                                    <div class="text-center text-muted" style="color: rgba(255,255,255,0.5) !important;">
+                                        <small><i class="bi bi-clock me-1"></i>Service in progress...</small>
+                                    </div>
+                                }
+                                else if (item.Status == Status.cancelled)
+                                {
+                                    <div class="text-center text-muted" style="color: rgba(255,255,255,0.5) !important;">
+                                        <small><i class="bi bi-x-circle me-1"></i>Service cancelled</small>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="text-center text-muted" style="color: rgba(255,255,255,0.5) !important;">
+                                        <small><i class="bi bi-info-circle me-1"></i>Status: @item.Status.ToString().ToUpper()</small>
+                                    </div>
+                                }
+                            }
                         </div>
                     </div>
                 }
@@ -495,12 +637,24 @@
                     <i class="bi bi-inbox"></i>
                 </div>
                 <div class="no-data-title">No services available</div>
-                <p>Start by adding your first service to get started</p>
+                @if (userRole == Seed.Role_Admin)
+                {
+                    <p>Start by adding your first service to get started</p>
+                }
+                else if (userRole == Seed.Role_Customer)
+                {
+                    <p>Create your first service request to get started</p>
+                }
+                else
+                {
+                    <p>No pending services to process at the moment</p>
+                }
             </div>
         }
     }
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const cards = document.querySelectorAll('.service-card');
@@ -513,5 +667,31 @@
                 card.style.transform = 'translateY(0)';
             }, index * 100);
         });
+
+        document.querySelectorAll('.btn-delete, .btn-reject').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                const action = this.classList.contains('btn-delete') ? 'delete' : 'reject';
+                if (!confirm(`Are you sure you want to ${action} this service?`)) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        document.querySelectorAll('.btn-accept').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to accept this service request?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            var alerts = document.querySelectorAll('.alert-dismissible');
+            alerts.forEach(function(alert) {
+                var bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
     });
 </script>
