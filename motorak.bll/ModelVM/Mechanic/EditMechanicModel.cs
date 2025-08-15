@@ -12,6 +12,9 @@ namespace Motorak.BLL.ModelVM.Mechanic
         [Required]
         public string Name { get; set; }
 
+        [Required, EmailAddress]
+        public string Email { get; set; }
+
         [Required, Display(Name = "Working Hours")]
         public string WorkHours { get; set; }
 
@@ -21,7 +24,7 @@ namespace Motorak.BLL.ModelVM.Mechanic
         [Required]
         public MechanicStatus Status { get; set; }
 
-        public DateTime UpdatedAt { get; set; } //= DateTime.Now;
-        public bool IsUpdated { get; set; } //= true;
+        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public bool IsUpdated { get; set; } = true;
     }
 }

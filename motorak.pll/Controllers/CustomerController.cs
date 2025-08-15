@@ -80,7 +80,7 @@ namespace Motorak.PLL.Controllers
             if (!status || customer == null)
             {
                 ViewBag.Error = message;
-                return View("Customer Not Found");
+                return View(message);
             }
 
             if (customer.IsDeleted)
@@ -115,11 +115,10 @@ namespace Motorak.PLL.Controllers
 
             return RedirectToAction(nameof(Index));
         }
-
         
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var (status, message) = await _customerService.DeleteCustomerAsync(id);
             if (!status)

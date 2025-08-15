@@ -110,7 +110,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var (status, message) = await _mechanicService.DeleteMechanicAsync(id);
             if (!status)

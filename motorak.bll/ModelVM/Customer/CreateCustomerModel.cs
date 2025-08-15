@@ -20,8 +20,8 @@ namespace Motorak.BLL.ModelVM.Customer
         [DataType(DataType.Password), Display(Name = "Confirm Password"), Compare("Password", ErrorMessage = "Not matched with Password")]
         public string ConfirmPassword { get; set; }
 
-        public bool IsDeleted { get; set; } //= false;
+        public bool IsDeleted { get; set; } = false;
         public DateTime? DeletedAt { get; set; }
-        public DateTime CreatedAt { get; private set; } //= DateTime.Now;
+        public DateTime CreatedAt { get; private set; } = DateTime.Now;
     }
 }

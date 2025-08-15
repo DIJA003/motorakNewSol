@@ -1,0 +1,70 @@
+﻿@using Motorak.BLL.ModelVM.Mechanic
+@model CreateMechanicModel
+
+
+<style>
+    /* Custom card style for this view only */
+    .card-purple {
+        background-color: #2a0044; /* deep purple for card body */
+        color: white;
+        border: 1px solid #5a00a3; /* purple border */
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(90, 0, 163, 0.5);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .card-purple:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(90, 0, 163, 0.7);
+        }
+
+        .card-purple .card-header {
+            background-color: #4b007d;
+            border-bottom: 1px solid #5a00a3;
+            font-weight: bold;
+        }
+
+        .card-purple .card-body {
+            background-color: #35005c;
+        }
+</style>
+
+
+<div class="card text-center">
+    <div>
+        <b>Create Mechanic</b>
+    </div>
+    <div class="card-body">
+        <form asp-controller="Customer" asp-action="Create">
+            <div class="form-group">
+                <div style="text-align: left;" for="exampleInputName">Name</div>
+                <input asp-for="Name" type="text" class="form-control" id="exampleInputName" aria-describedby="nameHelp" placeholder="Enter Name">
+                <br>
+            </div>
+
+            <div class="form-group">
+                <div style="text-align: left;" for="exampleInputEmail1">Email</div>
+                <input asp-for="Email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter Email">
+                <br>
+            </div>
+            <select input asp-for="WorkHours" type="text" class="form-select" aria-label="Default select example">
+                <option selected>Work Horus</option>
+                <option value="1">7AM - 4PM</option>
+                <option value="2">4PM - 1AM</option>
+                <br>
+            </select>
+            <div class="form-group">
+                <div style="text-align: left;" for="exampleInputAddress">Password</div>
+                <input asp-for="Password" type="password" class="form-control" id="exampleInputPassword" placeholder="Enter Password">
+                <br>
+            </div>
+            <div class="form-group">
+                <div style="text-align: left;" for="exampleInputDateOfBirth">Confirm Password</div>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" id="exampleInputPassword" placeholder="ConfirmedPassword">
+                <br>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+
+</div>

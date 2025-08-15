@@ -7,7 +7,10 @@ namespace Motorak.BLL.ModelVM.Mechanic
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Email { get; set; }
+        public string PhoneNumber { get; set; }
         public decimal Rating { get; set; }
+        public string WorkHours { get; set; }
         public MechanicStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
         public bool IsDeleted { get; set; }
