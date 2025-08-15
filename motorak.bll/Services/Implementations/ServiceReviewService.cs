@@ -7,11 +7,11 @@ using Motorak.DAL.Repo.Abstractions;
 
 namespace Motorak.BLL.Services.Implementations
 {
-    public class ServiceReviewSercice : IServiceReviewService
+    public class ServiceReviewService : IServiceReviewService
     {
         private readonly IServiceReviewRepo _reviewRepo;
         public readonly IMapper _mapper;
-        public ServiceReviewSercice(IServiceReviewRepo reviewRepo, IMapper mapper)
+        public ServiceReviewService(IServiceReviewRepo reviewRepo, IMapper mapper)
         {
             _reviewRepo = reviewRepo;
             _mapper = mapper;
@@ -41,9 +41,10 @@ namespace Motorak.BLL.Services.Implementations
                 {
                     return (false, "Service review not found.");
                 }
-                _reviewRepo.Delete(result);
-                return (true, "Service review deleted successfully.");
 
+                await _reviewRepo.Delete(result);
+
+                return (true, "Service review deleted successfully.");
             }
             catch (Exception ex)
             {
@@ -134,11 +135,12 @@ namespace Motorak.BLL.Services.Implementations
             {
                 var existingReview = await _reviewRepo.GetByIdAsync(model.ReviewId);
                 if (existingReview == null)
-                {
                     return (false, "Service review not found.");
-                }
-                var updatedReview = _mapper.Map(model, existingReview);
-                _reviewRepo.Update(updatedReview);
+
+                _mapper.Map(model, existingReview);
+
+                await _reviewRepo.Update(existingReview);
+
                 return (true, "Service review updated successfully.");
             }
             catch (Exception ex)
@@ -146,5 +148,6 @@ namespace Motorak.BLL.Services.Implementations
                 return (false, ex.Message);
             }
         }
+
     }
 }

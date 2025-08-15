@@ -66,7 +66,7 @@ namespace motorak.pll
             builder.Services.AddScoped<ITransactionService, TransactionService>();
             builder.Services.AddScoped<IPurchaseService, PurchaseService>();
             builder.Services.AddScoped<IRentService, RentService>();
-            builder.Services.AddScoped<IServiceReviewService, ServiceReviewSercice>();
+            builder.Services.AddScoped<IServiceReviewService, ServiceReviewService>();
             builder.Services.AddScoped<IServiceServicecs, ServiceServices>();
 
             //emailsender

@@ -10,7 +10,6 @@ namespace Motorak.DAL.Entites
         public int Id { get; private set; }
         public int Rating { get; private set; }
         public string Comment { get; private set; }
-
         public int CustomerId { get; private set; }
         [ForeignKey(nameof(CustomerId))]
         public virtual Customer Customer { get; private set; }

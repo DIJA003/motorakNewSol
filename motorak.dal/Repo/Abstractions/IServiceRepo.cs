@@ -8,7 +8,6 @@ namespace Motorak.DAL.Repo.Abstractions
 {
     public interface IServiceRepo
     {
-        IQueryable<Service> GetAllQueryable();
         Task<List<Service>> GetAllAsync();
         Task<Service?> GetByIdAsync(int id);
         Task<List<Service>> GetByCustomerIdAsync(int customerId);
@@ -18,8 +17,8 @@ namespace Motorak.DAL.Repo.Abstractions
         Task<List<Service>> GetByCarIdAsync(int carId);
 
         Task CreateAsync(Service service);
-        void Update(Service service);
-        void Delete(Service service);
+        Task Update(Service service);
+        Task Delete(Service service);
         Task<int> SaveChangesAsync();
     }
 }

@@ -257,19 +257,19 @@
         <a asp-controller="Dashboard" asp-action="Index">
             <i class="fas fa-tachometer-alt"></i> Dashboard
         </a>
-        <a asp-controller="Services" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Services" ? "active" : "")">
+        <a asp-controller="Services" asp-action="Index">
             <i class="fas fa-cogs"></i> Services
         </a>
-        <a asp-controller="Service" asp-action="Details" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Details" ? "active" : "")">
+        <a asp-controller="Service" asp-action="Details">
             <i class="fas fa-cogs"></i> Details
         </a>
-        <a asp-controller="Service" asp-action="Create" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Service" && ViewContext.RouteData.Values["action"]?.ToString() == "Create" ? "active" : "")">
+        <a asp-controller="Service" asp-action="Create">
             <i class="fas fa-users"></i> Create Service
         </a>
-        <a asp-controller="Service" asp-action="Edit" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Service" && ViewContext.RouteData.Values["action"]?.ToString() == "Edit" ? "active" : "")">
+        <a asp-controller="Service" asp-action="Edit">
             <i class="fas fa-chart-line"></i> Edit Service
         </a>
-        <a asp-controller="Service" asp-action="Delete" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Service" && ViewContext.RouteData.Values["action"]?.ToString() == "Delete" ? "active" : "")">
+        <a asp-controller="Service" asp-action="Delete">
             <i class="fas fa-life-ring"></i> Delete Service
         </a>
     </nav>

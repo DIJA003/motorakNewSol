@@ -17,23 +17,23 @@ namespace Motorak.DAL.Repo.Implementations
         {
             this.db = db;
         }
-        public IQueryable<Service> GetAllQueryable()
-        {
-            return db.Services.AsQueryable();
-        }
-
+        
         public async Task CreateAsync(Service service)
         {
             await db.Services.AddAsync(service);
+            await db.SaveChangesAsync();
         }
-        public void Delete(Service service)
+        public async Task Delete(Service service)
         {
             service.Delete();
             db.Services.Update(service);
+             await db.SaveChangesAsync();
         }
         public async Task<List<Service>> GetAllAsync()
         {
-            return await db.Services.ToListAsync();
+            return await db.Services
+                .Where(s => !s.IsDeleted)
+                .ToListAsync();
         }
 
         public async Task<List<Service>> GetByCarIdAsync(int carId)
@@ -59,7 +59,7 @@ namespace Motorak.DAL.Repo.Implementations
 
         public async Task<Service?> GetByIdAsync(int id)
         {
-            return await db.Services.FirstOrDefaultAsync(s => s.Id == id);
+            return await db.Services.FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
         }
 
         public async Task<List<Service>> GetByMechanicIdAsync(int mechanicId)
@@ -80,9 +80,10 @@ namespace Motorak.DAL.Repo.Implementations
             return db.SaveChangesAsync();
         }
 
-        public void Update(Service service)
+        public async Task Update(Service service)
         {
             db.Services.Update(service);
+            await db.SaveChangesAsync();
         }
     }
 }

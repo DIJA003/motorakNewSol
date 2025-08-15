@@ -13,6 +13,7 @@ namespace Motorak.PLL.Controllers
         {
             _serviceReviewService = serviceReviewService;
         }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -59,7 +60,7 @@ namespace Motorak.PLL.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(UpdateServiceReviewVM model)
         {
-            if (ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid) return View(model);
 
             var (status, message) = await _serviceReviewService.UpdateAsync(model);
             if (!status)

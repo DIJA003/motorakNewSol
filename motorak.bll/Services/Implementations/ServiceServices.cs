@@ -2,6 +2,7 @@
 
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Motorak.BLL.ModelVM.Service;
 using Motorak.BLL.Services.Abstractions;
 using Motorak.DAL.Entites;
@@ -20,50 +21,39 @@ namespace Motorak.BLL.Services.Implementations
             _serviceRebo = serviceRebo;
             _mapper = mapper;
         }
+        //public async Task<(bool status, string message)> CreateServiceAsync(CreateServiceVM service)
+        //{
+        //    try
+        //    {
+        //        if (service == null) return (false, "Service data is null");
+        //        var result = _mapper.Map<Service>(service);
+        //        await _serviceRebo.CreateAsync(result);
+        //        return (true, "Service Created Successfully");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return (false, $"Error Occurred: {ex.Message}");
+        //    }
+        //}
         public async Task<(bool status, string message)> CreateServiceAsync(CreateServiceVM service)
         {
             try
             {
-                if (service == null) return (false, "Service data is null");
+                if (service == null)
+                    return (false, "Service data is null");
+
                 var result = _mapper.Map<Service>(service);
+
+                if (result.CarId == 0) return (false, "CarId is required.");
+                if (result.MechanicId == 0) return (false, "MechanicId is required.");
+
                 await _serviceRebo.CreateAsync(result);
                 return (true, "Service Created Successfully");
             }
             catch (Exception ex)
             {
-                return (false, $"Error Occurred: {ex.Message}");
-            }
-        }
-        public async Task<(bool status, string message, List<ServiceDTO> services)> GetServicesFilteredAsync(
-        Status? status, int? carId, int? customerId, DateTime? from, DateTime? to, int? mechanicId)
-        {
-            try
-            {
-                var query = _serviceRebo.GetAllQueryable();
-
-                if (status.HasValue)
-                    query = query.Where(s => s.Status == status.Value);
-
-                if (carId.HasValue)
-                    query = query.Where(s => s.CarId == carId.Value);
-
-                if (customerId.HasValue)
-                    query = query.Where(s => s.CustomerId == customerId.Value);
-
-                if (from.HasValue && to.HasValue)
-                    query = query.Where(s => s.RequestDate >= from.Value && s.RequestDate <= to.Value);
-
-                if (mechanicId.HasValue)
-                    query = query.Where(s => s.MechanicId == mechanicId.Value);
-
-                var list = await query.ToListAsync();
-                var dtoList = _mapper.Map<List<ServiceDTO>>(list);
-
-                return (true, "Filtered results", dtoList);
-            }
-            catch (Exception ex)
-            {
-                return (false, $"Error: {ex.Message}", new List<ServiceDTO>());
+                var innerMessage = ex.InnerException?.Message ?? ex.Message;
+                return (false, $"Error Occurred: {innerMessage}");
             }
         }
         public async Task<(bool status, string message)> DeleteServiceAsync(int serviceId)
@@ -72,8 +62,8 @@ namespace Motorak.BLL.Services.Implementations
             {
                 var result = await _serviceRebo.GetByIdAsync(serviceId);
                 if (result == null) return (false, "Service not Found");
-                _serviceRebo.Delete(result);
-                await _serviceRebo.SaveChangesAsync();
+                await _serviceRebo.Delete(result);
+                //await _serviceRebo.SaveChangesAsync();
                 return (true, "Deleted Successfully");
             }
             catch (Exception ex)
@@ -100,13 +90,13 @@ namespace Motorak.BLL.Services.Implementations
         {
             try
             {
-                var result = _serviceRebo.GetByIdAsync(id);
+                var result =  await _serviceRebo.GetByIdAsync(id);
                 if (result == null)
                 {
                     return (false, "Service not found", null);
                 }
 
-                return (true, "Service found", _mapper.Map<ServiceDTO>(await result));
+                return (true, "Service found", _mapper.Map<ServiceDTO>(result));
             }
             catch (Exception ex)
             {
@@ -179,20 +169,23 @@ namespace Motorak.BLL.Services.Implementations
             }
         }
 
-        public async Task<(bool status, string message)> UpdateServiceStatusAsync(UpdateServiceVM service)
+        public async Task<(bool status, string message)> UpdateServiceStatusAsync(UpdateServiceVM model)
         {
             try
             {
-                var result = await _serviceRebo.GetByIdAsync(service.ServiceId);
-                if (result == null) return (false, "Service not found");
-                _mapper.Map(service, result);
-                _serviceRebo.Update(result);
-                await _serviceRebo.SaveChangesAsync();
-                return (true, "Service status updated successfully");
+                var existingReview = await _serviceRebo.GetByIdAsync(model.ServiceId);
+                if (existingReview == null)
+                    return (false, "Service review not found.");
+
+                _mapper.Map(model, existingReview);
+
+                await _serviceRebo.Update(existingReview);
+
+                return (true, "Service review updated successfully.");
             }
             catch (Exception ex)
             {
-                return (false, $"Error Occurred: {ex.Message}");
+                return (false, ex.Message);
             }
         }
     }
