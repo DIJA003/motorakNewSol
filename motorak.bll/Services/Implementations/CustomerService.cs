@@ -90,7 +90,7 @@ namespace Motorak.BLL.Services.Implementations
         {
             try
             {
-                var existingCustomer = await _customerRepo.GetByUserIdAsync(customerModel.Id);
+                var existingCustomer = await _customerRepo.GetByIdAsync(customerModel.Id);
                 if (existingCustomer == null)
                 {
                     return (false, "Customer Not Found!!");

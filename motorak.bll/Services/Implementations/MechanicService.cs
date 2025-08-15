@@ -62,8 +62,12 @@ namespace Motorak.BLL.Services.Implementations
             {
                 if (mechanicModel == null) 
                     return (false, "Mechanic Null");
-                var result = _mapper.Map<Mechanic>(mechanicModel);
-                await _mechanicRepo.AddAsync(result);
+                var mechanic = _mapper.Map<Mechanic>(mechanicModel);
+                var user = _mapper.Map<User>(mechanicModel);
+                mechanic.UserId = user.Id;
+                mechanic.User = user;
+                await _mechanicRepo.AddAsync(mechanic);
+                await _mechanicRepo.SaveChangesAsync();
                 return (true, "Mechanic Created Successfully!");
             }
             catch (Exception ex)
