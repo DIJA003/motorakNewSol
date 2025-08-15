@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Motorak.BLL.ModelVM.ServiceReview;
 using Motorak.BLL.Services.Abstractions;
+using Motorak.Utility;
 
 namespace Motorak.PLL.Controllers
 {
@@ -28,6 +30,7 @@ namespace Motorak.PLL.Controllers
             return View();
         }
 
+        [Authorize(Roles = Seed.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateServiceReviewVM model)

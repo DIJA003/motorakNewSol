@@ -18,6 +18,7 @@ namespace Motorak.PLL.Controllers
             _customerRebo = customerRebo;
         }
 
+        
         [HttpGet]
         public async Task<IActionResult> Index()
         {
