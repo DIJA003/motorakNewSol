@@ -31,17 +31,44 @@ namespace motorak.DAL.DataBase
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Customer>()
+                        .HasOne(c => c.User)
+                        .WithOne(u => u.Customer)
+                        .HasForeignKey<Customer>(c => c.UserId);
+
+            modelBuilder.Entity<Mechanic>()
+                .HasOne(m => m.User)
+                .WithOne(u => u.Mechanic)
+                .HasForeignKey<Mechanic>(m => m.UserId);
 
             modelBuilder.Entity<Purchase>().HasBaseType<Transactions>();
             modelBuilder.Entity<Rent>().HasBaseType<Transactions>();
 
+            modelBuilder.Entity<CartItem>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(c => c.Car)
+                    .WithMany()
+                    .HasForeignKey(c => c.CarId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(c => c.User)
+                    .WithMany()
+                    .HasForeignKey(c => c.UserId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.Property(c => c.ItemType)
+                    .HasConversion<string>();
+            });
+
 
 
             modelBuilder.Entity<Service>()
-        .HasOne(s => s.Customer)
-        .WithMany()
-        .HasForeignKey(s => s.CustomerId)
-        .OnDelete(DeleteBehavior.Restrict);
+                        .HasOne(s => s.Customer)
+                        .WithMany()
+                        .HasForeignKey(s => s.CustomerId)
+                        .OnDelete(DeleteBehavior.Restrict);
 
 
             modelBuilder.Entity<Service>()

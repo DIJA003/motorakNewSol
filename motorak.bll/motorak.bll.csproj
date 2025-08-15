@@ -14,6 +14,7 @@
 	
 	<ItemGroup>
 	  <ProjectReference Include="..\motorak.dal\motorak.dal.csproj" />
+	  <ProjectReference Include="..\Motorak.Utility\Motorak.Utility.csproj" />
 	</ItemGroup>
 	
 </Project>

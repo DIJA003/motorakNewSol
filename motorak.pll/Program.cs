@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
+using motorak.bll.Mapper.CartMapping;
+using motorak.bll.Services.Abstractions;
+using motorak.bll.Services.Implementations;
 using motorak.dal.DataTemp;
 using motorak.dal.Entites;
 using motorak.dal.Repo.Abstractions;
@@ -42,8 +45,14 @@ namespace motorak.pll
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = true;
                 options.Password.RequireUppercase = true;
-                options.Password.RequiredLength = 6;
-                options.Password.RequiredUniqueChars = 0;
+                options.Password.RequiredLength = 8;
+                options.Password.RequiredUniqueChars = 1;
+
+                options.User.RequireUniqueEmail = true;
+
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+                options.Lockout.AllowedForNewUsers = true;
             })
             .AddEntityFrameworkStores<MotorakDbContext>()
             .AddDefaultTokenProviders()
@@ -55,6 +64,7 @@ namespace motorak.pll
                 options.IdleTimeout = TimeSpan.FromHours(2);
                 options.Cookie.HttpOnly = true;
                 options.Cookie.IsEssential = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             });
             builder.Services.AddHttpContextAccessor();
 
@@ -63,8 +73,13 @@ namespace motorak.pll
                 options.LoginPath = "/Identity/Account/Login";
                 options.LogoutPath = "/Identity/Account/Logout";
                 options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+                options.ExpireTimeSpan = TimeSpan.FromHours(12);
+                options.SlidingExpiration = true;
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             });
 
+            builder.Services.AddHttpContextAccessor();
             builder.Services.AddRazorPages();
 
             //emailsender
@@ -93,8 +108,9 @@ namespace motorak.pll
             builder.Services.AddScoped<IRentService, RentService>();
             builder.Services.AddScoped<IServiceReviewService, ServiceReviewService>();
             builder.Services.AddScoped<IServiceServicecs, ServiceServices>();
+            builder.Services.AddScoped<ICartService, CartService>();
 
-            
+
 
 
             builder.Services.AddAutoMapper(cfg =>
@@ -105,6 +121,7 @@ namespace motorak.pll
                 cfg.AddProfile(new ServiceProfile());
                 cfg.AddProfile(new ServiceReviewProfile());
                 cfg.AddProfile(new TransactionsProfile());
+                cfg.AddProfile(new CartProfile());
             });
 
             builder.Services.AddAuthentication()
@@ -129,6 +146,13 @@ namespace motorak.pll
                 try
                 {
                     var context = services.GetRequiredService<MotorakDbContext>();
+                    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+                    var userManager = services.GetRequiredService<UserManager<User>>();
+
+                    await context.Database.EnsureCreatedAsync();
+
+                    await SeedRoles(roleManager);
+
                     await DbSeeder.SeedAsync(context);
                 }
                 catch (Exception ex)
@@ -164,6 +188,19 @@ namespace motorak.pll
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
             app.Run();
+        }
+
+        private static async Task SeedRoles(RoleManager<IdentityRole> roleManager)
+        {
+            string[] roles = { Seed.Role_Admin, Seed.Role_Customer, Seed.Role_Mechanic };
+
+            foreach (var role in roles)
+            {
+                if (!await roleManager.RoleExistsAsync(role))
+                {
+                    await roleManager.CreateAsync(new IdentityRole(role));
+                }
+            }
         }
     }
 }

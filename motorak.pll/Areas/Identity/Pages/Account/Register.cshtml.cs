@@ -23,6 +23,10 @@ using Microsoft.Extensions.Logging;
 using motorak.dal.DataTemp;
 using motorak.dal.Entites;
 using Motorak.Utility;
+using motorak.DAL.DataBase;
+using Motorak.DAL.Entites;
+using Motorak.DAL.Enums.MechaincEnums;
+
 namespace motorak.pll.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
@@ -34,6 +38,7 @@ namespace motorak.pll.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<User> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly MotorakDbContext _context;
 
         public RegisterModel(
             UserManager<User> userManager,
@@ -41,7 +46,8 @@ namespace motorak.pll.Areas.Identity.Pages.Account
             IUserStore<User> userStore,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            MotorakDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -50,85 +56,66 @@ namespace motorak.pll.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-
             [Required]
             [Display(Name = "Full Name")]
             public string FullName { get; set; }
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
+            [Required]
+            [Display(Name = "Phone Number")]
+            [DataType(DataType.PhoneNumber)]
+            public string PhoneNumber { get; set; }
+
             public string? Role { get; set; }
+
             [ValidateNever]
             public IEnumerable<SelectListItem> RoleList { get; set; }
 
-            public string? PhoneNumber { get; set; }
+            // Mechanic specific fields
+            [Display(Name = "Working Hours")]
+            public string? WorkHours { get; set; }
         }
-
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-
+            // Create roles if they don't exist
             if (!_roleManager.RoleExistsAsync(Seed.Role_Customer).GetAwaiter().GetResult())
             {
                 _roleManager.CreateAsync(new IdentityRole(Seed.Role_Customer)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(Seed.Role_Mechanic)).GetAwaiter().GetResult();
                 _roleManager.CreateAsync(new IdentityRole(Seed.Role_Admin)).GetAwaiter().GetResult();
             }
+
             Input = new()
             {
-                RoleList = _roleManager.Roles.Select(x => x.Name).Select(i => new SelectListItem
+                RoleList = _roleManager.Roles.Where(r => r.Name != Seed.Role_Admin).Select(x => x.Name).Select(i => new SelectListItem
                 {
                     Text = i,
                     Value = i
@@ -142,51 +129,98 @@ namespace motorak.pll.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
+            // Recreate RoleList in case of validation errors
+            Input.RoleList = _roleManager.Roles.Where(r => r.Name != Seed.Role_Admin).Select(x => x.Name).Select(i => new SelectListItem
+            {
+                Text = i,
+                Value = i
+            });
+
+            // Custom validation for mechanic
+            if (Input.Role == Seed.Role_Mechanic && string.IsNullOrEmpty(Input.WorkHours))
+            {
+                ModelState.AddModelError("Input.WorkHours", "Working hours are required for mechanics.");
+            }
+
             if (ModelState.IsValid)
             {
-                var user = CreateUser();
-
-                user.Name = Input.FullName;
-                user.PhoneNumber = Input.PhoneNumber;
-
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
-                var result = await _userManager.CreateAsync(user, Input.Password);
-
-                if (result.Succeeded)
+                using var transaction = await _context.Database.BeginTransactionAsync();
+                try
                 {
-                    _logger.LogInformation("User created a new account with password.");
+                    var user = CreateUser();
+                    user.Name = Input.FullName;
+                    user.PhoneNumber = Input.PhoneNumber;
+                    user.CreatedAt = DateTime.Now;
 
-                    if (!String.IsNullOrEmpty(Input.Role))
+                    await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                    await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+
+                    var result = await _userManager.CreateAsync(user, Input.Password);
+
+                    if (result.Succeeded)
                     {
-                        await _userManager.AddToRoleAsync(user, Input.Role);
-                    }else
-                    {
-                        await _userManager.AddToRoleAsync(user, Seed.Role_Customer);
+                        _logger.LogInformation("User created a new account with password.");
+
+                        // Assign role
+                        string userRole = !String.IsNullOrEmpty(Input.Role) ? Input.Role : Seed.Role_Customer;
+                        await _userManager.AddToRoleAsync(user, userRole);
+
+                        // Create Customer or Mechanic entity based on role
+                        if (userRole == Seed.Role_Customer)
+                        {
+                            var customer = new Customer
+                            {
+                                UserId = user.Id,
+                                User = user
+                            };
+                            _context.Customers.Add(customer);
+                        }
+                        else if (userRole == Seed.Role_Mechanic)
+                        {
+                            var mechanic = new Mechanic
+                            {
+                                UserId = user.Id,
+                                User = user,
+                                WorkHours = Input.WorkHours,
+                                Status = MechanicStatus.Free,
+                                Rating = 0
+                            };
+                            _context.Mechanics.Add(mechanic);
+                        }
+
+                        await _context.SaveChangesAsync();
+                        await transaction.CommitAsync();
+
+                        var userId = await _userManager.GetUserIdAsync(user);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = Url.Page(
+                            "/Account/ConfirmEmail",
+                            pageHandler: null,
+                            values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                            protocol: Request.Scheme);
+
+                        var emailBody = EmailTemplate.GetEmailConfirmationTemplate(callbackUrl);
+                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your Motorak account", emailBody);
+
+                        return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
 
-                    var userId = await _userManager.GetUserIdAsync(user);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = Url.Page(
-                        "/Account/ConfirmEmail",
-                        pageHandler: null,
-                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                        protocol: Request.Scheme);
-
-                    var emailBody = EmailTemplate.GetEmailConfirmationTemplate(callbackUrl);
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your Motorak account", emailBody);
-
-                    // Redirect to confirmation page
-                    return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
+                    await transaction.RollbackAsync();
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
-                foreach (var error in result.Errors)
+                catch (Exception ex)
                 {
-                    ModelState.AddModelError(string.Empty, error.Description);
+                    await transaction.RollbackAsync();
+                    _logger.LogError(ex, "Error occurred during user registration");
+                    ModelState.AddModelError(string.Empty, "An error occurred during registration. Please try again.");
                 }
             }
 
-            // If we got this far, something failed, redisplay form
             return Page();
         }
 

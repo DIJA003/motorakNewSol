@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using motorak.DAL.DataBase;
 
@@ -11,9 +12,11 @@ using motorak.DAL.DataBase;
 namespace motorak.dal.Migrations
 {
     [DbContext(typeof(MotorakDbContext))]
-    partial class MotorakDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250815171858_latestMig")]
+    partial class latestMig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -163,34 +166,28 @@ namespace motorak.dal.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CarId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Count")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("DateAdded")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ItemType")
+                    b.Property<string>("Brand")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("RentEndDate")
-                        .HasColumnType("datetime2");
+                    b.Property<int>("CarId")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime?>("RentStartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
+                    b.Property<string>("ImagePath")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CarId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("CartItems");
                 });
@@ -400,8 +397,7 @@ namespace motorak.dal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Customers");
                 });
@@ -445,8 +441,7 @@ namespace motorak.dal.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("Mechanics");
                 });
@@ -672,25 +667,6 @@ namespace motorak.dal.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Motorak.DAL.Entites.CartItem", b =>
-                {
-                    b.HasOne("motorak.dal.Entites.Car", "Car")
-                        .WithMany()
-                        .HasForeignKey("CarId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("motorak.dal.Entites.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Car");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Motorak.DAL.Entites.Service", b =>
                 {
                     b.HasOne("motorak.dal.Entites.Car", "Car")
@@ -756,8 +732,8 @@ namespace motorak.dal.Migrations
             modelBuilder.Entity("motorak.dal.Entites.Customer", b =>
                 {
                     b.HasOne("motorak.dal.Entites.User", "User")
-                        .WithOne("Customer")
-                        .HasForeignKey("motorak.dal.Entites.Customer", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -767,8 +743,8 @@ namespace motorak.dal.Migrations
             modelBuilder.Entity("motorak.dal.Entites.Mechanic", b =>
                 {
                     b.HasOne("motorak.dal.Entites.User", "User")
-                        .WithOne("Mechanic")
-                        .HasForeignKey("motorak.dal.Entites.Mechanic", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -841,15 +817,6 @@ namespace motorak.dal.Migrations
             modelBuilder.Entity("motorak.dal.Entites.Mechanic", b =>
                 {
                     b.Navigation("Services");
-                });
-
-            modelBuilder.Entity("motorak.dal.Entites.User", b =>
-                {
-                    b.Navigation("Customer")
-                        .IsRequired();
-
-                    b.Navigation("Mechanic")
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

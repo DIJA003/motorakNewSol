@@ -9,6 +9,9 @@ namespace motorak.dal.Entites
         public string Name { get; set; }
         public DateTime CreatedAt { get; set; }
         public string? ImagePath { get; set; }
+
+        public virtual Customer Customer { get; set; }
+        public virtual Mechanic Mechanic { get; set; }
     }
     
 }

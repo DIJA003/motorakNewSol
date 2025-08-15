@@ -27,11 +27,11 @@
                         <i class="ri-car-fill"></i> Cars
                     </a>
                 </li>
-                <li class="nav-item">
+                @* <li class="nav-item">
                     <a class="nav-link" href="/Cart/Index">
                         Cart (<span id="cart-count">@((HttpContextAccessor.HttpContext?.Session.GetObjectFromJson<List<Motorak.DAL.Entites.CartItem>>("Cart")?.Sum(c => c.Quantity) ?? 0))</span>)
                     </a>
-                </li>
+                </li> *@
             </ul>
 
             <partial name="_LoginPartial" />

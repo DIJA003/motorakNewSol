@@ -34,7 +34,7 @@ namespace motorak.pll.Areas.Identity.Pages.Account
         /// </summary>
         [TempData]
         public string StatusMessage { get; set; }
-        public async Task<IActionResult> OnGetAsync(string userId, string code)
+        public async Task<IActionResult> OnGetAsync(string userId, string code,string returnUrl = null)
         {
             if (userId == null || code == null)
             {
@@ -62,7 +62,8 @@ namespace motorak.pll.Areas.Identity.Pages.Account
             // Automatically sign in the user after confirmation
             await _signInManager.SignInAsync(user, isPersistent: false);
 
-            return Page();
+            return LocalRedirect(returnUrl ?? "/");
+
         }
     }
 }

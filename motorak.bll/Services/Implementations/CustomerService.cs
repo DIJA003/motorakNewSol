@@ -1,5 +1,4 @@
-﻿
-using AutoMapper;
+﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 using motorak.dal.Entites;
 using Motorak.BLL.ModelVM.Customer;
@@ -15,12 +14,11 @@ namespace Motorak.BLL.Services.Implementations
         private readonly ICustomerRebo _customerRepo;
         private readonly IMapper _mapper;
 
-        public CustomerService(ICustomerRebo _customerRepo, IMapper _mapper)
+        public CustomerService(ICustomerRebo customerRepo, IMapper mapper)
         {
-            this._customerRepo = _customerRepo;
-            this._mapper = _mapper;
+            _customerRepo = customerRepo;
+            _mapper = mapper;
         }
-
 
         public async Task<(bool status, string message, List<CustomerListModel>)> GetAllCustomersAsync()
         {
@@ -28,11 +26,11 @@ namespace Motorak.BLL.Services.Implementations
             {
                 var result = await _customerRepo.GetAllAsync();
                 var resultList = _mapper.Map<List<CustomerListModel>>(result);
-                return (true, "Customer retrieved successfully!", resultList);
+                return (true, "Customers retrieved successfully!", resultList);
             }
             catch (Exception ex)
             {
-                return (false, $"Failed to retrieve customers : {ex.Message}", new List<CustomerListModel>());
+                return (false, $"Failed to retrieve customers: {ex.Message}", new List<CustomerListModel>());
             }
         }
 
@@ -42,12 +40,13 @@ namespace Motorak.BLL.Services.Implementations
             {
                 var customer = await _customerRepo.GetByIdAsync(id);
                 if (customer == null) return (false, "Customer Not Found!!", null);
+
                 var result = _mapper.Map<CustomerDetailsModel>(customer);
                 return (true, "Customer retrieved successfully!", result);
             }
             catch (Exception ex)
             {
-                return (false, $"Failed to retrieve car : {ex.Message}", null);
+                return (false, $"Failed to retrieve customer: {ex.Message}", null);
             }
         }
 
@@ -57,34 +56,48 @@ namespace Motorak.BLL.Services.Implementations
             {
                 var customer = await _customerRepo.GetByUsernameAsync(username);
                 if (customer == null) return (false, "Customer Not Found!!", null);
+
                 var result = _mapper.Map<CustomerDetailsModel>(customer);
                 return (true, "Customer retrieved successfully!", result);
             }
             catch (Exception ex)
             {
-                return (false, $"Failed to retrieve customer : {ex.Message}", null);
+                return (false, $"Failed to retrieve customer: {ex.Message}", null);
             }
         }
+
         public async Task<(bool status, string message)> CreateCustomerAsync(CreateCustomerModel customerModel)
         {
             try
             {
-                if (customerModel == null) 
-                    return (false, "Customer Null");
+                if (customerModel == null)
+                    return (false, "Customer model is null");
+
+                // Check if email already exists
+                var existingCustomer = await _customerRepo.GetByEmailAsync(customerModel.Email);
+                if (existingCustomer != null)
+                    return (false, "Email already exists");
+
+                // Check if phone number already exists
+                var existingPhone = await _customerRepo.GetByPhoneAsync(customerModel.PhoneNumber);
+                if (existingPhone != null)
+                    return (false, "Phone number already exists");
+
                 var customer = _mapper.Map<Customer>(customerModel);
                 var user = _mapper.Map<User>(customerModel);
+
                 customer.UserId = user.Id;
                 customer.User = user;
+
                 await _customerRepo.CreateAsync(customer);
                 await _customerRepo.SaveChangesAsync();
                 return (true, "Customer Created Successfully!");
             }
             catch (Exception ex)
             {
-                return (false, $"Error Ocurred: {ex.Message}");
+                return (false, $"Error Occurred: {ex.Message}");
             }
         }
-
 
         public async Task<(bool status, string message)> EditCustomerAsync(EditCustomerModel customerModel)
         {
@@ -95,7 +108,12 @@ namespace Motorak.BLL.Services.Implementations
                 {
                     return (false, "Customer Not Found!!");
                 }
+
                 _mapper.Map(customerModel, existingCustomer);
+                _mapper.Map(customerModel, existingCustomer.User);
+
+                existingCustomer.Update();
+
                 _customerRepo.Update(existingCustomer);
                 await _customerRepo.SaveChangesAsync();
                 return (true, "Customer Updated Successfully!");
@@ -112,31 +130,30 @@ namespace Motorak.BLL.Services.Implementations
             {
                 var result = await _customerRepo.GetByIdAsync(id);
                 if (result == null) return (false, "Customer Not Found!!");
+
                 _customerRepo.Delete(result);
                 await _customerRepo.SaveChangesAsync();
                 return (true, "Customer Deleted Successfully!");
             }
             catch (Exception ex)
             {
-                return (false, $"Failed to delete : {ex.Message}");
+                return (false, $"Failed to delete: {ex.Message}");
             }
         }
-        
 
-        public async Task<(bool status, string message,CustomerDetailsModel?)> IsEmailExistsAsync(string email)
+        public async Task<(bool status, string message, CustomerDetailsModel?)> IsEmailExistsAsync(string email)
         {
             try
             {
-
                 var customer = await _customerRepo.GetByEmailAsync(email);
                 if (customer == null) return (false, "Customer Not Found!!", null);
+
                 var result = _mapper.Map<CustomerDetailsModel>(customer);
                 return (true, "Customer retrieved successfully!", result);
             }
             catch (Exception ex)
             {
-
-                return (false, $"Failed to find Email : {ex.Message}",null);
+                return (false, $"Failed to find Email: {ex.Message}", null);
             }
         }
 
@@ -144,16 +161,15 @@ namespace Motorak.BLL.Services.Implementations
         {
             try
             {
-
                 var customer = await _customerRepo.GetByPhoneAsync(phoneNumber);
                 if (customer == null) return (false, "Phone Number Not Found!!", null);
+
                 var result = _mapper.Map<CustomerDetailsModel>(customer);
                 return (true, "Customer retrieved successfully!", result);
             }
             catch (Exception ex)
             {
-
-                return (false, $"Failed to find Phone Number : {ex.Message}", null);
+                return (false, $"Failed to find Phone Number: {ex.Message}", null);
             }
         }
     }

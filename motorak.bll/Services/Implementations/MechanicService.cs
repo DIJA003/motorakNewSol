@@ -21,12 +21,11 @@ namespace Motorak.BLL.Services.Implementations
         private readonly IMechanicRebo _mechanicRepo;
         private readonly IMapper _mapper;
 
-        public MechanicService(IMechanicRebo _mechanicRepo, IMapper _mapper)
+        public MechanicService(IMechanicRebo mechanicRepo, IMapper mapper)
         {
-            this._mechanicRepo = _mechanicRepo;
-            this._mapper = _mapper;
+            _mechanicRepo = mechanicRepo;
+            _mapper = mapper;
         }
-
 
         public async Task<(bool status, string message, List<MechanicListModel>)> GetAllMechanicsAsync()
         {
@@ -34,11 +33,11 @@ namespace Motorak.BLL.Services.Implementations
             {
                 var result = await _mechanicRepo.GetAllAsync();
                 var resultList = _mapper.Map<List<MechanicListModel>>(result);
-                return (true, "Mechanic retrieved successfully!", resultList);
+                return (true, "Mechanics retrieved successfully!", resultList);
             }
             catch (Exception ex)
             {
-                return (false, $"Failed to retrieve mechanic!! : {ex.Message}", new List<MechanicListModel>());
+                return (false, $"Failed to retrieve mechanics: {ex.Message}", new List<MechanicListModel>());
             }
         }
 
@@ -46,35 +45,41 @@ namespace Motorak.BLL.Services.Implementations
         {
             try
             {
-                var customer = await _mechanicRepo.GetByIdAsync(id);
-                if (customer == null) return (false, "Mechanic Not Found!!", null);
-                var result = _mapper.Map<MechanicDetailsModel>(customer);
+                var mechanic = await _mechanicRepo.GetByIdAsync(id);
+                if (mechanic == null) return (false, "Mechanic Not Found!!", null);
+
+                var result = _mapper.Map<MechanicDetailsModel>(mechanic);
                 return (true, "Mechanic retrieved successfully!", result);
             }
             catch (Exception ex)
             {
-                return (false, $"Failed to retrieve mechanic!! : {ex.Message}", null);
+                return (false, $"Failed to retrieve mechanic: {ex.Message}", null);
             }
         }
+
         public async Task<(bool status, string message)> CreateMechanicAsync(CreateMechanicModel mechanicModel)
         {
             try
             {
-                if (mechanicModel == null) 
-                    return (false, "Mechanic Null");
+                if (mechanicModel == null)
+                    return (false, "Mechanic model is null");
+
                 var mechanic = _mapper.Map<Mechanic>(mechanicModel);
                 var user = _mapper.Map<User>(mechanicModel);
+
                 mechanic.UserId = user.Id;
                 mechanic.User = user;
+
                 await _mechanicRepo.AddAsync(mechanic);
                 await _mechanicRepo.SaveChangesAsync();
                 return (true, "Mechanic Created Successfully!");
             }
             catch (Exception ex)
             {
-                return (false, $"Error Ocurred: {ex.Message}");
+                return (false, $"Error Occurred: {ex.Message}");
             }
         }
+
         public async Task<(bool status, string message)> EditMechanicAsync(EditMechanicModel mechanicModel)
         {
             try
@@ -84,8 +89,16 @@ namespace Motorak.BLL.Services.Implementations
                 {
                     return (false, "Mechanic Not Found!!");
                 }
+
                 _mapper.Map(mechanicModel, existingMechanic);
+                _mapper.Map(mechanicModel, existingMechanic.User);
+
+                existingMechanic.UpdateWorkHours(mechanicModel.WorkHours);
+                existingMechanic.UpdateRating(mechanicModel.Rating);
+                existingMechanic.UpdateStatus(mechanicModel.Status);
+
                 _mechanicRepo.Update(existingMechanic);
+                await _mechanicRepo.SaveChangesAsync();
                 return (true, "Mechanic Updated Successfully!");
             }
             catch (Exception ex)
@@ -100,16 +113,15 @@ namespace Motorak.BLL.Services.Implementations
             {
                 var result = await _mechanicRepo.GetByIdAsync(id);
                 if (result == null) return (false, "Mechanic Not Found!!");
+
                 _mechanicRepo.Delete(result);
                 await _mechanicRepo.SaveChangesAsync();
                 return (true, "Mechanic Deleted Successfully!");
             }
             catch (Exception ex)
             {
-                return (false, $"Failed to delete : {ex.Message}");
+                return (false, $"Failed to delete: {ex.Message}");
             }
         }
-
-
     }
 }

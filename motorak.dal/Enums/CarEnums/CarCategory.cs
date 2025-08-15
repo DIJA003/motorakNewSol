@@ -5,6 +5,9 @@ namespace motorak.dal.Enums.CarEnums
     public enum CarCategory
     {
         Buy,
-        Rent
+        Rent,
+        ForSale,
+        ForRent,
+        Both
     }
 }
