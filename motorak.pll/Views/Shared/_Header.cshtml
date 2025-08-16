@@ -5,31 +5,31 @@
     <nav class="nav container">
         <a asp-area="" asp-controller="Home" asp-action="Index" class="nav__logo">
             <i class="ri-steering-fill"></i>
-            Motorak
+            @SharedLocalizer["Motorak"]
         </a>
         <div class="nav__menu" id="nav-menu">
             <ul class="nav__list">
                 <li class="nav__item">
-                    <a asp-area="" asp-controller="Home" asp-action="Index" class="nav__link">Home</a>
+                    <a asp-area="" asp-controller="Home" asp-action="Index" class="nav__link">@SharedLocalizer["Home"]</a>
                 </li>
                 <li class="nav__item">
                     <a asp-controller="Service" asp-action="Index" class="nav__link">
-                        <i class="ri-service-fill"></i> Services
+                        <i class="ri-service-fill"></i> @SharedLocalizer["Services"]
                     </a>
                 </li>
                 <li class="nav__item">
                     <a asp-controller="Mechanic" asp-action="Index" class="nav__link">
-                        <i class="ri-tools-fill"></i> Mechanics
+                        <i class="ri-tools-fill"></i> @SharedLocalizer["Mechanics"]
                     </a>
                 </li>
                 <li class="nav__item">
                     <a asp-controller="Car" asp-action="Index" class="nav__link">
-                        <i class="ri-car-fill"></i> Cars
+                        <i class="ri-car-fill"></i> @SharedLocalizer["Cars"]
                     </a>
                 </li>
                 @* <li class="nav-item">
                     <a class="nav-link" href="/Cart/Index">
-                        Cart (<span id="cart-count">@((HttpContextAccessor.HttpContext?.Session.GetObjectFromJson<List<Motorak.DAL.Entites.CartItem>>("Cart")?.Sum(c => c.Quantity) ?? 0))</span>)
+                        @SharedLocalizer["Cart"] (<span id="cart-count">@((HttpContextAccessor.HttpContext?.Session.GetObjectFromJson<List<Motorak.DAL.Entites.CartItem>>("Cart")?.Sum(c => c.Quantity) ?? 0))</span>)
                     </a>
                 </li> *@
             </ul>
@@ -45,6 +45,29 @@
             <i class="ri-menu-line"></i>
         </div>
     </nav>
+     <a class="dropdown-item d-flex justify-content-between"
+        href="@Url.Action("SetLanguage", "Home", new {
+                        culture = "en-US",
+                        returnUrl = Context.Request.Path + Context.Request.QueryString
+                    })">
+        <img src="~/assets/img/US_Flag.png" width="25" height="15" class="mt-1" />
+        <span>English</span>
+    </a>
+    <a class="dropdown-item d-flex justify-content-between"
+        href="@Url.Action("SetLanguage", "Home", new {
+                        culture = "ar-EG",
+                        returnUrl = Context.Request.Path + Context.Request.QueryString
+                    })">
+        <img src="~/assets/img/EG_Flag.png" width="25" height="15" class="mt-1" />
+        <span>Arabic</span>
+    </a>
+
+
+
+
+
+
+
     <!--=============== SCROLL REVEAL - PAGE ANNIMATION ===============-->
     <script src="~/assets/js/scrollrevealAnimation.min.js"></script>
 

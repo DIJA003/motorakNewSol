@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using motorak.bll.Mapper.CartMapping;
 using motorak.bll.Services.Abstractions;
@@ -9,6 +11,7 @@ using motorak.dal.Entites;
 using motorak.dal.Repo.Abstractions;
 using motorak.dal.Repo.Implementations;
 using motorak.DAL.DataBase;
+using motorak.pll.Language;
 using Motorak.BLL.Mapper.CarMapping;
 using Motorak.BLL.Mapper.CustomerMapping;
 using Motorak.BLL.Mapper.MechanicMappin;
@@ -22,6 +25,7 @@ using Motorak.DAl.Repo.Implementations;
 using Motorak.DAL.Repo.Abstractions;
 using Motorak.DAL.Repo.Implementations;
 using Motorak.Utility;
+using System.Globalization;
 
 namespace motorak.pll
 {
@@ -86,7 +90,12 @@ namespace motorak.pll
             builder.Services.AddTransient<IEmailSender, EmailSender>();
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
+            .AddDataAnnotationsLocalization(options =>
+            {
+                options.DataAnnotationLocalizerProvider = (type, factory) =>
+                    factory.Create(typeof(SharedResource));
+            }); ;
 
             //Repos
             builder.Services.AddScoped<ICarRebo, CarRebo>();
@@ -186,6 +195,23 @@ namespace motorak.pll
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            var supportedCultures = new[] {
+                      new CultureInfo("ar-EG"),
+                      new CultureInfo("en-US"),
+                };
+
+            app.UseRequestLocalization(new RequestLocalizationOptions
+            {
+                DefaultRequestCulture = new RequestCulture("en-US"),
+                SupportedCultures = supportedCultures,
+                SupportedUICultures = supportedCultures,
+                RequestCultureProviders = new List<IRequestCultureProvider>
+                {
+                new QueryStringRequestCultureProvider(),
+                new CookieRequestCultureProvider()
+                }
+            });
 
             app.Run();
         }

@@ -1,4 +1,10 @@
 ﻿@using motorak.pll
 @using motorak.pll.Models
 @using Motorak.Utility;
+@using Microsoft.Extensions.Localization
+@using motorak.pll.Language
+
+@inject IStringLocalizer<SharedResource> SharedLocalizer
+
+
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
