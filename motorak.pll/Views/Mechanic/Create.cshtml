@@ -1,70 +1,115 @@
 ﻿@using Motorak.BLL.ModelVM.Mechanic
 @model CreateMechanicModel
-
-
+@{
+    Layout = null;
+}
 <style>
-    /* Custom card style for this view only */
-    .card-purple {
-        background-color: #2a0044; /* deep purple for card body */
+    body {
+        background-color: #1a001f;
         color: white;
-        border: 1px solid #5a00a3; /* purple border */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #e0c3ff;
+    }
+
+    .card-purple {
+        background-color: #2a0044;
+        border: 1px solid #5a00a3;
         border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(90, 0, 163, 0.5);
+        box-shadow: 0 4px 15px rgba(90, 0, 163, 0.4);
+        padding: 20px;
+        margin: 20px auto;
+        max-width: 600px;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
         .card-purple:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(90, 0, 163, 0.7);
+            box-shadow: 0 8px 25px rgba(90, 0, 163, 0.6);
         }
 
-        .card-purple .card-header {
-            background-color: #4b007d;
-            border-bottom: 1px solid #5a00a3;
-            font-weight: bold;
+    .card-header {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 20px;
+        text-align: center;
+        border-bottom: 1px solid #5a00a3;
+        padding-bottom: 10px;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 15px;
+        border-radius: 8px;
+        border: 1px solid #5a00a3;
+        background-color: #35005c;
+        color: white;
+    }
+
+        input::placeholder {
+            color: #ccc;
         }
 
-        .card-purple .card-body {
-            background-color: #35005c;
+    button {
+        background-color: #4b007d;
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+        button:hover {
+            background-color: #5a00a3;
+            transform: translateY(-2px);
         }
 </style>
 
-
-<div class="card text-center">
-    <div>
-        <b>Create Mechanic</b>
-    </div>
+<div class="card-purple">
+    <div class="card-header">Create Mechanic</div>
     <div class="card-body">
         <form asp-controller="Mechanic" asp-action="Create">
             <div class="form-group">
-                <div style="text-align: left;" for="exampleInputName">Name</div>
-                <input asp-for="Name" type="text" class="form-control" id="exampleInputName" aria-describedby="nameHelp" placeholder="Enter Name">
-                <br>
+                <label asp-for="Name">Name</label>
+                <input asp-for="Name" type="text" class="form-control" placeholder="Enter Name" />
             </div>
 
             <div class="form-group">
-                <div style="text-align: left;" for="exampleInputEmail1">Email</div>
-                <input asp-for="Email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter Email">
-                <br>
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" type="email" class="form-control" placeholder="Enter Email" />
             </div>
-            <select input asp-for="WorkHours" type="text" class="form-select" aria-label="Default select example">
-                <option selected>Work Horus</option>
-                <option value="1">7AM - 4PM</option>
-                <option value="2">4PM - 1AM</option>
-                <br>
-            </select>
+
+
             <div class="form-group">
-                <div style="text-align: left;" for="exampleInputAddress">Password</div>
-                <input asp-for="Password" type="password" class="form-control" id="exampleInputPassword" placeholder="Enter Password">
-                <br>
+                <label asp-for="WorkHours">Work Hours</label>
+                <select asp-for="WorkHours" class="form-select">
+                    <option disabled selected>Choose Work Hours</option>
+                    <option value="1">7AM - 4PM</option>
+                    <option value="2">4PM - 1AM</option>
+                </select>
             </div>
+
             <div class="form-group">
-                <div style="text-align: left;" for="exampleInputDateOfBirth">Confirm Password</div>
-                <input asp-for="ConfirmPassword" type="password" class="form-control" id="exampleInputPassword" placeholder="ConfirmedPassword">
-                <br>
+                <label asp-for="Password">Password</label>
+                <input asp-for="Password" type="password" class="form-control" placeholder="Enter Password" />
             </div>
+
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Confirm Password</label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control" placeholder="Confirm Password" />
+            </div>
+
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
     </div>
-
 </div>
+
+

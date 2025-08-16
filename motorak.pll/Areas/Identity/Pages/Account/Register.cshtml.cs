@@ -2,14 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,10 +11,21 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using motorak.dal.DataTemp;
 using motorak.dal.Entites;
+using motorak.DAL.DataBase;
+using Motorak.BLL.ModelVM.Customer;
 using Motorak.Utility;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading;
+using System.Threading.Tasks;
 namespace motorak.pll.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
@@ -34,6 +37,7 @@ namespace motorak.pll.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<User> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly MotorakDbContext _context;
 
         public RegisterModel(
             UserManager<User> userManager,
@@ -41,7 +45,8 @@ namespace motorak.pll.Areas.Identity.Pages.Account
             IUserStore<User> userStore,
             SignInManager<User> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            MotorakDbContext context)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -50,6 +55,7 @@ namespace motorak.pll.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _context = context;
         }
 
         /// <summary>
@@ -114,6 +120,8 @@ namespace motorak.pll.Areas.Identity.Pages.Account
             public IEnumerable<SelectListItem> RoleList { get; set; }
 
             public string? PhoneNumber { get; set; }
+
+
         }
 
 
@@ -164,6 +172,27 @@ namespace motorak.pll.Areas.Identity.Pages.Account
                     {
                         await _userManager.AddToRoleAsync(user, Seed.Role_Customer);
                     }
+
+                    if (Input.Role == "Customer")
+                    {
+                        var customer = new Customer
+                        {
+                            UserId = user.Id,
+                            User = user
+                        };
+                        _context.Customers.Add(customer);
+                    }
+                    else if (Input.Role == "Mechanic")
+                    {
+                        var mechanic = new Mechanic
+                        {
+                            UserId = user.Id,
+                            User = user
+                        };
+                        _context.Mechanics.Add(mechanic);
+                    }
+
+                    await _context.SaveChangesAsync();
 
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);

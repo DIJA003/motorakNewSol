@@ -58,20 +58,17 @@ namespace Motorak.BLL.Mapper.MechanicMappin
                 .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
-                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password))
-                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password.GetHashCode()))
                 .ForMember(dest => dest.NormalizedEmail, opt => opt.MapFrom(src => src.Email.Normalize().ToUpper()))
                 .ForMember(dest => dest.NormalizedUserName, opt => opt.MapFrom(src => src.Email.Normalize().ToUpper()))
-                .ForMember(dest => dest.ImagePath, opt => opt.Ignore());
-
+                .ForMember(dest => dest.ImagePath, opt => opt.Ignore())
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
 
             CreateMap<EditMechanicModel, Mechanic>()
-                .ForMember(m => m.WorkHours, opt => opt.MapFrom(src => src.WorkHours))
-                .ForMember(m => m.Rating, opt => opt.MapFrom(src => src.Rating))
-                .ForMember(m => m.UserId, opt => opt.Ignore())
-                .ForMember(m => m.User, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
 
-            CreateMap<EditMechanicModel, User>().ReverseMap();
+            CreateMap<EditMechanicModel, User>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
         }
     }
 }

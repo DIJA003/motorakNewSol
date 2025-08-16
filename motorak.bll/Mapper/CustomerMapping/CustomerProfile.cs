@@ -51,17 +51,18 @@ namespace Motorak.BLL.Mapper.CustomerMapping
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
-                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password.GetHashCode()))
                 .ForMember(dest => dest.NormalizedEmail, opt => opt.MapFrom(src => src.Email.Normalize().ToUpper()))
                 .ForMember(dest => dest.NormalizedUserName, opt => opt.MapFrom(src => src.Email.Normalize().ToUpper()))
-                .ForMember(dest => dest.ImagePath, opt => opt.Ignore());
+                .ForMember(dest => dest.ImagePath, opt => opt.Ignore())
+                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore());
 
             CreateMap<EditCustomerModel, Customer>()
-               .ForMember(dest => dest.Id, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); 
 
             CreateMap<EditCustomerModel, User>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
                 .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name));
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); 
 
         }
     }

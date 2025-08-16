@@ -28,9 +28,8 @@ namespace Motorak.DAL.Repo.Implementations
 
         public async Task<Mechanic?> GetByIdAsync(int id)
         {
-            return await MDB.Mechanics.Include(m => m.User).Where(m => m.Id == id).FirstOrDefaultAsync();
+            return await MDB.Mechanics.Include(m => m.User).FirstOrDefaultAsync(m => m.Id == id);
         }
-
         public async Task<int> SaveChangesAsync()
         {
             return await MDB.SaveChangesAsync();
@@ -39,6 +38,7 @@ namespace Motorak.DAL.Repo.Implementations
         public void Update(Mechanic mechanic)
         {
             MDB.Mechanics.Update(mechanic);
+            MDB.SaveChanges();
         }
 
         public void Delete(Mechanic mechanic)

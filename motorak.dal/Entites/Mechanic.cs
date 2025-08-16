@@ -20,16 +20,10 @@ namespace motorak.dal.Entites
         public virtual List<Service>? Services { get; set; }= new List<Service>();
 
 
-        public void UpdateWorkHours(string newWorkHours)
+        public void UpdateMechanicInfo(string name,string newWorkHours,MechanicStatus newStatus)
         {
+            User.Name = name;
             WorkHours = newWorkHours;
-        }
-        public void UpdateRating(decimal newRating)
-        {
-            Rating = newRating;
-        }
-        public void UpdateStatus(MechanicStatus newStatus)
-        {
             Status = newStatus;
         }
 
@@ -37,6 +31,16 @@ namespace motorak.dal.Entites
         {
             IsDeleted = true;
             DeletedAt = DateTime.Now;
+        }
+
+        public Mechanic()
+        {
+            CreatedAt = DateTime.Now;
+            Status = MechanicStatus.Free;
+            WorkHours = "1";
+            IsDeleted = false;
+            IsUpdated = false;
+
         }
     }
 }

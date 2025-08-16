@@ -13,6 +13,7 @@ using Motorak.BLL.Services.Abstractions;
 using Motorak.BLL.Services.Implementations;
 using Motorak.DAl.Repo.Abstractions;
 using Motorak.DAl.Repo.Implementations;
+using Motorak.DAL.Entites;
 using Motorak.DAL.Repo.Abstractions;
 using Motorak.DAL.Repo.Implementations;
 using Motorak.Utility;
@@ -68,6 +69,9 @@ namespace motorak.pll
             builder.Services.AddScoped<IRentService, RentService>();
             builder.Services.AddScoped<IServiceReviewService, ServiceReviewSercice>();
             builder.Services.AddScoped<IServiceServicecs, ServiceServices>();
+            builder.Services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+
 
             //emailsender
             builder.Services.AddScoped<IEmailSender, EmailSender>();
