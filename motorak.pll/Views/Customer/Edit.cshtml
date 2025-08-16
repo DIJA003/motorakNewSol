@@ -1,53 +1,103 @@
 ﻿@using Motorak.BLL.ModelVM.Customer
 @model EditCustomerModel
-
+@{
+    Layout = null;
+}
 <style>
-    /* Custom card style for this view only */
-    .card-purple {
-        background-color: #2a0044; /* deep purple for card body */
+    body {
+        background-color: #1a001f;
         color: white;
-        border: 1px solid #5a00a3; /* purple border */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #e0c3ff;
+    }
+
+    .card-purple {
+        background-color: #2a0044;
+        border: 1px solid #5a00a3;
         border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(90, 0, 163, 0.5);
+        box-shadow: 0 4px 15px rgba(90, 0, 163, 0.4);
+        padding: 20px;
+        margin-bottom: 20px;
+        max-width: 800px;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
         .card-purple:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(90, 0, 163, 0.7);
+            box-shadow: 0 8px 25px rgba(90, 0, 163, 0.6);
         }
 
-        .card-purple .card-header {
-            background-color: #4b007d;
-            border-bottom: 1px solid #5a00a3;
-            font-weight: bold;
+    .card-header {
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+
+    input {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #5a00a3;
+        background-color: #35005c;
+        color: white;
+    }
+
+        input::placeholder {
+            color: #ccc;
         }
 
-        .card-purple .card-body {
-            background-color: #35005c;
+    button {
+        background-color: #4b007d;
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+        button:hover {
+            background-color: #5a00a3;
+            transform: translateY(-2px);
         }
 </style>
 
+<h1>Edit Customer</h1>
 
-<div class="card text-center">
-    <div>
-        <b>Edit Customer</b>
-    </div>
-    <div class="card-body">
-       
-        <form asp-controller="Customer" asp-action="Edit">
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <div style="text-align: left;" for="exampleInputName">Name</div>
-                <input asp-for="Name" type="text" class="form-control" id="exampleInputName" aria-describedby="nameHelp" placeholder="Enter Name" />
-                <br />
-            </div>
-            <div class="form-group">
-                <div style="text-align: left;" for="exampleInputPhone">Phone</div>
-                <input asp-for="PhoneNumber" type="text" class="form-control" id="exampleInputPhone" placeholder="Enter Phone Number">
-                <br>
-            </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
+<div class="card-purple">
+    <div class="card-header">Edit Customer Info</div>
+    <form asp-controller="Customer" asp-action="Edit">
+        <input type="hidden" asp-for="Id" />
+
+        <div class="form-group">
+            <label asp-for="Name">Name</label>
+            <input asp-for="Name" placeholder="Enter Name" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="PhoneNumber">Phone</label>
+            <input asp-for="PhoneNumber" placeholder="Enter Phone Number" />
+        </div>
+
+        <button type="submit">Update</button>
+    </form>
 </div>
+
+

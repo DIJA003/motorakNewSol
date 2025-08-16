@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Identity;
 using motorak.dal.Entites;
 using Motorak.BLL.ModelVM.Customer;
 using Motorak.BLL.ModelVM.Mechanic;
@@ -20,11 +21,13 @@ namespace Motorak.BLL.Services.Implementations
     {
         private readonly IMechanicRebo _mechanicRepo;
         private readonly IMapper _mapper;
+        private readonly IPasswordHasher<User> _passwordHasher;
 
-        public MechanicService(IMechanicRebo mechanicRepo, IMapper mapper)
+        public MechanicService(IMechanicRebo _mechanicRepo, IMapper _mapper, IPasswordHasher<User> passwordHasher)
         {
-            _mechanicRepo = mechanicRepo;
-            _mapper = mapper;
+            this._mechanicRepo = _mechanicRepo;
+            this._mapper = _mapper;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<(bool status, string message, List<MechanicListModel>)> GetAllMechanicsAsync()
@@ -66,7 +69,7 @@ namespace Motorak.BLL.Services.Implementations
 
                 var mechanic = _mapper.Map<Mechanic>(mechanicModel);
                 var user = _mapper.Map<User>(mechanicModel);
-
+                user.PasswordHash = _passwordHasher.HashPassword(user, mechanicModel.Password);
                 mechanic.UserId = user.Id;
                 mechanic.User = user;
 
@@ -84,29 +87,27 @@ namespace Motorak.BLL.Services.Implementations
         {
             try
             {
-                var existingMechanic = await _mechanicRepo.GetByIdAsync(mechanicModel.Id);
-                if (existingMechanic == null)
-                {
-                    return (false, "Mechanic Not Found!!");
-                }
+                var result = await _mechanicRepo.GetByIdAsync(mechanicModel.Id);
+                if (result == null)
+                    return (false, "Mechanic not found");
 
-                _mapper.Map(mechanicModel, existingMechanic);
-                _mapper.Map(mechanicModel, existingMechanic.User);
+                _mapper.Map(mechanicModel, result);
 
-                existingMechanic.UpdateWorkHours(mechanicModel.WorkHours);
-                existingMechanic.UpdateRating(mechanicModel.Rating);
-                existingMechanic.UpdateStatus(mechanicModel.Status);
+                if (result.User != null)
+                    _mapper.Map(mechanicModel, result.User);
 
-                _mechanicRepo.Update(existingMechanic);
+                result.UpdateMechanicInfo(mechanicModel.Name, mechanicModel.WorkHours, mechanicModel.Status);
+
+                _mechanicRepo.Update(result);
                 await _mechanicRepo.SaveChangesAsync();
-                return (true, "Mechanic Updated Successfully!");
+
+                return (true, "Mechanic updated successfully");
             }
             catch (Exception ex)
             {
-                return (false, ex.Message);
+                return (false, $"Error Occurred: {ex.Message}");
             }
         }
-
         public async Task<(bool status, string message)> DeleteMechanicAsync(int id)
         {
             try

@@ -1,17 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Motorak.BLL.ModelVM.Customer;
 using Motorak.BLL.Services.Abstractions;
-using Motorak.BLL.Services.Implementations;
-using motorak.DAL.DataBase;
-using Motorak.DAL.Entites;
-using Motorak.DAL.Enums.SeviceEnums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Motorak.Utility;
 
 namespace Motorak.PLL.Controllers
 {
@@ -23,8 +14,8 @@ namespace Motorak.PLL.Controllers
             _customerService = customerService;
         }
 
-        
-        //[Authorize(Roles = "Admin")]
+
+        [Authorize(Roles=Seed.Role_Admin)]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -37,7 +28,8 @@ namespace Motorak.PLL.Controllers
             return View(customers);
         }
 
-        
+        [Authorize(Roles = Seed.Role_Admin)]
+        [HttpGet]
         public async Task<IActionResult> CustomerDetails(int id)
         {
             var (status, message, customer) = await _customerService.GetCustomerByIdAsync(id);
@@ -49,14 +41,14 @@ namespace Motorak.PLL.Controllers
             return View(customer);
         }
 
-        
+        [Authorize(Roles = Seed.Role_Admin)]
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-
+        [Authorize(Roles = Seed.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateCustomerModel model)
@@ -73,17 +65,19 @@ namespace Motorak.PLL.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+        [Authorize(Roles = Seed.Role_Admin)]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            var (status, message, customer) = await _customerService.GetCustomerByIdAsync(id);
-            if (!status || customer == null)
+            var (status, message, existing) = await _customerService.GetCustomerByIdAsync(id);
+            if (!status || existing == null)
             {
                 ViewBag.Error = message;
-                return View(message);
+                return NotFound(message);
             }
 
-            if (customer.IsDeleted)
+            if (existing.IsDeleted)
             {
                 ViewBag.Error = "This customer has been deleted.";
                 return View("Customer Deleted");
@@ -91,30 +85,32 @@ namespace Motorak.PLL.Controllers
 
             var model = new EditCustomerModel
             {
-                Id = customer.Id,
-                Name = customer.Name,
-                PhoneNumber = customer.PhoneNumber
+                Id = existing.Id,
+                Name= existing.Name,
+                PhoneNumber = existing.PhoneNumber
             };
             return View(model);
+
         }
 
-
+        [Authorize(Roles = Seed.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditCustomerModel model)
         {
-            if (!ModelState.IsValid) return View(model);
-
-            var (status, message) = await _customerService.EditCustomerAsync(model);
-            if (!status)
+            try
             {
-                ModelState.AddModelError("", message);
+                await _customerService.EditCustomerAsync(model);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
                 return View(model);
             }
-
-            return RedirectToAction(nameof(Index));
         }
-        
+
+        [Authorize(Roles = Seed.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
@@ -122,13 +118,12 @@ namespace Motorak.PLL.Controllers
             var (status, message) = await _customerService.DeleteCustomerAsync(id);
             if (!status)
             {
-                TempData["Error"] = "Could not delete Customer.";
+                TempData["Error"] = message;
                 return RedirectToAction(nameof(Index));
             }
 
             TempData["Success"] = "Customer Deleted Successfully";
             return RedirectToAction(nameof(Index));
-
         }
 
     }
