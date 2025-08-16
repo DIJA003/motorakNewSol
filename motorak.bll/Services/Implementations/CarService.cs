@@ -179,19 +179,54 @@ namespace Motorak.BLL.Services.Implementations
                 return (false, $"Failed to sell car: {ex.Message}");
             }
         }
-        public async Task<(bool status, string message)> UpdateCarAsync(EditCarModel car)
+        public async Task<(bool status, string message)> UpdateCarAsync(EditCarModel carModel)
         {
             try
             {
-                var result = await _carRebo.GetByIdAsync(car.Id);
-                if (result == null) return (false, "Car not found");
-                _mapper.Map(car, result);
-                _carRebo.Update(result);
-                await _carRebo.SaveChangesAsync();
-                return (true, "Car Updated Successfully");
+                if (carModel == null)
+                    return (false, "Car data is null");
+
+                // Get the existing car from database
+                var existingCar = await _carRebo.GetByIdAsync(carModel.Id);
+                if (existingCar == null)
+                    return (false, "Car not found");
+
+                // Manual mapping instead of AutoMapper to avoid issues
+                existingCar.Edit(
+                    brand: carModel.Brand,
+                    model: carModel.Model,
+                    year: carModel.Year,
+                    color: carModel.Color,
+                    mileage: carModel.Mileage,
+                    type: carModel.Type,
+                    transmission: carModel.Transmission,
+                    condition: carModel.Condition,
+                    status: carModel.Status,
+                    category: carModel.Category,
+                    price: carModel.Price,
+                    dailyRentPrice: carModel.DailyRentPrice,
+                    imagePath: carModel.ImagePath
+                );
+
+                existingCar.Update();
+
+                _carRebo.Update(existingCar);
+
+                var saveResult = await _carRebo.SaveChangesAsync();
+
+                if (saveResult > 0)
+                {
+                    return (true, "Car updated successfully");
+                }
+                else
+                {
+                    return (false, "No changes were saved to the database");
+                }
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Exception in UpdateCarAsync: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return (false, $"Failed to update car: {ex.Message}");
             }
         }

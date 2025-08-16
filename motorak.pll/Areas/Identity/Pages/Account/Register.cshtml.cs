@@ -182,7 +182,8 @@ namespace motorak.pll.Areas.Identity.Pages.Account
                         var mechanic = new Mechanic
                         {
                             UserId = user.Id,
-                            User = user
+                            User = user,
+                            WorkHours = Input.WorkHours ?? "1" 
                         };
                         _context.Mechanics.Add(mechanic);
                     }

@@ -42,5 +42,9 @@ namespace motorak.dal.Entites
             IsUpdated = false;
 
         }
+        public Mechanic(string newWrokHours)
+        {
+            WorkHours = newWrokHours;
+        }
     }
 }

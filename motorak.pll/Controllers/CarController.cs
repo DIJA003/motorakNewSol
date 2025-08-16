@@ -72,8 +72,13 @@ namespace Motorak.PLL.Controllers
         public async Task<IActionResult> Edit(int id)
         {
             var (status, message, car) = await _carService.GetCarByIdAsync(id);
-            if (!status || car == null) return NotFound();
+            if (!status || car == null)
+            {
+                TempData["Error"] = message ?? "Car not found";
+                return RedirectToAction(nameof(Index));
+            }
 
+            // Map all properties correctly
             var editModel = new EditCarModel
             {
                 Id = car.Id,
@@ -85,7 +90,11 @@ namespace Motorak.PLL.Controllers
                 Condition = car.Condition,
                 Transmission = car.Transmission,
                 Price = car.Price,
-                Type = car.Type
+                Type = car.Type,
+                Status = car.Status,      
+                Category = car.Category,       
+                DailyRentPrice = car.DailyRentPrice,  
+                ImagePath = car.ImagePath      
             };
 
             return View(editModel);
@@ -96,7 +105,15 @@ namespace Motorak.PLL.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(EditCarModel model)
         {
-            if (!ModelState.IsValid) return View(model);
+            if (!ModelState.IsValid)
+            {
+                // Add debug information
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+                }
+                return View(model);
+            }
 
             var (status, message) = await _carService.UpdateCarAsync(model);
             if (!status)
@@ -122,6 +139,7 @@ namespace Motorak.PLL.Controllers
 
             return View(car);
         }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
