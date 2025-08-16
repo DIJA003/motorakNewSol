@@ -222,11 +222,12 @@ namespace motorak.pll
                 }
             });
 
-            RecurringJob.AddOrUpdate<IReminderService>(
-                x => x.ShowReminder(),
-                Cron.Minutely);
+            
 
             app.UseHangfireDashboard("/Mustafa");
+            RecurringJob.AddOrUpdate<ReminderService>(
+                x => x.ShowReminder(),
+                Cron.Minutely);
 
             app.Run();
         }

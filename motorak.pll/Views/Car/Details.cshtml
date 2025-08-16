@@ -169,14 +169,14 @@
                 </div>
 
                 <!-- Action Buttons -->
-                @if (SignInManager.IsSignedIn(User) && Model.Status == CarStatus.Available)
+                @if (SignInManager.IsSignedIn(User) && (User.IsInRole("Customer") || User.IsInRole("Mechanc")) && Model.Status == CarStatus.Available)
                 {
                     <div class="action-section">
                         <h3 class="action-title">
                             <i class="ri-shopping-cart-line"></i> Take Action
                         </h3>
                         <div class="action-buttons">
-                            @if (Model.Category == CarCategory.ForSale)
+                            @if (Model.Category == CarCategory.ForSale || Model.Category == CarCategory.Buy)
                             {
                                 <button class="action-btn buy-btn" onclick="addToCart(@Model.Id, 'buy')">
                                     <i class="ri-shopping-bag-line"></i>
@@ -186,7 +186,7 @@
                                     </div>
                                 </button>
                             }
-                            @if (Model.Category == CarCategory.ForRent && Model.DailyRentPrice.HasValue)
+                            @if ((Model.Category == CarCategory.ForRent || Model.Category == CarCategory.Rent) && Model.DailyRentPrice.HasValue)
                             {
                                 <button class="action-btn rent-btn" onclick="showRentModal()">
                                     <i class="ri-calendar-line"></i>
@@ -242,7 +242,7 @@
                 }
             </div>
         </div>
-
+        i
         <!-- Back to Fleet Button -->
         <div class="back-section">
             <a asp-controller="Car" asp-action="Index" class="back-btn">
