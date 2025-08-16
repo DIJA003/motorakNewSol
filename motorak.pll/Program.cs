@@ -158,6 +158,9 @@ namespace motorak.pll
 
                     await SeedRoles(roleManager);
 
+                    await AdminLogins.SeedAdminAsync(userManager, roleManager);
+                    
+
                     await DbSeeder.SeedAsync(context);
                 }
                 catch (Exception ex)
