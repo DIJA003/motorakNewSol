@@ -1,46 +1,60 @@
-﻿@Html.AntiForgeryToken()
-@section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        // Get CSRF token
-        function getAntiForgeryToken() {
-            return $('input[name="__RequestVerificationToken"]').val();
+﻿
+@using Microsoft.AspNetCore.Identity
+@using Motorak.DAL.Entites
+@using motorak.dal.Entites
+
+@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+@model IEnumerable<Motorak.BLL.ModelVM.Car.CarListModel>
+
+@{
+    ViewData["Title"] = "Our Fleet";
+}
+
+<section class="featured section" id="featured">
+    <div class="container">
+        <h2 class="section__title">
+            Our Fleet of Cars
+        </h2>
+
+        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+        {
+            <p style="margin-bottom: 2rem;">
+                <a asp-action="Create" class="button">
+                    <i class='bx bx-plus'></i> Add New Car
+                </a>
+            </p>
         }
 
-        $(document).on("click", ".add-to-cart", function () {
-            var carId = $(this).data("id");
-            var button = $(this);
+        <div class="featured__content grid">
 
-            // Disable button during request
-            button.prop('disabled', true).text('Adding...');
+            @* We loop through the car data from the controller *@
+            @foreach (var car in Model)
+            {
+                <article class="featured__card">
+                    <div class="shape shape__smaller"></div>
 
-            $.ajax({
-                url: '/Cart/AddToCartSimple',
-                type: 'POST',
-                headers: {
-                    'RequestVerificationToken': getAntiForgeryToken()
-                },
-                data: {
-                    id: carId,
-                    itemType: 'Buy'
-                },
-                success: function (response) {
-                    if (response.success) {
-                        $("#cart-count").text(response.count);
-                        alert(response.message || "Added to cart!");
-                    } else {
-                        alert(response.message || "Failed to add to cart.");
+                    <h1 class="featured__title">@car.Brand</h1>
+                    <h3 class="featured__subtitle">@car.Model (@car.Year)</h3>
+
+                    <img src="@Url.Content(car.ImagePath ?? "~/assets/img/featured1.png")" alt="@car.Brand @car.Model" class="featured__img">
+
+                    <h3 class="featured__price">$@car.Price.ToString("N0")</h3>
+
+                    <a asp-action="Details" asp-route-id="@car.Id" class="button featured__button">
+                        <i class='bx bx-show'></i> Details
+                    </a>
+
+                    @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    {
+                        <div class="admin-actions" style="margin-top: 1rem;">
+                            <a asp-action="Edit" asp-route-id="@car.Id" class="btn btn-sm btn-info" style="color:white; background-color: #007bff; padding: 5px 10px; border-radius: 5px; text-decoration: none;">Edit</a>
+                            <a asp-action="Delete" asp-route-id="@car.Id" class="btn btn-sm btn-danger" style="color:white; background-color: #dc3545; padding: 5px 10px; border-radius: 5px; text-decoration: none;">Delete</a>
+                        </div>
                     }
-                },
-                error: function (xhr, status, error) {
-                    console.error('Error:', error);
-                    alert("Failed to add to cart. Please try again.");
-                },
-                complete: function() {
-                    // Re-enable button
-                    button.prop('disabled', false).text('Add to Cart');
-                }
-            });
-        });
-    </script>
-}
+                </article>
+            }
+        </div>
+    </div>
+</section>

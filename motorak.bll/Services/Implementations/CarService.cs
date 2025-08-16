@@ -67,9 +67,15 @@ namespace Motorak.BLL.Services.Implementations
         {
             try
             {
-                var result  = await _carRebo.GetAllAsync();
-                var resultList = _mapper.Map<List<CarListModel>>(result);
-                return (true, "Car retrieved successfully", resultList);
+                var cars = await _carRebo.GetAllAsync();
+
+                if (cars == null)
+                {
+                    return (false, "Could not retrieve car data.", new List<CarListModel>());
+                }
+
+                var result = _mapper.Map<List<CarListModel>>(cars);
+                return (true, "Cars retrieved successfully", result);
             }
             catch (Exception ex) 
             {
