@@ -1,139 +1,641 @@
-﻿@using motorak.bll.ModelVM.ShoppingCart;
-@using motorak.dal.Enums.CartEnums;
-
-@model List<ShoppingCartVM>
+﻿@model IEnumerable<object>
 @{
     ViewData["Title"] = "Shopping Cart";
+    Layout = "~/Views/Shared/_MotorakIndex.cshtml";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">
-                <i class="fas fa-shopping-cart"></i> Your Shopping Cart
-                <span class="badge badge-primary ml-2" id="cart-count">@Model.Sum(c => c.Count)</span>
-            </h2>
-        </div>
-    </div>
-
-    @if (!Model.Any())
-    {
-        <div class="text-center py-5">
-            <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-            <h4 class="text-muted">Your cart is empty</h4>
-            <p class="text-muted">Browse our cars and add items to your cart</p>
-            <a href="@Url.Action("Index", "Car")" class="btn btn-primary">Browse Cars</a>
-        </div>
+<style>
+    .cart-container {
+        background: var(--body-color);
+        min-height: 100vh;
+        padding: 2rem 0;
     }
-    else
-    {
+
+    .cart-header {
+        background: linear-gradient(135deg, var(--first-color), var(--first-color-alt));
+        color: var(--white-color);
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .cart-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .cart-header h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+    .cart-subtitle {
+        opacity: 0.9;
+        margin-bottom: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .cart-card {
+        background: var(--container-color);
+        border-radius: 1rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        border: none;
+        margin-bottom: 2rem;
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+        .cart-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+    .cart-item {
+        padding: 1.5rem;
+        border-bottom: 1px solid rgba(var(--first-color-rgb), 0.1);
+        transition: all 0.3s ease;
+    }
+
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+
+        .cart-item:hover {
+            background: rgba(var(--first-color-rgb), 0.02);
+        }
+
+    .item-image {
+        width: 120px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .item-details h6 {
+        color: var(--title-color);
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-size: 1.1rem;
+    }
+
+    .item-meta {
+        color: var(--text-color);
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .item-type-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .badge-buy {
+        background: rgba(34, 197, 94, 0.1);
+        color: #16a34a;
+        border: 1px solid rgba(34, 197, 94, 0.2);
+    }
+
+    .badge-rent {
+        background: rgba(59, 130, 246, 0.1);
+        color: #2563eb;
+        border: 1px solid rgba(59, 130, 246, 0.2);
+    }
+
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin: 1rem 0;
+    }
+
+    .quantity-btn {
+        width: 32px;
+        height: 32px;
+        border: 2px solid var(--first-color);
+        background: rgba(var(--first-color-rgb), 0.1);
+        color: var(--first-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+        .quantity-btn:hover {
+            background: var(--first-color);
+            color: var(--white-color);
+            transform: scale(1.1);
+        }
+
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        border: 2px solid rgba(var(--first-color-rgb), 0.2);
+        border-radius: 0.5rem;
+        padding: 0.5rem;
+        font-weight: 600;
+        color: var(--title-color);
+    }
+
+        .quantity-input:focus {
+            outline: none;
+            border-color: var(--first-color);
+            box-shadow: 0 0 0 3px rgba(var(--first-color-rgb), 0.1);
+        }
+
+    .date-inputs {
+        display: flex;
+        gap: 1rem;
+        margin: 1rem 0;
+    }
+
+    .date-input-group {
+        flex: 1;
+    }
+
+        .date-input-group label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .date-input-group input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 2px solid rgba(var(--first-color-rgb), 0.2);
+            border-radius: 0.5rem;
+            color: var(--title-color);
+            transition: all 0.3s ease;
+        }
+
+            .date-input-group input:focus {
+                outline: none;
+                border-color: var(--first-color);
+                box-shadow: 0 0 0 3px rgba(var(--first-color-rgb), 0.1);
+            }
+
+    .item-price {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: var(--first-color);
+        margin: 0.5rem 0;
+    }
+
+    .remove-btn {
+        background: rgba(239, 68, 68, 0.1);
+        border: 2px solid rgba(239, 68, 68, 0.2);
+        color: #dc2626;
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .remove-btn:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .update-btn {
+        background: rgba(var(--first-color-rgb), 0.1);
+        border: 2px solid rgba(var(--first-color-rgb), 0.2);
+        color: var(--first-color);
+        border-radius: 0.5rem;
+        padding: 0.5rem 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        margin-right: 0.5rem;
+    }
+
+        .update-btn:hover {
+            background: var(--first-color);
+            border-color: var(--first-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .cart-summary {
+        background: linear-gradient(135deg, rgba(var(--first-color-rgb), 0.05), rgba(var(--first-color-rgb), 0.1));
+        border: 2px solid rgba(var(--first-color-rgb), 0.15);
+        border-radius: 1rem;
+        padding: 2rem;
+        position: sticky;
+        top: 2rem;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(var(--first-color-rgb), 0.1);
+    }
+
+        .summary-row:last-child {
+            border-bottom: none;
+            font-size: 1.25rem;
+            font-weight: 700;
+            padding-top: 1rem;
+            margin-top: 1rem;
+            border-top: 2px solid rgba(var(--first-color-rgb), 0.2);
+        }
+
+    .checkout-btn {
+        width: 100%;
+        background: linear-gradient(135deg, var(--first-color), var(--first-color-alt));
+        border: none;
+        border-radius: 0.75rem;
+        padding: 1rem 2rem;
+        color: var(--white-color);
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        margin-top: 1.5rem;
+    }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--first-color-rgb), 0.3);
+            color: var(--white-color);
+        }
+
+    .clear-cart-btn {
+        width: 100%;
+        background: rgba(239, 68, 68, 0.1);
+        border: 2px solid rgba(239, 68, 68, 0.2);
+        color: #dc2626;
+        border-radius: 0.75rem;
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+        .clear-cart-btn:hover {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+    .empty-cart {
+        text-align: center;
+        padding: 4rem 2rem;
+        color: var(--text-color);
+    }
+
+    .empty-cart-icon {
+        font-size: 4rem;
+        color: rgba(var(--first-color-rgb), 0.3);
+        margin-bottom: 1rem;
+    }
+
+    .empty-cart h4 {
+        color: var(--title-color);
+        margin-bottom: 1rem;
+    }
+
+    .shop-now-btn {
+        background: linear-gradient(135deg, var(--first-color), var(--first-color-alt));
+        color: var(--white-color);
+        border: none;
+        border-radius: 0.75rem;
+        padding: 1rem 2rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+        .shop-now-btn:hover {
+            color: var(--white-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(var(--first-color-rgb), 0.3);
+        }
+
+    .loading-spinner {
+        display: none;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-top: 2px solid white;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-right: 0.5rem;
+    }
+
+
+    .cart-item {
+        animation: slideIn 0.5s ease-out;
+    }
+
+</style>
+
+<div class="cart-container">
+    <div class="container">
+        <!-- Cart Header -->
+        <div class="cart-header">
+            <h2>
+                <i class="ri-shopping-cart-2-line me-3"></i>
+                Shopping Cart
+            </h2>
+            <p class="cart-subtitle">Review your selected vehicles before checkout</p>
+        </div>
+
         <div class="row">
             <div class="col-lg-8">
-                @foreach (var item in Model)
-                {
-                    <div class="card mb-3 cart-item" data-cart-id="@item.Id">
-                        <div class="card-body">
-                            <div class="row align-items-center">
-                                <div class="col-md-3">
-                                    <img src="@(item.ImagePath ?? "/images/default-car.jpg")"
-                                         class="img-fluid rounded" alt="@item.Brand @item.Model">
-                                </div>
-                                <div class="col-md-6">
-                                    <h5 class="card-title">@item.Brand @item.Model (@item.Year)</h5>
-                                    <p class="card-text">
-                                        <span class="badge badge-@(item.ItemType == CartItemType.Rent ? "info" : "success")">
-                                            @item.ItemType.ToString().ToUpper()
-                                        </span>
-                                    </p>
+                <div id="cart-items-container">
+                    @if (Model != null && Model.Any())
+                    {
+                        <div class="cart-card">
+                            @foreach (var item in Model)
+                            {
+                                <div class="cart-item" data-item-id="@item.GetType().GetProperty("Id")?.GetValue(item)">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-3 mb-3 mb-md-0">
+                                            <img src="@(item.GetType().GetProperty("ImagePath")?.GetValue(item) ?? "/images/default-car.jpg")"
+                                                 alt="Vehicle" class="item-image">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <div class="item-details">
+                                                <h6>@item.GetType().GetProperty("CarBrand")?.GetValue(item) @item.GetType().GetProperty("CarModel")?.GetValue(item)</h6>
+                                                <div class="item-meta">
+                                                    <i class="ri-calendar-line"></i>
+                                                    <span>@item.GetType().GetProperty("CarYear")?.GetValue(item)</span>
+                                                </div>
+                                                <div class="item-meta">
+                                                    <span class="item-type-badge @(item.GetType().GetProperty("ItemType")?.GetValue(item)?.ToString() == "Buy" ? "badge-buy" : "badge-rent")">
+                                                        <i class="@(item.GetType().GetProperty("ItemType")?.GetValue(item)?.ToString() == "Buy" ? "ri-shopping-cart-line" : "ri-calendar-line")"></i>
+                                                        @item.GetType().GetProperty("ItemType")?.GetValue(item)
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <!-- Quantity Controls -->
+                                            <div class="quantity-controls">
+                                                <button class="quantity-btn" onclick="updateQuantity(@item.GetType().GetProperty("Id")?.GetValue(item), 'decrease')">-</button>
+                                                <input type="number" class="quantity-input" value="@(item.GetType().GetProperty("Quantity")?.GetValue(item) ?? 1)"
+                                                       onchange="updateQuantity(@item.GetType().GetProperty("Id")?.GetValue(item), 'set', this.value)" min="1">
+                                                <button class="quantity-btn" onclick="updateQuantity(@item.GetType().GetProperty("Id")?.GetValue(item), 'increase')">+</button>
+                                            </div>
 
-                                    @if (item.ItemType == CartItemType.Rent)
-                                    {
-                                        <div class="rent-details">
-                                            <small class="text-muted">
-                                                <i class="fas fa-calendar"></i>
-                                                @item.RentStartDate?.ToString("MM/dd/yyyy") - @item.RentEndDate?.ToString("MM/dd/yyyy")
-                                                (@item.RentDays days)
-                                            </small>
+                                            <!-- Date Inputs for Rental Items -->
+                                            @if (item.GetType().GetProperty("ItemType")?.GetValue(item)?.ToString() == "Rent")
+                                            {
+                                                <div class="date-inputs">
+                                                    <div class="date-input-group">
+                                                        <label>Start Date</label>
+                                                        <input type="date" class="start-date"
+                                                               value="@(item.GetType().GetProperty("RentStartDate")?.GetValue(item)?.ToString() ?? DateTime.Today.ToString("yyyy-MM-dd"))"
+                                                               onchange="updateDates(@item.GetType().GetProperty("Id")?.GetValue(item))">
+                                                    </div>
+                                                    <div class="date-input-group">
+                                                        <label>End Date</label>
+                                                        <input type="date" class="end-date"
+                                                               value="@(item.GetType().GetProperty("RentEndDate")?.GetValue(item)?.ToString() ?? DateTime.Today.AddDays(1).ToString("yyyy-MM-dd"))"
+                                                               onchange="updateDates(@item.GetType().GetProperty("Id")?.GetValue(item))">
+                                                    </div>
+                                                </div>
+                                            }
+
+                                            <div class="item-price">$@(item.GetType().GetProperty("TotalPrice")?.GetValue(item)?.ToString() ?? "0")</div>
+
                                             <div class="mt-2">
-                                                <input type="date" class="form-control form-control-sm rent-start"
-                                                       value="@item.RentStartDate?.ToString("yyyy-MM-dd")"
-                                                       onchange="updateRentDates(@item.Id, this.value, document.querySelector('[data-cart-id=@item.Id] .rent-end').value)">
-                                                <input type="date" class="form-control form-control-sm rent-end mt-1"
-                                                       value="@item.RentEndDate?.ToString("yyyy-MM-dd")"
-                                                       onchange="updateRentDates(@item.Id, document.querySelector('[data-cart-id=@item.Id] .rent-start').value, this.value)">
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                                <div class="col-md-3 text-right">
-                                    <div class="quantity-controls mb-2">
-                                        <div class="input-group input-group-sm">
-                                            <div class="input-group-prepend">
-                                                <button class="btn btn-outline-secondary" type="button"
-                                                        onclick="updateQuantity(@item.Id, @item.Count - 1)">
-                                                    <i class="fas fa-minus"></i>
+                                                <button class="update-btn" onclick="updateCartItem(@item.GetType().GetProperty("Id")?.GetValue(item))">
+                                                    <i class="ri-refresh-line me-1"></i>Update
                                                 </button>
-                                            </div>
-                                            <input type="number" class="form-control text-center"
-                                                   value="@item.Count" min="1" max="10"
-                                                   onchange="updateQuantity(@item.Id, this.value)">
-                                            <div class="input-group-append">
-                                                <button class="btn btn-outline-secondary" type="button"
-                                                        onclick="updateQuantity(@item.Id, @item.Count + 1)">
-                                                    <i class="fas fa-plus"></i>
+                                                <button class="remove-btn" onclick="removeFromCart(@item.GetType().GetProperty("Id")?.GetValue(item))">
+                                                    <i class="ri-delete-bin-line me-1"></i>Remove
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
-
-                                    <div class="price-display">
-                                        @if (item.ItemType == CartItemType.Rent)
-                                        {
-                                            <div class="text-muted small">$@item.DailyRentPrice/day</div>
-                                        }
-                                        <strong class="item-total">$@item.TotalPrice.ToString("F2")</strong>
-                                    </div>
-
-                                    <button class="btn btn-danger btn-sm mt-2" onclick="removeFromCart(@item.Id)">
-                                        <i class="fas fa-trash"></i> Remove
-                                    </button>
                                 </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="cart-card">
+                            <div class="empty-cart">
+                                <div class="empty-cart-icon">
+                                    <i class="ri-shopping-cart-line"></i>
+                                </div>
+                                <h4>Your cart is empty</h4>
+                                <p>Looks like you haven't added any vehicles to your cart yet.</p>
+                                <a href="@Url.Action("Index", "Car")" class="shop-now-btn">
+                                    <i class="ri-car-line"></i>
+                                    Browse Vehicles
+                                </a>
                             </div>
                         </div>
-                    </div>
-                }
+                    }
+                </div>
             </div>
 
-            <div class="col-lg-4">
-                <div class="card sticky-top">
-                    <div class="card-header">
-                        <h5 class="mb-0">Order Summary</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Items (@Model.Sum(c => c.Count)):</span>
-                            <span id="subtotal">$@Model.Sum(c => c.TotalPrice).ToString("F2")</span>
-                        </div>
-                        <div class="d-flex justify-content-between mb-2">
-                            <span>Tax:</span>
-                            <span id="tax">$@((Model.Sum(c => c.TotalPrice) * 0.08m).ToString("F2"))</span>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between mb-3">
-                            <strong>Total:</strong>
-                            <strong id="total">$@((Model.Sum(c => c.TotalPrice) * 1.08m).ToString("F2"))</strong>
+            @if (Model != null && Model.Any())
+            {
+                <div class="col-lg-4">
+                    <div class="cart-summary">
+                        <h5 class="mb-3">
+                            <i class="ri-file-list-3-line me-2"></i>
+                            Order Summary
+                        </h5>
+
+                        <div class="summary-row">
+                            <span>Items (@Model.Count())</span>
+                            <span id="items-subtotal">$@Model.Sum(item => Convert.ToDecimal(item.GetType().GetProperty("TotalPrice")?.GetValue(item) ?? 0)).ToString("N2")</span>
                         </div>
 
-                        <button class="btn btn-primary btn-block btn-lg" onclick="proceedToCheckout()">
-                            <i class="fas fa-credit-card"></i> Proceed to Checkout
+                        <div class="summary-row">
+                            <span>Processing Fee</span>
+                            <span>$25.00</span>
+                        </div>
+
+                        <div class="summary-row">
+                            <span>Tax (8.5%)</span>
+                            <span id="tax-amount">$@((Model.Sum(item => Convert.ToDecimal(item.GetType().GetProperty("TotalPrice")?.GetValue(item) ?? 0)) * 0.085m).ToString("N2"))</span>
+                        </div>
+
+                        <div class="summary-row">
+                            <span><strong>Total</strong></span>
+                            <span id="total-amount"><strong>$@((Model.Sum(item => Convert.ToDecimal(item.GetType().GetProperty("TotalPrice")?.GetValue(item) ?? 0)) * 1.085m + 25m).ToString("N2"))</strong></span>
+                        </div>
+
+                        <button class="checkout-btn" onclick="proceedToCheckout()">
+                            <span class="loading-spinner"></span>
+                            <i class="ri-secure-payment-line me-2"></i>
+                            Proceed to Checkout
                         </button>
 
-                        <button class="btn btn-outline-secondary btn-block mt-2" onclick="clearCart()">
-                            <i class="fas fa-trash-alt"></i> Clear Cart
+                        <button class="clear-cart-btn" onclick="clearCart()">
+                            <i class="ri-delete-bin-line me-2"></i>
+                            Clear Cart
                         </button>
                     </div>
                 </div>
-            </div>
+            }
         </div>
-    }
+    </div>
 </div>
+
+<!-- Anti-forgery token -->
+@Html.AntiForgeryToken()
+
+<script>
+    // Cart functionality
+    async function updateQuantity(itemId, action, value = null) {
+        const quantityInput = document.querySelector(`[data-item-id="${itemId}"] .quantity-input`);
+        let currentQuantity = parseInt(quantityInput.value);
+        let newQuantity = currentQuantity;
+
+        switch (action) {
+            case 'increase':
+                newQuantity = currentQuantity + 1;
+                break;
+            case 'decrease':
+                newQuantity = Math.max(1, currentQuantity - 1);
+                break;
+            case 'set':
+                newQuantity = Math.max(1, parseInt(value) || 1);
+                break;
+        }
+
+        quantityInput.value = newQuantity;
+
+        // Add visual feedback
+        quantityInput.style.background = 'rgba(var(--first-color-rgb), 0.1)';
+        setTimeout(() => {
+            quantityInput.style.background = '';
+        }, 300);
+    }
+
+    async function updateDates(itemId) {
+        const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+        const startDate = itemElement.querySelector('.start-date').value;
+        const endDate = itemElement.querySelector('.end-date').value;
+
+        // Validate dates
+        if (new Date(startDate) >= new Date(endDate)) {
+            showNotification('End date must be after start date', 'error');
+            return;
+        }
+
+        if (new Date(startDate) < new Date().toISOString().split('T')[0]) {
+            showNotification('Start date cannot be in the past', 'error');
+            return;
+        }
+
+        // Add visual feedback
+        const dateInputs = itemElement.querySelectorAll('.date-inputs input');
+        dateInputs.forEach(input => {
+            input.style.borderColor = 'var(--first-color)';
+            input.style.background = 'rgba(var(--first-color-rgb), 0.05)';
+        });
+
+        setTimeout(() => {
+            dateInputs.forEach(input => {
+                input.style.borderColor = '';
+                input.style.background = '';
+            });
+        }, 500);
+    }
+
+        async function updateCartItem(itemId) {
+        try {
+            const itemElement = document.querySelector(`[data-item-id="${itemId}"]`);
+            const quantity = parseInt(itemElement.querySelector('.quantity-input').value);
+            const startDateInput = itemElement.querySelector('.start-date');
+            const endDateInput = itemElement.querySelector('.end-date');
+
+            const startDate = startDateInput ? startDateInput.value : null;
+            const endDate = endDateInput ? endDateInput.value : null;
+
+            const updateBtn = itemElement.querySelector('.update-btn');
+            const originalText = updateBtn.innerHTML;
+            updateBtn.innerHTML = '<i class="ri-loader-4-line me-1" style="animation: spin 1s linear infinite;"></i>Updating...';
+            updateBtn.disabled = true;
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            const response = await fetch('/Cart/UpdateCartItem', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify({
+                    id: itemId,
+                    quantity: quantity,
+                    rentStartDate: startDate,
+                    rentEndDate: endDate
+                })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+
+                if (result.success) {
+                    showNotification('Item updated successfully!', 'success');
+
+                    // Option 1: Refresh the page to reload cart data
+                    location.reload();
+
+                    // Option 2 (Optional): Update totals without refresh
+                    // document.querySelector(`#items-subtotal`).textContent = `$${result.subtotal.toFixed(2)}`;
+                    // document.querySelector(`#tax-amount`).textContent = `$${result.tax.toFixed(2)}`;
+                    // document.querySelector(`#total-amount`).textContent = `$${result.total.toFixed(2)}`;
+                    // itemElement.querySelector('.item-price').textContent = `$${result.itemTotal.toFixed(2)}`;
+                } else {
+                    showNotification(result.message || 'Failed to update item', 'error');
+                }
+            } else {
+                showNotification('Error updating cart item', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            showNotification('Something went wrong', 'error');
+        } finally {
+            // Restore button state
+            const updateBtn = document.querySelector(`[data-item-id="${itemId}"] .update-btn`);
+            updateBtn.innerHTML = '<i class="ri-refresh-line me-1"></i>Update';
+            updateBtn.disabled = false;
+        }
+    }
+
+}

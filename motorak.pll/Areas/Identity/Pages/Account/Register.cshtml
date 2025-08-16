@@ -163,6 +163,51 @@
         gap: 1rem;
     }
 
+    /* Password visibility toggle styles */
+    .password-container {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 0;
+        z-index: 5;
+        transition: color 0.3s ease;
+    }
+
+        .password-toggle:hover {
+            color: var(--first-color);
+        }
+
+        .password-toggle i {
+            font-size: 1.2rem;
+        }
+
+    /* Auth links styling */
+    .auth-links {
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .auth-link {
+        color: var(--text-color);
+        text-decoration: none;
+        font-size: var(--small-font-size);
+        transition: color 0.3s ease;
+        display: inline-block;
+        margin: 0.5rem 0;
+    }
+
+        .auth-link:hover {
+            color: var(--first-color);
+        }
 
 
     /* Background effects */
@@ -228,15 +273,21 @@
             </div>
 
             <div class="form-row">
-                <div class="form-floating">
-                    <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder=" " />
+                <div class="form-floating password-container">
+                    <input asp-for="Input.Password" type="password" class="form-control" autocomplete="new-password" aria-required="true" placeholder=" " id="passwordInput" />
                     <label asp-for="Input.Password" class="form-label">Password</label>
+                    <button type="button" class="password-toggle" onclick="togglePassword('passwordInput', 'eyeIcon1')">
+                        <i class="ri-eye-line" id="eyeIcon1"></i>
+                    </button>
                     <span asp-validation-for="Input.Password" class="text-danger"></span>
                 </div>
 
-                <div class="form-floating">
-                    <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder=" " />
+                <div class="form-floating password-container">
+                    <input asp-for="Input.ConfirmPassword" type="password" class="form-control" autocomplete="new-password" aria-required="true" placeholder=" " id="confirmPasswordInput" />
                     <label asp-for="Input.ConfirmPassword" class="form-label">Confirm Password</label>
+                    <button type="button" class="password-toggle" onclick="togglePassword('confirmPasswordInput', 'eyeIcon2')">
+                        <i class="ri-eye-line" id="eyeIcon2"></i>
+                    </button>
                     <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                 </div>
             </div>
@@ -246,16 +297,36 @@
                     <i class="ri-user-settings-line" style="margin-right: 0.25rem;"></i>
                     Select Role
                 </label>
-                <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-select">
+                <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-select" onchange="toggleMechanicFields()">
                     <option value="" disabled selected>Choose your role...</option>
                 </select>
                 <span asp-validation-for="Input.Role" class="text-danger"></span>
+            </div>
+
+            <!-- Mechanic specific fields (initially hidden) -->
+            <div id="mechanicFields" class="form-group" style="display: none;">
+                <label asp-for="Input.WorkHours" class="form-label">
+                    <i class="ri-time-line" style="margin-right: 0.25rem;"></i>
+                    Working Hours
+                </label>
+                <input asp-for="Input.WorkHours" class="form-control" placeholder="e.g., 9:00 AM - 6:00 PM" />
+                <span asp-validation-for="Input.WorkHours" class="text-danger"></span>
             </div>
 
             <button id="registerSubmit" type="submit" class="btn-auth">
                 <i class="ri-user-add-line" style="margin-right: 0.5rem;"></i>
                 Create Account
             </button>
+
+            <div class="auth-links">
+                <p style="color: var(--text-color); margin: 0;">
+                    Already have an account?
+                    <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="auth-link">
+                        <i class="ri-login-circle-line" style="margin-right: 0.25rem;"></i>
+                        Sign in here
+                    </a>
+                </p>
+            </div>
         </form>
 
         @{
@@ -276,6 +347,37 @@
         }
     </div>
 </div>
+
+<script>
+    function togglePassword(inputId, iconId) {
+        const passwordInput = document.getElementById(inputId);
+        const eyeIcon = document.getElementById(iconId);
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.className = 'ri-eye-off-line';
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.className = 'ri-eye-line';
+        }
+    }
+
+    function toggleMechanicFields() {
+        const roleSelect = document.querySelector('select[name="Input.Role"]');
+        const mechanicFields = document.getElementById('mechanicFields');
+
+        if (roleSelect.value === 'Mechanic') {
+            mechanicFields.style.display = 'block';
+        } else {
+            mechanicFields.style.display = 'none';
+        }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        toggleMechanicFields();
+    });
+</script>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

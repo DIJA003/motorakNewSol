@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using motorak.bll.ModelVM.ShoppingCart;
 using motorak.bll.Services.Abstractions;
 using motorak.dal.Enums.CarEnums;
 using motorak.dal.Enums.CartEnums;
