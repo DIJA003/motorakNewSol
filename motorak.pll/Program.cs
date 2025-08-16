@@ -1,3 +1,4 @@
+using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Localization;
@@ -18,6 +19,7 @@ using Motorak.BLL.Mapper.MechanicMappin;
 using Motorak.BLL.Mapper.ServiceMapping;
 using Motorak.BLL.Mapper.ServiceReviewMapping;
 using Motorak.BLL.Mapper.TransactionMapping;
+using Motorak.BLL.Services;
 using Motorak.BLL.Services.Abstractions;
 using Motorak.BLL.Services.Implementations;
 using Motorak.DAl.Repo.Abstractions;
@@ -118,8 +120,10 @@ namespace motorak.pll
             builder.Services.AddScoped<IServiceReviewService, ServiceReviewService>();
             builder.Services.AddScoped<IServiceServicecs, ServiceServices>();
             builder.Services.AddScoped<ICartService, CartService>();
+            builder.Services.AddScoped<IReminderService, ReminderService>();
 
-
+            builder.Services.AddHangfire(x => x.UseSqlServerStorage(connectionString));
+            builder.Services.AddHangfireServer();
 
 
             builder.Services.AddAutoMapper(cfg =>
@@ -212,6 +216,12 @@ namespace motorak.pll
                 new CookieRequestCultureProvider()
                 }
             });
+
+            RecurringJob.AddOrUpdate<IReminderService>(
+                x => x.ShowReminder(),
+                Cron.Minutely);
+
+            app.UseHangfireDashboard("/Mustafa");
 
             app.Run();
         }
