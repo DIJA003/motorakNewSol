@@ -18,7 +18,7 @@ namespace Motorak.PLL.Controllers
             _customerRebo = customerRebo;
         }
 
-        
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -43,6 +43,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -50,6 +51,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create(CreateCarModel model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -61,10 +63,12 @@ namespace Motorak.PLL.Controllers
                 return View(model);
             }
 
+            TempData["Success"] = "Car added successfully!";
             return RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             var (status, message, car) = await _carService.GetCarByIdAsync(id);
@@ -89,6 +93,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(EditCarModel model)
         {
             if (!ModelState.IsValid) return View(model);
@@ -100,12 +105,28 @@ namespace Motorak.PLL.Controllers
                 return View(model);
             }
 
+            TempData["Success"] = "Car updated successfully!";
             return RedirectToAction(nameof(Index));
         }
 
-
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
+        {
+            var (status, message, car) = await _carService.GetCarByIdAsync(id);
+            if (!status || car == null)
+            {
+                TempData["Error"] = message ?? "Car not found.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(car);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var (status, message) = await _carService.DeleteCarAsync(id);
             if (!status)
