@@ -12,10 +12,6 @@ namespace motorak.dal.Entites
         public virtual List<ServiceReview>? ServiceReviews { get; set; } = new List<ServiceReview>();
         public virtual List<Car>? Cars { get; set; } = new List<Car>();
 
-        public virtual List<Service>? Services { get; private set; } = new List<Service>();
-        public virtual List<ServiceReview>? ServiceReviews { get; private set; } = new List<ServiceReview>();
-        public virtual List<Car>? Cars { get; private set; } = new List<Car>();
-
         public string UserId { get; set; }
         public virtual User User { get; set; }
         public DateTime CreatedAt { get; private set; }

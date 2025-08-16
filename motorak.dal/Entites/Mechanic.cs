@@ -25,7 +25,6 @@ namespace motorak.dal.Entites
             User.Name = name;
             WorkHours = newWorkHours;
             Status = newStatus;
-            Update();
         }
 
         public void Delete()

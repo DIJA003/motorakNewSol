@@ -97,9 +97,8 @@ namespace motorak.pll.Areas.Identity.Pages.Account
             [ValidateNever]
             public IEnumerable<SelectListItem> RoleList { get; set; }
 
-            public string? PhoneNumber { get; set; }
-
-
+            [Display(Name = "Working Hours")]
+            public string? WorkHours { get; set; }
         }
 
         public async Task OnGetAsync(string returnUrl = null)
