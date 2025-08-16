@@ -1,41 +1,45 @@
 ﻿@using Motorak.BLL.ModelVM.Mechanic
 @model MechanicDetailsModel
-
+@{
+    Layout = null;
+}
 <style>
     .table-darkpurple {
-        background-color: #2a0044; /* darker purple for table */
+        background-color: #2a0044;
         color: white;
     }
 
         .table-darkpurple thead th {
-            background-color: #4b007d; /* header color */
+            background-color: #4b007d;
         }
 
         .table-darkpurple tbody tr:nth-child(even) {
-            background-color: #35005c; /* alternate row color */
+            background-color: #35005c;
         }
 
         .table-darkpurple tbody tr:hover {
-            background-color: #5a00a3; /* hover effect */
+            background-color: #5a00a3;
         }
 </style>
 
 <h1>Mechanic Data</h1>
 
-
 <table class="table table-striped table-darkpurple">
-    <input type="hidden" asp-for="Id">
+    <input type="hidden" asp-for="Id" />
     <thead>
         <tr>
             <th>Id</th>
             <th>Name</th>
+            <th>Email</th>
+            <th>Phone</th>
             <th>Rating</th>
             <th>Status</th>
+            <th>WorkHours</th>
             <th>CreatedAt</th>
             <th>IsDeleted</th>
             <th>IsUpdated</th>
-            <th>       </th>
-            <th>       </th>
+            <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -68,3 +72,4 @@
         </tr>
     </tbody>
 </table>
+

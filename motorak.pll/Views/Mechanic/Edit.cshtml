@@ -1,65 +1,91 @@
 ﻿@using Motorak.BLL.ModelVM.Mechanic
-@model MechanicDetailsModel
-
+@model EditMechanicModel
+@{
+    Layout = null;
+}
 <style>
-    /* Custom card style for this view only */
-    .card-purple {
-        background-color: #2a0044; /* deep purple for card body */
+    body {
+        background-color: #1a001f;
         color: white;
-        border: 1px solid #5a00a3; /* purple border */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 30px;
+        color: #e0c3ff;
+    }
+
+    .card-purple {
+        background-color: #2a0044;
+        border: 1px solid #5a00a3;
         border-radius: 15px;
-        box-shadow: 0 4px 10px rgba(90, 0, 163, 0.5);
+        box-shadow: 0 4px 15px rgba(90, 0, 163, 0.4);
+        padding: 20px;
+        margin-bottom: 20px;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
 
-        .card-purple:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(90, 0, 163, 0.7);
-        }
+    .card-purple:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(90, 0, 163, 0.6);
+    }
 
-        .card-purple .card-header {
-            background-color: #4b007d;
-            border-bottom: 1px solid #5a00a3;
-            font-weight: bold;
-        }
+    .card-header {
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #fff;
+        margin-bottom: 15px;
+    }
 
-        .card-purple .card-body {
-            background-color: #35005c;
-        }
+    .form-control, .form-select {
+        background-color: #35005c;
+        color: white;
+        border: 1px solid #5a00a3;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+
+    .btn-primary {
+        background-color: #4b007d;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .btn-primary:hover {
+        background-color: #5a00a3;
+    }
 </style>
 
+<h1>Edit Mechanic</h1>
 
-<div class="card text-center">
-    <div>
-        <b>Edit Mechanic</b>
-    </div>
-    <div class="card-body">
+<div class="card-purple">
+    <div class="card-header">Mechanic Information</div>
+    <form asp-controller="Mechanic" asp-action="Edit">
+        <input type="hidden" asp-for="Id" />
 
-        <form asp-controller="Customer" asp-action="Edit">
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <div style="text-align: left;" for="exampleInputName">Name</div>
-                <input asp-for="Name" type="text" class="form-control" id="exampleInputName" aria-describedby="nameHelp" placeholder="Enter Name" />
-                <br />
-            </div>
-            <div class="form-group">
-                <div style="text-align: left;" for="exampleInputEmail1">Email</div>
-                <input asp-for="Email" type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter Email" />
-                <br />
-            </div>
-            <select input asp-for="WorkHours" type="text" class="form-select" aria-label="Default select example">
-                <option selected>Work Horus</option>
+        <label asp-for="Name">Name</label>
+        <input asp-for="Name" class="form-control" placeholder="Enter Name" />
+
+        <div class="form-group">
+            <label asp-for="WorkHours">Work Hours</label>
+            <select asp-for="WorkHours" class="form-select">
+                <option disabled selected>Choose Work Hours</option>
                 <option value="1">7AM - 4PM</option>
                 <option value="2">4PM - 1AM</option>
-                <br>
             </select>
-            <select input asp-for="Status" type="text" class="form-select" aria-label="Default select example">
-                <option selected>Status</option>
+        </div>
+        <div class="form-group">
+            <label asp-for="WorkHours">Status</label>
+            <select asp-for="WorkHours" class="form-select">
+                <option disabled selected>Choose Status</option>
                 <option value="1">Free</option>
                 <option value="2">Busy</option>
-                <br>
             </select>
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
-    </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 </div>

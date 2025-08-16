@@ -2,14 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,14 +11,21 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using motorak.dal.DataTemp;
 using motorak.dal.Entites;
-using Motorak.Utility;
 using motorak.DAL.DataBase;
-using Motorak.DAL.Entites;
-using Motorak.DAL.Enums.MechaincEnums;
-
+using Motorak.BLL.ModelVM.Customer;
+using Motorak.Utility;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading;
+using System.Threading.Tasks;
 namespace motorak.pll.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
@@ -98,9 +97,9 @@ namespace motorak.pll.Areas.Identity.Pages.Account
             [ValidateNever]
             public IEnumerable<SelectListItem> RoleList { get; set; }
 
-            // Mechanic specific fields
-            [Display(Name = "Working Hours")]
-            public string? WorkHours { get; set; }
+            public string? PhoneNumber { get; set; }
+
+
         }
 
         public async Task OnGetAsync(string returnUrl = null)
@@ -162,44 +161,43 @@ namespace motorak.pll.Areas.Identity.Pages.Account
                     {
                         _logger.LogInformation("User created a new account with password.");
 
-                        // Assign role
-                        string userRole = !String.IsNullOrEmpty(Input.Role) ? Input.Role : Seed.Role_Customer;
-                        await _userManager.AddToRoleAsync(user, userRole);
+                    if (!String.IsNullOrEmpty(Input.Role))
+                    {
+                        await _userManager.AddToRoleAsync(user, Input.Role);
+                    }else
+                    {
+                        await _userManager.AddToRoleAsync(user, Seed.Role_Customer);
+                    }
 
-                        // Create Customer or Mechanic entity based on role
-                        if (userRole == Seed.Role_Customer)
+                    if (Input.Role == "Customer")
+                    {
+                        var customer = new Customer
                         {
-                            var customer = new Customer
-                            {
-                                UserId = user.Id,
-                                User = user
-                            };
-                            _context.Customers.Add(customer);
-                        }
-                        else if (userRole == Seed.Role_Mechanic)
+                            UserId = user.Id,
+                            User = user
+                        };
+                        _context.Customers.Add(customer);
+                    }
+                    else if (Input.Role == "Mechanic")
+                    {
+                        var mechanic = new Mechanic
                         {
-                            var mechanic = new Mechanic
-                            {
-                                UserId = user.Id,
-                                User = user,
-                                WorkHours = Input.WorkHours,
-                                Status = MechanicStatus.Free,
-                                Rating = 0
-                            };
-                            _context.Mechanics.Add(mechanic);
-                        }
+                            UserId = user.Id,
+                            User = user
+                        };
+                        _context.Mechanics.Add(mechanic);
+                    }
 
-                        await _context.SaveChangesAsync();
-                        await transaction.CommitAsync();
+                    await _context.SaveChangesAsync();
 
-                        var userId = await _userManager.GetUserIdAsync(user);
-                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = Url.Page(
-                            "/Account/ConfirmEmail",
-                            pageHandler: null,
-                            values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
-                            protocol: Request.Scheme);
+                    var userId = await _userManager.GetUserIdAsync(user);
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = Url.Page(
+                        "/Account/ConfirmEmail",
+                        pageHandler: null,
+                        values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
+                        protocol: Request.Scheme);
 
                         var emailBody = EmailTemplate.GetEmailConfirmationTemplate(callbackUrl);
                         await _emailSender.SendEmailAsync(Input.Email, "Confirm your Motorak account", emailBody);
