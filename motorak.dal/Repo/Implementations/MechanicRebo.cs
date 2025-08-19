@@ -38,7 +38,6 @@ namespace Motorak.DAL.Repo.Implementations
         public void Update(Mechanic mechanic)
         {
             MDB.Mechanics.Update(mechanic);
-            MDB.SaveChanges();
         }
 
         public void Delete(Mechanic mechanic)

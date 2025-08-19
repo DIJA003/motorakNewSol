@@ -62,7 +62,6 @@ namespace Motorak.DAl.Repo.Implementations
         public void Update(Customer customer)
         {
             MDB.Customers.Update(customer);
-            MDB.SaveChanges();
         }
 
         public void Delete(Customer customer)

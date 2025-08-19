@@ -11,18 +11,21 @@ using Motorak.DAL.Entites;
 namespace Motorak.BLL.Services.Implementations
 {
     using Microsoft.AspNetCore.Identity;
+    using Motorak.Utility;
 
     public class CustomerService : ICustomerService
     {
         private readonly ICustomerRebo _customerRepo;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher<User> _passwordHasher;
+        private readonly UserManager<User> _userManager;
 
-        public CustomerService(ICustomerRebo customerRepo, IMapper mapper, IPasswordHasher<User> passwordHasher)
+        public CustomerService(ICustomerRebo customerRepo, IMapper mapper, IPasswordHasher<User> passwordHasher,UserManager<User> userManager)
         {
             _customerRepo = customerRepo;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
+            _userManager = userManager;
         }
    
 
@@ -82,7 +85,7 @@ namespace Motorak.BLL.Services.Implementations
                     return (false, "Customer model is null");
 
                 // Check if email already exists
-                var existingCustomer = await _customerRepo.GetByEmailAsync(customerModel.Email);
+                var existingCustomer = await _userManager.FindByEmailAsync(customerModel.Email);
                 if (existingCustomer != null)
                     return (false, "Email already exists");
 
@@ -91,14 +94,41 @@ namespace Motorak.BLL.Services.Implementations
                 if (existingPhone != null)
                     return (false, "Phone number already exists");
 
-                var customer = _mapper.Map<Customer>(customerModel);
-                var user = _mapper.Map<User>(customerModel);
-        user.PasswordHash = _passwordHasher.HashPassword(user, customerModel.Password);
-                customer.UserId = user.Id;
-                customer.User = user;
+                var user = new User
+                {
+                    UserName = customerModel.Email,
+                    Email = customerModel.Email,
+                    PhoneNumber = customerModel.PhoneNumber,
+                    Name = customerModel.Name,
+                    EmailConfirmed = true,
+                    CreatedAt = DateTime.Now
+                };
+
+                var createUserResult = await _userManager.CreateAsync(user, customerModel.Password);
+                if (!createUserResult.Succeeded)
+                {
+                    var errors = string.Join(", ", createUserResult.Errors.Select(e => e.Description));
+                    return (false, $"Failed to create user: {errors}");
+                }
+
+                var roleResult = await _userManager.AddToRoleAsync(user, Seed.Role_Customer);
+                if (!roleResult.Succeeded)
+                {
+                    await _userManager.DeleteAsync(user);
+                    var errors = string.Join(", ", roleResult.Errors.Select(e => e.Description));
+                    return (false, $"Failed to assign customer role: {errors}");
+                }
+
+                var customer = new Customer
+                {
+                    UserId = user.Id,
+                    User = user,
+                    CreatedAt = DateTime.Now,
+                };
 
                 await _customerRepo.CreateAsync(customer);
                 await _customerRepo.SaveChangesAsync();
+
                 return (true, "Customer Created Successfully!");
             }
             catch (Exception ex)

@@ -52,15 +52,31 @@ namespace Motorak.PLL.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Create(CreateCarModel model)
+        public async Task<IActionResult> Create(CreateCarModel car)
         {
-            if (!ModelState.IsValid) return View(model);
+            // Add debugging
+            if (car == null)
+            {
+                Console.WriteLine("Model is null!");
+                return View();
+            }
 
-            var (status, message) = await _carService.CreateCarAsync(model);
+            Console.WriteLine($"Brand: {car.Brand}, Model: {car.Model}, Year: {car.Year}");
+
+            if (!ModelState.IsValid)
+            {
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"Validation Error: {error.ErrorMessage}");
+                }
+                return View(car);
+            }
+
+            var (status, message) = await _carService.CreateCarAsync(car);
             if (!status)
             {
                 ModelState.AddModelError("", message);
-                return View(model);
+                return View(car);
             }
 
             TempData["Success"] = "Car added successfully!";
@@ -103,7 +119,7 @@ namespace Motorak.PLL.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Edit(EditCarModel model)
+        public async Task<IActionResult> Edit(EditCarModel car)
         {
             if (!ModelState.IsValid)
             {
@@ -112,14 +128,14 @@ namespace Motorak.PLL.Controllers
                 {
                     Console.WriteLine($"Validation Error: {error.ErrorMessage}");
                 }
-                return View(model);
+                return View(car);
             }
 
-            var (status, message) = await _carService.UpdateCarAsync(model);
+            var (status, message) = await _carService.UpdateCarAsync(car);
             if (!status)
             {
                 ModelState.AddModelError("", message);
-                return View(model);
+                return View(car);
             }
 
             TempData["Success"] = "Car updated successfully!";
@@ -127,34 +143,42 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            var (status, message, car) = await _carService.GetCarByIdAsync(id);
-            if (!status || car == null)
+            var result = await _carService.GetCarByIdAsync(id);
+
+            if (!result.status)
             {
-                TempData["Error"] = message ?? "Car not found.";
-                return RedirectToAction(nameof(Index));
+                TempData["ErrorMessage"] = result.message;
+                return RedirectToAction("Index");
             }
 
-            return View(car);
+            return View(result.Car);
         }
-
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
-            var (status, message) = await _carService.DeleteCarAsync(id);
-            if (!status)
+            try
             {
-                TempData["Error"] = message;
-                return RedirectToAction(nameof(Index));
+                var result = await _carService.DeleteCarAsync(id);
+
+                if (result.status)
+                {
+                    TempData["SuccessMessage"] = result.message;
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = result.message;
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"An error occurred: {ex.Message}";
             }
 
-            TempData["Success"] = message;
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index");
         }
 
         [Authorize]

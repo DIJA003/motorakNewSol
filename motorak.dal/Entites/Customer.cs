@@ -14,7 +14,7 @@ namespace motorak.dal.Entites
 
         public string UserId { get; set; }
         public virtual User User { get; set; }
-        public DateTime CreatedAt { get; private set; }
+        public DateTime CreatedAt { get;  set; }
         public bool IsDeleted { get; private set; }
         public DateTime? DeletedAt { get; private set; }
         public DateTime UpdatedAt { get; private set; }

@@ -176,8 +176,10 @@ namespace motorak.pll.Areas.Identity.Pages.Account
                             var customer = new Customer
                             {
                                 UserId = user.Id,
-                                User = user
+                                User = user,
+                                CreatedAt = DateTime.Now
                             };
+
                             _context.Customers.Add(customer);
                         }
                         else if (Input.Role == "Mechanic")

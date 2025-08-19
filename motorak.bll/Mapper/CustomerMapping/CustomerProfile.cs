@@ -15,6 +15,7 @@ namespace Motorak.BLL.Mapper.CustomerMapping
                 .ForMember(c => c.Id, opt => opt.MapFrom(x => x.Id.ToString()))
                 .ForMember(c => c.Name, opt => opt.MapFrom(x => x.User.Name))
                 .ForMember(c => c.Email, opt => opt.MapFrom(x => x.User.Email))
+                .ForMember(c => c.Phone, opt => opt.MapFrom(x => x.User.PhoneNumber))
                 .ForMember(c => c.PurchasedCarsCount, opt => opt.MapFrom(x => x.Purchases != null ? x.Purchases.Count : 0))
                 .ForMember(c => c.CreatedAt, opt => opt.MapFrom(x => x.CreatedAt))
                 .ForMember(c => c.IsDeleted, opt => opt.MapFrom(x => x.IsDeleted))

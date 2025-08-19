@@ -2,6 +2,7 @@
 using AutoMapper;
 using motorak.dal.Entites;
 using motorak.dal.Entities;
+using Motorak.BLL.Helper;
 using Motorak.BLL.ModelVM.Car;
 using Motorak.BLL.Services.Abstractions;
 using Motorak.DAl.Repo.Abstractions;
@@ -37,8 +38,15 @@ namespace Motorak.BLL.Services.Implementations
             try
             {
                 if (car == null) return (false, "Car data is null");
+
+                if (car.ImageFile != null)
+                {
+                    car.ImagePath = Upload.UploadFile("Cars", car.ImageFile);
+                }
+
                 var result = _mapper.Map<Car>(car);
                 await _carRebo.CreateAsync(result);
+                await _carRebo.SaveChangesAsync();
                 return (true, "Car Created Successfully");
             }
             catch (Exception ex) 
@@ -52,14 +60,25 @@ namespace Motorak.BLL.Services.Implementations
             try
             {
                 var result = await _carRebo.GetByIdAsync(id);
-                if (result == null) return (false, "Car not Found");
+                if (result == null)
+                    return (false, "Car not Found");
+
                 _carRebo.Delete(result);
-                await _carRebo.SaveChangesAsync();
-                return (true, "Deleted Successfully");
+
+                var saveResult = await _carRebo.SaveChangesAsync();
+
+                if (saveResult > 0)
+                {
+                    return (true, "Car deleted successfully");
+                }
+                else
+                {
+                    return (false, "Failed to delete car - no changes were made");
+                }
             }
             catch (Exception ex)
             {
-                return (false, $"Failed to delete due to : {ex.Message}");
+                return (false, $"Failed to delete due to: {ex.Message}");
             }
         }
 

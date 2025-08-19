@@ -171,7 +171,7 @@ namespace motorak.pll
                     await AdminLogins.SeedAdminAsync(userManager, roleManager);
                     
 
-                    await DbSeeder.SeedAsync(context);
+                    //await DbSeeder.SeedAsync(context);
                 }
                 catch (Exception ex)
                 {

@@ -8,6 +8,7 @@ using Motorak.Utility;
 
 namespace Motorak.PLL.Controllers
 {
+    [Authorize(Roles = Seed.Role_Admin)]
     public class MechanicController : Controller
     {
         private readonly IMechanicService _mechanicService;
@@ -17,7 +18,6 @@ namespace Motorak.PLL.Controllers
         }
 
 
-        [Authorize(Roles = Seed.Role_Admin)]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -31,7 +31,6 @@ namespace Motorak.PLL.Controllers
         }
 
 
-        [Authorize(Roles = Seed.Role_Admin)]
         [HttpGet]
         public async Task<IActionResult> MechanicDetails(int id)
         {
@@ -44,7 +43,6 @@ namespace Motorak.PLL.Controllers
             return View(mechanic);
         }
 
-        [Authorize(Roles = Seed.Role_Admin)]
         [HttpGet]
         public IActionResult Create()
         {
@@ -52,7 +50,6 @@ namespace Motorak.PLL.Controllers
         }
 
 
-        [Authorize(Roles = Seed.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateMechanicModel model)
@@ -69,7 +66,6 @@ namespace Motorak.PLL.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize(Roles = Seed.Role_Admin)]
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
@@ -98,7 +94,6 @@ namespace Motorak.PLL.Controllers
 
         }
 
-        [Authorize(Roles = Seed.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(EditMechanicModel model)
@@ -115,7 +110,6 @@ namespace Motorak.PLL.Controllers
             }
         }
 
-        [Authorize(Roles = Seed.Role_Admin)]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
