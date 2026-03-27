@@ -30,7 +30,6 @@
     <!--************* MAIN CODE ****************-->
 
     <main class="main">
-        <!-- Check if this is the home page to show the full homepage content -->
         @if (ViewContext.RouteData.Values["action"]?.ToString() == "Index" && ViewContext.RouteData.Values["controller"]?.ToString() == "Home")
         {
             <!--==================== HOME ====================-->
@@ -481,11 +480,6 @@
                 </div>
             </section>
         }
-        else
-        {
-            <!-- For other pages, just render the content -->
-            @RenderBody()
-        }
     </main>
 
     <!--==================== FOOTER ====================-->
@@ -505,60 +499,7 @@
                     the world.
                 </p>
             </div>
-
-            <div class="footer__content">
-                <h3 class="footer__title">Company </h3>
-                <ul class="footer__links">
-                    <li>
-                        <a href="#" class="footer__links">About</a>
-                    </li>
-                    <li>
-                        <a href="#" class="footer__links">Cars</a>
-                    </li>
-                    <li>
-                        <a href="#" class="footer__links">History</a>
-                    </li>
-                    <li>
-                        <a href="#" class="footer__links">Shop</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="footer__content">
-                <h3 class="footer__title">Information </h3>
-                <ul class="footer__links">
-                    <li>
-                        <a href="#" class="footer__links">Request a quote</a>
-                    </li>
-                    <li>
-                        <a href="#" class="footer__links">Find a dealer</a>
-                    </li>
-                    <li>
-                        <a href="#" class="footer__links">Contact us</a>
-                    </li>
-                    <li>
-                        <a href="#" class="footer__links">Services</a>
-                    </li>
-                </ul>
-            </div>
-
-            <div class="footer__content">
-                <h3 class="footer__title"> Follow us </h3>
-                <ul class="footer__social">
-                    <a href="" target="_blank" class="footer__social-link">
-                        <i class="ri-facebook-fill"></i>
-                    </a>
-                    <a href="" target="_blank" class="footer__social-link">
-                        <i class="ri-instagram-line"></i>
-                    </a>
-                    <a href="" target="_blank" class="footer__social-link">
-                        <i class="ri-twitter-line"></i>
-                    </a>
-                </ul>
-            </div>
         </div>
-        @RenderBody()
-        @RenderSection("Scripts", required: false)
     </footer>
 
     <!--========== SCROLL UP ==========-->
@@ -566,18 +507,13 @@
         <i class="ri-arrow-up-s-line"></i>
     </a>
 
-    <!--=============== SCROLL REVEAL - PAGE ANNIMATION ===============-->
     <script src="~/assets/js/scrollrevealAnimation.min.js"></script>
-
-    <!--=============== SWIPER JS - PRODUCT SLIDER ===============-->
     <script src="~/assets/js/swiper-bundle.min.js"></script>
-
-    <!--=============== MIXITUP JS - FILTER PRODUCT ===============-->
     <script src="~/assets/js/mixitup.min.js"></script>
-
-    <!--=============== MAIN JS ===============-->
     <script src="~/assets/js/main.js"></script>
 
-</body>
+    @RenderBody()  
+    @RenderSection("Scripts", required: false)
 
+</body>
 </html>

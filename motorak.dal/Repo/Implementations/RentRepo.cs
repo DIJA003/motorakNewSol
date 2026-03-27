@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿// motorak.dal/Repo/Implementations/RentRepo.cs
+using Microsoft.EntityFrameworkCore;
 using motorak.DAL.DataBase;
 using Motorak.DAL.Entities;
 using Motorak.DAL.Repo.Abstractions;
-
 
 namespace Motorak.DAL.Repo.Implementations
 {
@@ -33,17 +33,24 @@ namespace Motorak.DAL.Repo.Implementations
 
         public async Task UpdateAsync(Rent rent)
         {
-            var existing = await _context.Rents.FirstOrDefaultAsync(r => r.Id == rent.Id && !r.IsDeleted);
+            var existing = await _context.Rents
+                .FirstOrDefaultAsync(r => r.Id == rent.Id && !r.IsDeleted);
             if (existing == null)
                 throw new InvalidOperationException("Rent not found");
 
-            existing.UpdateTransaction(rent.PaymentMethod, rent.TotalPrice, rent.Status, rent.UpdatedBy ?? "System");
+            existing.UpdateTransaction(
+                rent.PaymentMethod,
+                rent.TotalPrice,
+                rent.Status,
+                "System"  // ← use literal
+            );
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(int id)
         {
-            var rent = await _context.Rents.FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
+            var rent = await _context.Rents
+                .FirstOrDefaultAsync(r => r.Id == id && !r.IsDeleted);
             if (rent == null)
                 throw new InvalidOperationException("Rent not found.");
 
@@ -52,4 +59,3 @@ namespace Motorak.DAL.Repo.Implementations
         }
     }
 }
-

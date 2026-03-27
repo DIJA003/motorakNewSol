@@ -44,10 +44,10 @@
                     <td>@car.Model</td>
                     <td>@car.Year</td>
                     <td>
-                        @(car.Category == CarCategory.Buy ? car.Price.ToString("C") : "-")
+                        @(car.Category == CarCategory.ForSale ? car.Price.ToString("C") : "-")
                     </td>
                     <td>
-                        @(car.Category == CarCategory.Rent && car.DailyRentPrice.HasValue ? car.DailyRentPrice.Value.ToString("C") : "-")
+                        @(car.Category == CarCategory.ForRent && car.DailyRentPrice.HasValue ? car.DailyRentPrice.Value.ToString("C") : "-")
                     </td>
                     <td>@car.Mileage.ToString("N0") km</td>
                     <td>@car.Status</td>
@@ -57,13 +57,13 @@
                         <button type="button" class="btn btn-sm btn-warning mb-1 add-to-cart" data-id="@car.Id">Add to Cart</button>
 
                         <!-- Buy button -->
-                        @if (car.Category == CarCategory.Buy)
+                        @if (car.Category == CarCategory.ForSale)
                         {
                             <a asp-controller="Purchase" asp-action="Create" asp-route-carId="@car.Id" class="btn btn-sm btn-success mb-1">Buy</a>
                         }
 
                         <!-- Rent button -->
-                        @if (car.Category == CarCategory.Rent)
+                        @if (car.Category == CarCategory.ForRent)
                         {
                             <a asp-controller="Rent" asp-action="Create" asp-route-carId="@car.Id" class="btn btn-sm btn-primary">Rent</a>
                         }

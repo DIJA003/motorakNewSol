@@ -1,11 +1,10 @@
-﻿using motorak.dal.Entites;
+﻿// motorak.dal/Entites/Transactions.cs
+using motorak.dal.Entites;
 using Motorak.DAL.Enums.TransactionEnums;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace motorak.dal.Entities
 {
-   
-
     public class Transactions
     {
         public int Id { get; private set; }
@@ -18,7 +17,7 @@ namespace motorak.dal.Entities
         public string CreatedBy { get; private set; } = "System";
 
         public DateTime? UpdatedAt { get; private set; }
-        public string? UpdatedBy { get; private set; }
+        public string? UpdatedBy { get; protected set; }  // ← changed to protected
 
         public bool IsDeleted { get; private set; }
         public DateTime? DeletedAt { get; private set; }
@@ -32,10 +31,9 @@ namespace motorak.dal.Entities
         [ForeignKey(nameof(CarId))]
         public virtual Car Car { get; private set; }
 
-
         public Transactions() { }
 
-        public Transactions(string paymentMethod, decimal totalPrice, int customerId, int carId , string createdBy = "System")
+        public Transactions(string paymentMethod, decimal totalPrice, int customerId, int carId, string createdBy = "System")
         {
             if (string.IsNullOrWhiteSpace(paymentMethod))
                 throw new ArgumentException("Payment method is required.");
@@ -95,6 +93,7 @@ namespace motorak.dal.Entities
             DeletedAt = DateTime.Now;
             DeletedBy = deletedBy;
         }
+
         public void UpdateTransaction(string? newPaymentMethod, decimal? newPrice, TransactionStatus? newStatus, string updatedBy = "System")
         {
             if (newPrice.HasValue)
