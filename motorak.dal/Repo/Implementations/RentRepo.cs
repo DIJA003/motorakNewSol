@@ -33,17 +33,9 @@ namespace Motorak.DAL.Repo.Implementations
 
         public async Task UpdateAsync(Rent rent)
         {
-            var existing = await _context.Rents
-                .FirstOrDefaultAsync(r => r.Id == rent.Id && !r.IsDeleted);
-            if (existing == null)
-                throw new InvalidOperationException("Rent not found");
-
-            existing.UpdateTransaction(
-                rent.PaymentMethod,
-                rent.TotalPrice,
-                rent.Status,
-                "System"  // ← use literal
-            );
+            // rent is already tracked by the context (fetched in service)
+            // Just mark it as modified and save.
+            _context.Rents.Update(rent);
             await _context.SaveChangesAsync();
         }
 
@@ -56,6 +48,19 @@ namespace Motorak.DAL.Repo.Implementations
 
             rent.Delete();
             await _context.SaveChangesAsync();
+        }
+        // RentRepo.cs
+        public async Task<bool> IsCarAvailableForDates(int carId, DateTime startDate, DateTime endDate)
+        {
+            // Check for any overlapping, non-deleted rentals
+            var overlapping = await _context.Rents
+                .Where(r => r.CarId == carId && !r.IsDeleted &&
+                            ((startDate >= r.StartDate && startDate < r.EndDate) ||
+                             (endDate > r.StartDate && endDate <= r.EndDate) ||
+                             (startDate <= r.StartDate && endDate >= r.EndDate)))
+                .AnyAsync();
+
+            return !overlapping; // return true if available
         }
     }
 }

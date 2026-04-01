@@ -2,14 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,14 +11,21 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using motorak.dal.DataTemp;
 using motorak.dal.Entites;
-using Motorak.Utility;
 using motorak.DAL.DataBase;
-using Motorak.DAL.Entites;
-using Motorak.DAL.Enums.MechaincEnums;
-
+using Motorak.BLL.ModelVM.Customer;
+using Motorak.Utility;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Text.Encodings.Web;
+using System.Threading;
+using System.Threading.Tasks;
 namespace motorak.pll.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
@@ -98,7 +97,6 @@ namespace motorak.pll.Areas.Identity.Pages.Account
             [ValidateNever]
             public IEnumerable<SelectListItem> RoleList { get; set; }
 
-            // Mechanic specific fields
             [Display(Name = "Working Hours")]
             public string? WorkHours { get; set; }
         }
@@ -160,57 +158,82 @@ namespace motorak.pll.Areas.Identity.Pages.Account
 
                     if (result.Succeeded)
                     {
-                        _logger.LogInformation("User created a new account with password.");
+                        _logger.LogInformation($"User created successfully with ID: {user.Id}");
 
-                        // Assign role
-                        string userRole = !String.IsNullOrEmpty(Input.Role) ? Input.Role : Seed.Role_Customer;
-                        await _userManager.AddToRoleAsync(user, userRole);
+                        // Add role
+                        string roleToAssign = !string.IsNullOrEmpty(Input.Role) ? Input.Role : Seed.Role_Customer;
+                        var roleResult = await _userManager.AddToRoleAsync(user, roleToAssign);
 
-                        // Create Customer or Mechanic entity based on role
-                        if (userRole == Seed.Role_Customer)
+                        if (!roleResult.Succeeded)
+                        {
+                            _logger.LogError($"Failed to assign role {roleToAssign} to user {user.Id}");
+                            // Don't fail the entire process for role assignment issues
+                        }
+
+                        // Create specific entity based on role
+                        if (Input.Role == "Customer")
                         {
                             var customer = new Customer
                             {
                                 UserId = user.Id,
-                                User = user
+                                User = user,
+                                CreatedAt = DateTime.Now
                             };
+
                             _context.Customers.Add(customer);
                         }
-                        else if (userRole == Seed.Role_Mechanic)
+                        else if (Input.Role == "Mechanic")
                         {
                             var mechanic = new Mechanic
                             {
                                 UserId = user.Id,
                                 User = user,
-                                WorkHours = Input.WorkHours,
-                                Status = MechanicStatus.Free,
-                                Rating = 0
+                                WorkHours = Input.WorkHours ?? "1"
                             };
                             _context.Mechanics.Add(mechanic);
                         }
 
+                        // Save changes first
                         await _context.SaveChangesAsync();
+
+                        // Commit transaction before sending email
                         await transaction.CommitAsync();
 
+                        _logger.LogInformation($"User {user.Id} and related entities saved successfully");
+
+                        // Generate confirmation email AFTER committing the transaction
                         var userId = await _userManager.GetUserIdAsync(user);
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
                         var callbackUrl = Url.Page(
                             "/Account/ConfirmEmail",
                             pageHandler: null,
                             values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                             protocol: Request.Scheme);
 
-                        var emailBody = EmailTemplate.GetEmailConfirmationTemplate(callbackUrl);
-                        await _emailSender.SendEmailAsync(Input.Email, "Confirm your Motorak account", emailBody);
+                        try
+                        {
+                            var emailBody = EmailTemplate.GetEmailConfirmationTemplate(callbackUrl);
+                            await _emailSender.SendEmailAsync(Input.Email, "Confirm your Motorak account", emailBody);
+                            _logger.LogInformation($"Confirmation email sent to {Input.Email}");
+                        }
+                        catch (Exception emailEx)
+                        {
+                            _logger.LogError(emailEx, $"Failed to send confirmation email to {Input.Email}");
+                            // Don't fail the registration if email sending fails
+                        }
 
                         return RedirectToPage("RegisterConfirmation", new { email = Input.Email, returnUrl = returnUrl });
                     }
-
-                    await transaction.RollbackAsync();
-                    foreach (var error in result.Errors)
+                    else
                     {
-                        ModelState.AddModelError(string.Empty, error.Description);
+                        await transaction.RollbackAsync();
+                        foreach (var error in result.Errors)
+                        {
+                            _logger.LogError($"User creation error: {error.Description}");
+                            ModelState.AddModelError(string.Empty, error.Description);
+                        }
                     }
                 }
                 catch (Exception ex)

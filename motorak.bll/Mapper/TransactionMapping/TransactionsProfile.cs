@@ -34,7 +34,9 @@ namespace Motorak.BLL.Mapper.TransactionMapping
             CreateMap<Purchase, PurchaseReadDto>();
             CreateMap<PurchaseCreateDto, Purchase>();
 
-            CreateMap<Rent, RentReadDto>();
+            CreateMap<Rent, RentReadDto>()
+            .ForMember(dest => dest.CustomerId, opt => opt.MapFrom(src => src.CustomerId))
+            .ForMember(dest => dest.CarId, opt => opt.MapFrom(src => src.CarId));
             CreateMap<RentCreateDto, Rent>();
 
 

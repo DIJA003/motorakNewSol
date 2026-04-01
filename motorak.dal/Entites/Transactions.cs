@@ -102,11 +102,12 @@ namespace motorak.dal.Entities
             if (!string.IsNullOrWhiteSpace(newPaymentMethod))
                 ChangePaymentMethod(newPaymentMethod, updatedBy);
 
-            if (newStatus.HasValue)
+            // Only change status if it's different and allowed
+            if (newStatus.HasValue && newStatus.Value != Status)
             {
-                if (newStatus == TransactionStatus.Completed)
+                if (newStatus.Value == TransactionStatus.Completed)
                     MarkAsCompleted(updatedBy);
-                else if (newStatus == TransactionStatus.Cancelled)
+                else if (newStatus.Value == TransactionStatus.Cancelled)
                     Cancel(updatedBy);
             }
 

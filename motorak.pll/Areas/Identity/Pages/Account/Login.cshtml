@@ -173,6 +173,33 @@
             color: var(--first-color);
         }
 
+    /* Password visibility toggle styles */
+    .password-container {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 0;
+        z-index: 5;
+        transition: color 0.3s ease;
+    }
+
+        .password-toggle:hover {
+            color: var(--first-color);
+        }
+
+        .password-toggle i {
+            font-size: 1.2rem;
+        }
+
     /* Background effects */
     .auth-container::before {
         content: '';
@@ -218,9 +245,12 @@
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
 
-            <div class="form-floating">
-                <input asp-for="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder=" " />
+            <div class="form-floating password-container">
+                <input asp-for="Input.Password" type="password" class="form-control" autocomplete="current-password" aria-required="true" placeholder=" " id="passwordInput" />
                 <label asp-for="Input.Password" class="form-label">Password</label>
+                <button type="button" class="password-toggle" onclick="togglePassword()">
+                    <i class="ri-eye-line" id="eyeIcon"></i>
+                </button>
                 <span asp-validation-for="Input.Password" class="text-danger"></span>
             </div>
 
@@ -245,11 +275,10 @@
                     <i class="ri-user-add-line" style="margin-right: 0.25rem;"></i>
                     Create a new account
                 </a>
-            </div>
-            <div class="form-group">
-                <p>
-                    <a id="resend-confirmation" asp-page="./ResendEmailConfirmation">Resend email confirmation</a>
-                </p>
+                <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" class="auth-link">
+                    <i class="ri-mail-send-line" style="margin-right: 0.25rem;"></i>
+                    Resend email confirmation
+                </a>
             </div>
         </form>
 
@@ -271,6 +300,21 @@
         }
     </div>
 </div>
+
+<script>
+    function togglePassword() {
+        const passwordInput = document.getElementById('passwordInput');
+        const eyeIcon = document.getElementById('eyeIcon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            eyeIcon.className = 'ri-eye-off-line';
+        } else {
+            passwordInput.type = 'password';
+            eyeIcon.className = 'ri-eye-line';
+        }
+    }
+</script>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
