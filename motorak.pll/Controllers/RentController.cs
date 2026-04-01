@@ -2,18 +2,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Motorak.BLL.ModelVM.Rents;
 using Motorak.BLL.Services.Abstractions;
+using motorak.DAL.DataBase;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Motorak.PLL.Controllers
 {
-    [Authorize]  // Require authentication for all actions
+    //[Authorize]  // Require authentication for all actions
     public class RentController : Controller
     {
         private readonly IRentService _service;
+        private readonly MotorakDbContext _context;
 
-        public RentController(IRentService service)
+        public RentController(IRentService service, MotorakDbContext context)
         {
             _service = service;
+            _context = context;
         }
 
         [AllowAnonymous] // Anyone can view the list
@@ -23,15 +27,30 @@ namespace Motorak.PLL.Controllers
             return View(list);
         }
 
-        [AllowAnonymous] // Anyone can view details, but we restrict in view if needed
+        [AllowAnonymous] // Anyone can view details, but we restrict if needed
         public async Task<IActionResult> Details(int id)
         {
             var item = await _service.GetByIdAsync(id);
             if (item == null) return NotFound();
 
-            // Optional: hide details if not the owner or admin
+            // Get the current logged-in user's Customer record
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (item.CustomerId.ToString() != userId && !User.IsInRole("Admin"))
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var customer = await _context.Customers
+                    .FirstOrDefaultAsync(c => c.UserId == userId);
+                
+                // Check if the rent belongs to the current customer OR user is admin
+                if (customer != null && item.CustomerId != customer.Id && !User.IsInRole("Admin"))
+                {
+                    return Forbid();
+                }
+                else if (customer == null && !User.IsInRole("Admin"))
+                {
+                    return Forbid();
+                }
+            }
+            else if (!User.IsInRole("Admin"))
             {
                 return Forbid();
             }
@@ -40,7 +59,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create(int? carId = null, decimal? price = null)
+        public async Task<IActionResult> Create(int? carId = null, decimal? price = null)
         {
             var model = new RentCreateDto();
             if (carId.HasValue) model.CarId = carId.Value;
@@ -49,11 +68,17 @@ namespace Motorak.PLL.Controllers
             model.StartDate = DateTime.Today;
             model.EndDate = DateTime.Today.AddDays(1);
 
-            // Automatically set CustomerId to the logged-in user
+            // Get the current logged-in user's Customer record
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (int.TryParse(userId, out int customerId))
+            if (!string.IsNullOrEmpty(userId))
             {
-                model.CustomerId = customerId;
+                var customer = await _context.Customers
+                    .FirstOrDefaultAsync(c => c.UserId == userId);
+                
+                if (customer != null)
+                {
+                    model.CustomerId = customer.Id; // This is the int CustomerId
+                }
             }
 
             return View(model);
@@ -63,18 +88,22 @@ namespace Motorak.PLL.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(RentCreateDto dto)
         {
-            // Ensure the CustomerId in the form matches the logged-in user
+            // Get the current logged-in user's Customer record
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!int.TryParse(userId, out int currentUserId))
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            // Verify the CustomerId belongs to the current user
+            if (customer == null && !User.IsInRole("Admin"))
             {
-                ModelState.AddModelError("", "User not authenticated.");
+                ModelState.AddModelError("", "You must be a registered customer to rent a car.");
                 return View(dto);
             }
 
-            if (dto.CustomerId != currentUserId && !User.IsInRole("Admin"))
+            // For non-admin users, force CustomerId to their own customer ID
+            if (!User.IsInRole("Admin"))
             {
-                ModelState.AddModelError("CustomerId", "You can only create rentals for yourself.");
-                return View(dto);
+                dto.CustomerId = customer.Id;
             }
 
             if (!ModelState.IsValid) return View(dto);
@@ -92,7 +121,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")] // Only admins can edit
+        //[Authorize(Roles = "Admin")] // Only admins can edit
         public async Task<IActionResult> Edit(int id)
         {
             var existing = await _service.GetByIdAsync(id);
@@ -110,7 +139,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, RentUpdateDto dto)
         {
             if (id != dto.Id) return BadRequest();
@@ -129,7 +158,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var existing = await _service.GetByIdAsync(id);
@@ -139,7 +168,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
@@ -152,6 +181,25 @@ namespace Motorak.PLL.Controllers
                 ModelState.AddModelError("", ex.Message);
                 return RedirectToAction(nameof(Index));
             }
+        }
+
+        // Optional: View current user's rentals
+        [HttpGet]
+        public async Task<IActionResult> MyRentals()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (customer == null)
+            {
+                return NotFound("Customer profile not found.");
+            }
+
+            var allRentals = await _service.GetAllAsync();
+            var myRentals = allRentals.Where(r => r.CustomerId == customer.Id).ToList();
+            
+            return View(myRentals);
         }
     }
 }

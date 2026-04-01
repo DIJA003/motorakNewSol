@@ -10,7 +10,8 @@ namespace Motorak.BLL.ModelVM.Rents
         public string PaymentMethod { get; set; }
         public decimal TotalPrice { get; set; }
         public TransactionStatus Status { get; set; }
-        public int CustomerId { get; set; }          // 👈 Added
-        public int CarId { get; set; }               // 👈 Optional, but good to include
+        public int CustomerId { get; set; }
+        public int CarId { get; set; }
+        public DateTime TransactionDate { get; set; } // Optional: from base class
     }
 }

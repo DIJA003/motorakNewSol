@@ -14,10 +14,10 @@ namespace motorak.dal.Entities
         public TransactionStatus Status { get; private set; }
 
         public DateTime CreatedAt { get; private set; }
-        public string CreatedBy { get; private set; } = "System";
+        public string CreatedBy { get;  set; } = "System";
 
         public DateTime? UpdatedAt { get; private set; }
-        public string? UpdatedBy { get; protected set; }  // ← changed to protected
+        public string? UpdatedBy { get;  set; }  // ← changed to protected
 
         public bool IsDeleted { get; private set; }
         public DateTime? DeletedAt { get; private set; }

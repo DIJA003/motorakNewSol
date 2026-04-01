@@ -22,10 +22,19 @@
                 <dd class="col-sm-9">@Model.PaymentMethod</dd>
 
                 <dt class="col-sm-3">Total Price</dt>
-                <dd class="col-sm-9">@Model.TotalPrice</dd>
+                <dd class="col-sm-9">$@Model.TotalPrice.ToString("N2")</dd>
 
                 <dt class="col-sm-3">Status</dt>
                 <dd class="col-sm-9">@Model.Status</dd>
+
+                <dt class="col-sm-3">Customer ID</dt>
+                <dd class="col-sm-9">@Model.CustomerId</dd>
+
+                <dt class="col-sm-3">Car ID</dt>
+                <dd class="col-sm-9">@Model.CarId</dd>
+
+                <dt class="col-sm-3">Transaction Date</dt>
+                <dd class="col-sm-9">@Model.TransactionDate.ToShortDateString()</dd>
             </dl>
         </div>
     </div>

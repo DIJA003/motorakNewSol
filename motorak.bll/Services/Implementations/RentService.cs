@@ -30,10 +30,9 @@ namespace Motorak.BLL.Services.Implementations
             return _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "System";
         }
 
-        private int GetCurrentUserId()
+        private string GetCurrentUserId()
         {
-            var userIdClaim = _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            return int.TryParse(userIdClaim, out int id) ? id : 0;
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
         public async Task<List<RentReadDto>> GetAllAsync()
@@ -62,25 +61,21 @@ namespace Motorak.BLL.Services.Implementations
             if (dto.StartDate < DateTime.Today)
                 throw new InvalidOperationException("Start date cannot be in the past.");
 
-            // Ensure the customer is the current user (or admin)
-            var currentUserId = GetCurrentUserId();
-            if (dto.CustomerId != currentUserId && !IsAdmin())
-                throw new UnauthorizedAccessException("You can only create rentals for yourself.");
-
             // Check availability using repository
             bool isAvailable = await _repo.IsCarAvailableForDates(dto.CarId, dto.StartDate, dto.EndDate);
             if (!isAvailable)
                 throw new InvalidOperationException("Car is not available for the selected dates.");
 
+            // Create rent WITHOUT customer validation here
+            // The ownership check should be done in the controller
             var rent = new Rent(dto.StartDate, dto.EndDate, dto.PaymentMethod, dto.TotalPrice, dto.CustomerId, dto.CarId);
-            // Set audit fields
-            rent.GetType().GetProperty("CreatedBy")?.SetValue(rent, GetCurrentUser());
+
+            // Set audit field - simpler approach
+            rent.CreatedBy = GetCurrentUser();
 
             await _repo.AddAsync(rent);
             return rent.Id;
         }
-        // RentService.cs
-  
 
         public async Task UpdateAsync(RentUpdateDto dto)
         {
@@ -113,8 +108,5 @@ namespace Motorak.BLL.Services.Implementations
         {
             return _httpContextAccessor.HttpContext?.User?.IsInRole("Admin") ?? false;
         }
-
-        
-        
     }
 }

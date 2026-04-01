@@ -1,6 +1,7 @@
 ﻿// IRentRepo.cs
 using Motorak.DAL.Entities;
 
+
 public interface IRentRepo
 {
     Task<Rent?> GetByIdAsync(int id);

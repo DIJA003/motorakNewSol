@@ -15,43 +15,55 @@
         </a>
     </p>
 
-    <table class="table table-bordered table-striped">
-        <thead class="table-dark">
-            <tr>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Payment Method</th>
-                <th>Total Price</th>
-                <th>Status</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var rent in Model)
-            {
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead class="table-dark">
                 <tr>
-                    <td>@rent.StartDate.ToShortDateString()</td>
-                    <td>@rent.EndDate.ToShortDateString()</td>
-                    <td>@rent.PaymentMethod</td>
-                    <td>@rent.TotalPrice</td>
-                    <td>@rent.Status</td>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Payment Method</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
+                    <th>Customer ID</th>
+                    <th>Car ID</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rent in Model)
+                {
+                    <tr>
+                        <td>@rent.StartDate.ToShortDateString()</td>
+                        <td>@rent.EndDate.ToShortDateString()</td>
+                        <td>@rent.PaymentMethod</td>
+                        <td>$@rent.TotalPrice.ToString("N2")</td>
+                        <td>
+                            <span class="badge @(rent.Status == Motorak.DAL.Enums.TransactionEnums.TransactionStatus.Completed ? "bg-success" :
+                                                                                 rent.Status == Motorak.DAL.Enums.TransactionEnums.TransactionStatus.Cancelled ? "bg-danger" : "bg-warning")">
+                            @rent.Status
+                        </span>
+                    </td>
+                    <td>@rent.CustomerId</td>
+                    <td>@rent.CarId</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@rent.Id" class="btn btn-info btn-sm">
+                        <a asp-action="Details" asp-route-id="@rent.Id" class="btn btn-info btn-sm" title="Details">
                             <i class="bi bi-eye"></i>
                         </a>
-                        <a asp-action="Edit" asp-route-id="@rent.Id" class="btn btn-warning btn-sm">
+                        <a asp-action="Edit" asp-route-id="@rent.Id" class="btn btn-warning btn-sm" title="Edit">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <form asp-action="Delete" asp-route-id="@rent.Id" method="post" style="display:inline;">
-                            <button type="submit" class="btn btn-danger btn-sm">
+                        <form asp-action="Delete" asp-route-id="@rent.Id" method="post" style="display:inline;"
+                              onsubmit="return confirm('Are you sure you want to delete this rent?');">
+                            <button type="submit" class="btn btn-danger btn-sm" title="Delete">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
                     </td>
                 </tr>
-            }
-        </tbody>
-    </table>
+                                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
 @section Scripts {
