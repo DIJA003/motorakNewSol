@@ -87,7 +87,7 @@ namespace motorak.pll.Controllers
                             {
                                 SellerName = "Motorak Store",
                                 PaymentMethod = request.PaymentMethod,
-                                TotalPrice = (int)item.TotalPrice,
+                                TotalPrice = item.TotalPrice,
                                 CustomerId = customer.Id,
                                 CarId = item.CarId
                             };

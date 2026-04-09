@@ -6,7 +6,7 @@ namespace Motorak.DAL.Entities
 {
     public class Purchase : Transactions
     {
-        public string SellerName { get; private set; }
+        public string SellerName { get;  set; }
 
         public Purchase(string sellerName, string paymentMethod, decimal totalPrice, int customerId, int carId)
             : base(paymentMethod, totalPrice, customerId, carId)
