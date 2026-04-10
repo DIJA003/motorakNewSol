@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using motorak.DAL.DataBase;
@@ -10,6 +11,7 @@ using System.Security.Claims;
 
 namespace Motorak.PLL.Controllers
 {
+    [Authorize]  // Require authentication for all actions
     public class PurchaseController : Controller
     {
         private readonly IPurchaseService _service;
@@ -26,6 +28,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous] // Anyone can view the list
         public async Task<IActionResult> Index()
         {
             var list = await _service.GetAllAsync();
@@ -33,6 +36,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Customer")]
         public async Task<IActionResult> Details(int id)
         {
             var item = await _service.GetByIdAsync(id);
@@ -41,6 +45,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Customer")]
         public async Task<IActionResult> Create(int? carId = null, decimal? price = null)
         {
             var (status, _, customers) = await _customerService.GetAllCustomersAsync();
@@ -80,6 +85,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Customer")]
         public async Task<IActionResult> Create(PurchaseCreateDto dto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -102,6 +108,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             var existing = await _service.GetByIdAsync(id);
@@ -119,6 +126,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, PurchaseUpdateDto dto)
         {
             if (id != dto.Id) return BadRequest();
@@ -136,6 +144,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var existing = await _service.GetByIdAsync(id);
@@ -145,6 +154,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try

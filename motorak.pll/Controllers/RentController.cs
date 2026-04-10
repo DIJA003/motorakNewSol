@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace Motorak.PLL.Controllers
 {
-    //[Authorize]  // Require authentication for all actions
+    [Authorize]  // Require authentication for all actions
     public class RentController : Controller
     {
         private readonly IRentService _service;
@@ -28,8 +28,8 @@ namespace Motorak.PLL.Controllers
             _carService = carService;
         }
 
-
         [HttpGet]
+        [Authorize(Roles = "Admin,Customer")]
         public async Task<IActionResult> Create(int? carId = null, decimal? price = null)
         {
             // Get customers for dropdown (admin only may need this)
@@ -73,6 +73,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin,Customer")]
         public async Task<IActionResult> Create(RentCreateDto dto)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -104,14 +105,16 @@ namespace Motorak.PLL.Controllers
             }
         }
 
-            [AllowAnonymous] // Anyone can view the list
+        [HttpGet]
+        [AllowAnonymous] // Anyone can view the list
         public async Task<IActionResult> Index()
         {
             var list = await _service.GetAllAsync();
             return View(list);
         }
 
-        [AllowAnonymous] // Anyone can view details, but we restrict if needed
+        [HttpGet]
+        [Authorize(Roles = "Admin,Customer")]
         public async Task<IActionResult> Details(int id)
         {
             var item = await _service.GetByIdAsync(id);
@@ -123,7 +126,7 @@ namespace Motorak.PLL.Controllers
             {
                 var customer = await _context.Customers
                     .FirstOrDefaultAsync(c => c.UserId == userId);
-                
+
                 // Check if the rent belongs to the current customer OR user is admin
                 if (customer != null && item.CustomerId != customer.Id && !User.IsInRole("Admin"))
                 {
@@ -142,10 +145,8 @@ namespace Motorak.PLL.Controllers
             return View(item);
         }
 
-     
-
         [HttpGet]
-        //[Authorize(Roles = "Admin")] // Only admins can edit
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id)
         {
             var existing = await _service.GetByIdAsync(id);
@@ -163,12 +164,12 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int id, RentUpdateDto dto)
         {
             if (id != dto.Id) return BadRequest();
 
-            
+
             ModelState.Remove("CarId");
             ModelState.Remove("CustomerId");
             ModelState.Remove("StartDate");
@@ -176,7 +177,7 @@ namespace Motorak.PLL.Controllers
 
             if (!ModelState.IsValid)
             {
-                
+
                 var errors = ModelState.Values.SelectMany(v => v.Errors);
                 return View(dto);
             }
@@ -194,7 +195,7 @@ namespace Motorak.PLL.Controllers
         }
 
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
             var existing = await _service.GetByIdAsync(id);
@@ -204,7 +205,7 @@ namespace Motorak.PLL.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        //[Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
@@ -221,6 +222,7 @@ namespace Motorak.PLL.Controllers
 
         // Optional: View current user's rentals
         [HttpGet]
+        [Authorize(Roles = "Customer")]
         public async Task<IActionResult> MyRentals()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -234,7 +236,7 @@ namespace Motorak.PLL.Controllers
 
             var allRentals = await _service.GetAllAsync();
             var myRentals = allRentals.Where(r => r.CustomerId == customer.Id).ToList();
-            
+
             return View(myRentals);
         }
     }
