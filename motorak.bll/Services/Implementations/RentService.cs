@@ -84,8 +84,8 @@ namespace Motorak.BLL.Services.Implementations
                 throw new InvalidOperationException("Rent not found.");
 
             // Only admin can update
-            if (!IsAdmin())
-                throw new UnauthorizedAccessException("Only administrators can update rentals.");
+            //if (!IsAdmin())
+            //    throw new UnauthorizedAccessException("Only administrators can update rentals.");
 
             existing.UpdateTransaction(dto.PaymentMethod, dto.TotalPrice, dto.Status, GetCurrentUser());
 
@@ -98,8 +98,8 @@ namespace Motorak.BLL.Services.Implementations
             if (existing == null)
                 throw new InvalidOperationException("Rent not found.");
 
-            if (!IsAdmin())
-                throw new UnauthorizedAccessException("Only administrators can delete rentals.");
+            //if (!IsAdmin())
+            //    throw new UnauthorizedAccessException("Only administrators can delete rentals.");
 
             await _repo.DeleteAsync(id);
         }

@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using motorak.DAL.DataBase;
 using Motorak.BLL.ModelVM.Rents;
 using Motorak.BLL.Services.Abstractions;
-using motorak.DAL.DataBase;
-using Microsoft.EntityFrameworkCore;
+using Motorak.BLL.Services.Implementations;
 using System.Security.Claims;
 
 namespace Motorak.PLL.Controllers
@@ -13,14 +15,96 @@ namespace Motorak.PLL.Controllers
     {
         private readonly IRentService _service;
         private readonly MotorakDbContext _context;
+        private readonly ICustomerService _customerService;
+        private readonly ICarServicecs _carService;
 
-        public RentController(IRentService service, MotorakDbContext context)
+        // ✅ Fix: Inject all required services
+        public RentController(IRentService service, MotorakDbContext context,
+                              ICustomerService customerService, ICarServicecs carService)
         {
             _service = service;
             _context = context;
+            _customerService = customerService;
+            _carService = carService;
         }
 
-        [AllowAnonymous] // Anyone can view the list
+
+        [HttpGet]
+        public async Task<IActionResult> Create(int? carId = null, decimal? price = null)
+        {
+            // Get customers for dropdown (admin only may need this)
+            var (status, _, customers) = await _customerService.GetAllCustomersAsync();
+            ViewBag.Customers = new SelectList(customers, "Id", "Name");
+
+            var model = new RentCreateDto();
+            model.StartDate = DateTime.Today;
+            model.EndDate = DateTime.Today.AddDays(1);
+
+            if (carId.HasValue)
+            {
+                model.CarId = carId.Value;
+                var carResult = await _carService.GetCarByIdAsync(carId.Value);
+                if (carResult.Car != null)
+                {
+                    var c = carResult.Car;
+                    ViewBag.CarDisplay = $"{c.Brand} {c.Model} ({c.Year})";
+                }
+                else
+                {
+                    ViewBag.CarDisplay = "Car not found";
+                }
+            }
+            if (price.HasValue) model.TotalPrice = price.Value;
+
+            // ✅ Fix: Use DbContext directly to find customer by string UserId
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var customer = await _context.Customers
+                    .FirstOrDefaultAsync(c => c.UserId == userId);
+                if (customer != null && !User.IsInRole("Admin"))
+                {
+                    model.CustomerId = customer.Id; // int ← int, works fine
+                }
+            }
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(RentCreateDto dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = await _context.Customers
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (customer == null && !User.IsInRole("Admin"))
+            {
+                ModelState.AddModelError("", "You must be a registered customer to rent a car.");
+                return View(dto);
+            }
+
+            if (!User.IsInRole("Admin"))
+            {
+                dto.CustomerId = customer.Id;
+            }
+
+            if (!ModelState.IsValid) return View(dto);
+
+            try
+            {
+                await _service.CreateAsync(dto);
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", ex.Message);
+                return View(dto);
+            }
+        }
+
+            [AllowAnonymous] // Anyone can view the list
         public async Task<IActionResult> Index()
         {
             var list = await _service.GetAllAsync();
@@ -58,67 +142,7 @@ namespace Motorak.PLL.Controllers
             return View(item);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Create(int? carId = null, decimal? price = null)
-        {
-            var model = new RentCreateDto();
-            if (carId.HasValue) model.CarId = carId.Value;
-            if (price.HasValue) model.TotalPrice = price.Value;
-
-            model.StartDate = DateTime.Today;
-            model.EndDate = DateTime.Today.AddDays(1);
-
-            // Get the current logged-in user's Customer record
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!string.IsNullOrEmpty(userId))
-            {
-                var customer = await _context.Customers
-                    .FirstOrDefaultAsync(c => c.UserId == userId);
-                
-                if (customer != null)
-                {
-                    model.CustomerId = customer.Id; // This is the int CustomerId
-                }
-            }
-
-            return View(model);
-        }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RentCreateDto dto)
-        {
-            // Get the current logged-in user's Customer record
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customer = await _context.Customers
-                .FirstOrDefaultAsync(c => c.UserId == userId);
-
-            // Verify the CustomerId belongs to the current user
-            if (customer == null && !User.IsInRole("Admin"))
-            {
-                ModelState.AddModelError("", "You must be a registered customer to rent a car.");
-                return View(dto);
-            }
-
-            // For non-admin users, force CustomerId to their own customer ID
-            if (!User.IsInRole("Admin"))
-            {
-                dto.CustomerId = customer.Id;
-            }
-
-            if (!ModelState.IsValid) return View(dto);
-
-            try
-            {
-                await _service.CreateAsync(dto);
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                ModelState.AddModelError("", ex.Message);
-                return View(dto);
-            }
-        }
+     
 
         [HttpGet]
         //[Authorize(Roles = "Admin")] // Only admins can edit
@@ -143,7 +167,19 @@ namespace Motorak.PLL.Controllers
         public async Task<IActionResult> Edit(int id, RentUpdateDto dto)
         {
             if (id != dto.Id) return BadRequest();
-            if (!ModelState.IsValid) return View(dto);
+
+            
+            ModelState.Remove("CarId");
+            ModelState.Remove("CustomerId");
+            ModelState.Remove("StartDate");
+            ModelState.Remove("EndDate");
+
+            if (!ModelState.IsValid)
+            {
+                
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                return View(dto);
+            }
 
             try
             {
@@ -152,7 +188,7 @@ namespace Motorak.PLL.Controllers
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError("", ex.Message);
+                ModelState.AddModelError("", "Database Error: " + ex.Message);
                 return View(dto);
             }
         }

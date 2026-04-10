@@ -4,98 +4,323 @@
 
 @{
     ViewData["Title"] = "Available Cars";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = "_MotorakIndex";
+    var carsList = Model ?? new List<Motorak.BLL.ModelVM.Car.CarListModel>();
 }
 
-<h2 class="mb-4">Available Cars</h2>
+<style>
+    :root {
+        --gold: #fbbf24;
+        --gold-hover: #f59e0b;
+        --gold-border: rgba(251,191,36,0.3);
+        --card-bg: rgba(15,23,42,0.8);
+    }
 
-<table class="table table-striped table-bordered">
-    <thead class="table-dark">
-        <tr>
-            <th>Image</th>
-            <th>Brand</th>
-            <th>Model</th>
-            <th>Year</th>
-            <th>Price</th>
-            <th>Daily Rent Price</th>
-            <th>Mileage</th>
-            <th>Status</th>
-            <th>Category</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Model != null && Model.Any())
-        {
-            foreach (var car in Model)
+    /* Base Page Styles */
+    .cars-page {
+        min-height: 100vh;
+        padding: 2rem 0 4rem;
+        position: relative;
+        color: white;
+    }
+
+        .cars-page::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 20% 25%, rgba(251,191,36,0.07) 0%, transparent 55%), radial-gradient(ellipse at 80% 75%, rgba(245,158,11,0.06) 0%, transparent 55%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+    /* Header & Stats */
+    .page-header {
+        text-align: center;
+        padding: 2rem 0;
+    }
+
+    .page-title {
+        font-family: 'Exo 2', sans-serif;
+        font-size: 2.8rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #fff 0%, #fef3c7 40%, #fbbf24 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Filter Bar */
+    .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1.5rem;
+        justify-content: space-between;
+        margin-bottom: 3rem;
+        padding: 1.2rem;
+        background: rgba(10,18,35,0.6);
+        backdrop-filter: blur(20px);
+        border-radius: 24px;
+        border: 1px solid rgba(251,191,36,0.1);
+    }
+
+    /* Grid & Cards */
+    .cars-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
+    }
+
+    .car-card {
+        background: var(--card-bg);
+        border: 1px solid rgba(251,191,36,0.1);
+        border-radius: 28px;
+        overflow: hidden;
+        transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        display: flex;
+        flex-direction: column;
+    }
+
+        .car-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--gold);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+    .car-image-container {
+        height: 220px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .car-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: 0.6s;
+    }
+
+    .car-card:hover .car-image {
+        transform: scale(1.1);
+    }
+
+    .car-content {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .car-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: #fff;
+    }
+
+    /* Price Styles */
+    .price-section {
+        margin: 1rem 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+    }
+
+    .price-sale {
+        font-size: 1.6rem;
+        font-weight: 900;
+        color: var(--gold);
+    }
+
+    .price-rent {
+        font-size: 1.1rem;
+        color: #cbd5e1;
+    }
+
+        .price-rent span {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+
+    /* --- THE PERFECT BUTTONS --- */
+    .car-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: auto; /* Pushes buttons to the bottom of the card */
+        padding-top: 1rem;
+    }
+
+    .btn-action {
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.8rem 1rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 0.85rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        flex: 1; /* Equal width for Buy/Rent buttons */
+        border: 1px solid transparent;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Cart Icon Button */
+    .btn-cart {
+        flex: 0 0 48px; /* Circular/Square fixed size */
+        background: rgba(251, 191, 36, 0.1);
+        color: var(--gold);
+        border: 1px solid var(--gold-border);
+    }
+
+        .btn-cart:hover {
+            background: var(--gold);
+            color: #000;
+        }
+
+    /* Buy Button - Dominant */
+    .btn-buy {
+        background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+        color: #000 !important;
+        box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
+    }
+
+        .btn-buy:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(251, 191, 36, 0.4);
+        }
+
+    /* Rent Button - Subtle/Glass */
+    .btn-rent {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff !important;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+        .btn-rent:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: #fff;
+        }
+
+    .btn-action:active {
+        transform: scale(0.95);
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem;
+        grid-column: 1 / -1;
+    }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+
+<div class="cars-page">
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">Available Cars</h1>
+            <p>Discover premium performance and luxury</p>
+        </div>
+
+        <div class="filter-bar">
+            <div class="search-box" style="display:flex; align-items:center; background:rgba(0,0,0,0.3); padding:0.5rem 1rem; border-radius:50px; border:1px solid var(--gold-border);">
+                <i class="ri-search-line" style="color: var(--gold)"></i>
+                <input type="text" id="searchInput" placeholder="Search..." style="background:transparent; border:none; color:white; outline:none; margin-left:10px;">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="sale">Sale</button>
+                <button class="filter-btn" data-filter="rent">Rent</button>
+            </div>
+        </div>
+
+        <div class="cars-grid" id="carsGrid">
+            @if (carsList.Any())
             {
-                <tr>
-                    <td>
-                        @if (!string.IsNullOrEmpty(car.ImagePath))
-                        {
-                            <img src="@Url.Content(car.ImagePath)" alt="@($"{car.Brand} {car.Model}")" width="120" height="80" style="object-fit:cover;" />
-                        }
-                        else
-                        {
-                            <span>No Image</span>
-                        }
-                    </td>
-                    <td>@car.Brand</td>
-                    <td>@car.Model</td>
-                    <td>@car.Year</td>
-                    <td>
-                        @(car.Category == CarCategory.ForSale ? car.Price.ToString("C") : "-")
-                    </td>
-                    <td>
-                        @(car.Category == CarCategory.ForRent && car.DailyRentPrice.HasValue ? car.DailyRentPrice.Value.ToString("C") : "-")
-                    </td>
-                    <td>@car.Mileage.ToString("N0") km</td>
-                    <td>@car.Status</td>
-                    <td>@car.Category</td>
-                    <td>
-                        <!-- Add to Cart button (always available) -->
-                        <button type="button" class="btn btn-sm btn-warning mb-1 add-to-cart" data-id="@car.Id">Add to Cart</button>
+                foreach (var car in carsList)
+                {
+                    <div class="car-card" data-category="@car.Category" data-name="@car.Brand @car.Model">
+                        <div class="car-image-container">
+                            <img src="@(!string.IsNullOrEmpty(car.ImagePath) ? Url.Content(car.ImagePath) : "/assets/img/default-car.png")"
+                                 alt="@car.Brand" class="car-image">
+                        </div>
 
-                        <!-- Buy button -->
-                        @if (car.Category == CarCategory.ForSale)
-                        {
-                            <a asp-controller="Purchase" asp-action="Create" asp-route-carId="@car.Id" class="btn btn-sm btn-success mb-1">Buy</a>
-                        }
+                        <div class="car-content">
+                            <h3 class="car-title">@car.Brand @car.Model</h3>
+                            <div style="color:#94a3b8; font-size:0.9rem;">@car.Year · @car.Transmission</div>
 
-                        <!-- Rent button -->
-                        @if (car.Category == CarCategory.ForRent)
-                        {
-                            <a asp-controller="Rent" asp-action="Create" asp-route-carId="@car.Id" class="btn btn-sm btn-primary">Rent</a>
-                        }
-                    </td>
-                </tr>
+                            <div class="price-section">
+                                @if (car.Category != CarCategory.ForRent)
+                                {
+                                    <div class="price-sale">$@car.Price.ToString("N0")</div>
+                                }
+                                @if (car.Category == CarCategory.ForRent || car.Category == CarCategory.Both)
+                                {
+                                    <div class="price-rent">$@car.DailyRentPrice?.ToString("N0") <span>/day</span></div>
+                                }
+                            </div>
+
+                            <div class="car-actions">
+                                <button class="btn-action btn-cart add-to-cart" data-id="@car.Id">
+                                    <i class="ri-shopping-cart-2-line"></i>
+                                </button>
+
+                                @if (car.Category != CarCategory.ForRent)
+                                {
+                                    <a asp-controller="Purchase" asp-action="Create" asp-route-carId="@car.Id" class="btn-action btn-buy">Buy Now</a>
+                                }
+
+                                @if (car.Category != CarCategory.ForSale)
+                                {
+                                    <a asp-controller="Rent" asp-action="Create" asp-route-carId="@car.Id" class="btn-action btn-rent">Rent</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
             }
-        }
-        else
-        {
-            <tr>
-                <td colspan="10" class="text-center">No cars available.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+            else
+            {
+                <div class="empty-state">
+                    <i class="ri-error-warning-line" style="font-size:3rem; color:var(--gold);"></i>
+                    <h3>No Cars Found</h3>
+                </div>
+            }
+        </div>
+    </div>
+</div>
 
 @section Scripts {
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).on("click", ".add-to-cart", function () {
-            var id = $(this).data("id");
-            $.ajax({
-                url: '/Cart/AddToCart',
-                type: 'POST',
-                data: { id: id },
-                success: function (res) {
-                    $("#cart-count").text(res.count);
-                    alert("Added to cart!");
-                },
-                error: function () {
-                    alert("Failed to add to cart.");
-                }
+        $(document).ready(function() {
+            const $cards = $('.car-card');
+
+            function performFilter() {
+                const term = $('#searchInput').val().toLowerCase();
+                const category = $('.filter-btn.active').data('filter');
+
+                $cards.each(function() {
+                    const $card = $(this);
+                    const name = $card.data('name').toLowerCase();
+                    const cardCat = $card.data('category');
+
+                    const matchesSearch = name.includes(term);
+                    let matchesCat = category === 'all' ||
+                                     (category === 'sale' && (cardCat === 'ForSale' || cardCat === 'Both')) ||
+                                     (category === 'rent' && (cardCat === 'ForRent' || cardCat === 'Both'));
+
+                    if(matchesSearch && matchesCat) $card.fadeIn(300);
+                    else $card.fadeOut(200);
+                });
+            }
+
+            $('#searchInput').on('input', performFilter);
+            $('.filter-btn').on('click', function() {
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active').css('background', 'var(--gold)').css('color', '#000');
+                performFilter();
             });
         });
     </script>

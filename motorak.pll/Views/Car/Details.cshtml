@@ -1,459 +1,363 @@
 ﻿@using Motorak.BLL.ModelVM.Car;
 @using Motorak.DAL.Enums.CarEnums;
-@using motorak.dal.Enums.CarEnums;
-
-
+@using motorak.dal.Enums.CarEnums
 @model CarDetailsModel
 @{
     ViewData["Title"] = $"{Model.Brand} {Model.Model} - Details";
+    Layout = "_MotorakIndex";
 }
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="mb-0">@Model.Brand @Model.Model (@Model.Year)</h3>
-                    <span class="badge badge-@(Model.Status == Motorak.DAL.Enums.CarEnums.CarStatus.Available ? "success" : "secondary")">
-                        @Model.Status
-                    </span>
-                    <span class="badge badge-@(Model.Category == CarCategory.ForSale ? "primary" : Model.Category == CarCategory.ForRent ? "info" : "warning") ml-2">
-                        @Model.Category
-                    </span>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <img src="@(Model.ImagePath ?? "/images/default-car.jpg")"
-                                 class="img-fluid rounded shadow" alt="@Model.Brand @Model.Model">
-                        </div>
-                        <div class="col-md-6">
-                            <h4 class="text-primary mb-3">Vehicle Details</h4>
-
-                            <div class="row mb-2">
-                                <div class="col-5"><strong>Brand:</strong></div>
-                                <div class="col-7">@Model.Brand</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-5"><strong>Model:</strong></div>
-                                <div class="col-7">@Model.Model</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-5"><strong>Year:</strong></div>
-                                <div class="col-7">@Model.Year</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-5"><strong>Color:</strong></div>
-                                <div class="col-7">@Model.Color</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-5"><strong>Mileage:</strong></div>
-                                <div class="col-7">@Model.Mileage.ToString("N0") miles</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-5"><strong>Type:</strong></div>
-                                <div class="col-7">@Model.Type</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-5"><strong>Transmission:</strong></div>
-                                <div class="col-7">@Model.Transmission</div>
-                            </div>
-                            <div class="row mb-2">
-                                <div class="col-5"><strong>Condition:</strong></div>
-                                <div class="col-7">@Model.Condition</div>
-                            </div>
-                            @if (!string.IsNullOrEmpty(Model.OwnerName))
-                            {
-                                <div class="row mb-2">
-                                    <div class="col-5"><strong>Owner:</strong></div>
-                                    <div class="col-7">@Model.OwnerName</div>
-                                </div>
-                            }
-                            <div class="row mb-2">
-                                <div class="col-5"><strong>Date Added:</strong></div>
-                                <div class="col-7">@Model.DateAdded.ToString("MMM dd, yyyy")</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="col-lg-4">
-            <div class="card sticky-top">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-dollar-sign"></i> Pricing & Actions
-                    </h5>
-                </div>
-                <div class="card-body">
-                    @if (Model.Status == Motorak.DAL.Enums.CarEnums.CarStatus.Available)
-                    {
-
-                        @if (Model.Category == CarCategory.ForSale || Model.Category == CarCategory.Both)
-                        {
-                            <div class="pricing-option mb-3 p-3 border rounded">
-                                <h6 class="text-success">
-                                    <i class="fas fa-shopping-cart"></i> Purchase
-                                </h6>
-                                <div class="price-display mb-2">
-                                    <span class="h4 text-success">$@Model.Price.ToString("N0")</span>
-                                    <small class="text-muted d-block">One-time payment</small>
-                                </div>
-                                @if (User.Identity.IsAuthenticated)
-                                {
-                                    <button type="button" class="btn btn-success btn-block"
-                                            onclick="addToCartDirect(@Model.Id, 'Buy')">
-                                        <i class="fas fa-cart-plus"></i> Add to Cart (Buy)
-                                    </button>
-                                }
-                                else
-                                {
-                                    <a href="/Identity/Account/Login" class="btn btn-success btn-block">
-                                        <i class="fas fa-sign-in-alt"></i> Login to Purchase
-                                    </a>
-                                }
-                                <style>
-                                    .sticky-top {
-                                        top: 20px;
-                                    }
-
-                                    .pricing-option {
-                                        background-color: #f8f9fa;
-                                        transition: all 0.3s ease;
-                                    }
-
-                                        .pricing-option:hover {
-                                            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                                            transform: translateY(-2px);
-                                        }
-
-                                    .price-display {
-                                        text-align: center;
-                                    }
-
-                                    .badge {
-                                        font-size: 0.875em;
-                                    }
-
-                                    .card {
-                                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                                    }
-
-                                    .alert.position-fixed {
-                                        animation: slideInRight 0.3s ease-out;
-                                    }
-
-                                </style>
-                            </div>
-                        }
-
-                        @if (Model.Category == CarCategory.ForRent || Model.Category == CarCategory.Both)
-                        {
-                            <div class="pricing-option mb-3 p-3 border rounded">
-                                <h6 class="text-info">
-                                    <i class="fas fa-calendar-alt"></i> Rental
-                                </h6>
-                                @if (Model.DailyRentPrice.HasValue)
-                                {
-                                    <div class="price-display mb-2">
-                                        <span class="h4 text-info">$@Model.DailyRentPrice.Value.ToString("N0")</span>
-                                        <small class="text-muted d-block">per day</small>
-                                    </div>
-                                    @if (User.Identity.IsAuthenticated)
-                                    {
-                                        <button type="button" class="btn btn-info btn-block"
-                                                onclick="showAddToCartModal(@Model.Id, '@Model.Category')">
-                                            <i class="fas fa-calendar-plus"></i> Select Rental Dates
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <a href="/Identity/Account/Login" class="btn btn-info btn-block">
-                                            <i class="fas fa-sign-in-alt"></i> Login to Rent
-                                        </a>
-                                    }
-                                }
-                                else
-                                {
-                                    <p class="text-muted">Rental pricing not available</p>
-                                }
-                            </div>
-                        }
-
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <div class="text-center mt-3">
-                                <a href="@Url.Action("Index", "Cart")" class="btn btn-outline-primary">
-                                    <i class="fas fa-shopping-cart"></i> View Cart
-                                    <span class="badge badge-primary cart-count">0</span>
-                                </a>
-                            </div>
-                        }
-                    }
-                    else
-                    {
-                        <div class="alert alert-warning">
-                            <h6><i class="fas fa-exclamation-triangle"></i> Not Available</h6>
-                            <p class="mb-0">This vehicle is currently @Model.Status.ToString().ToLower().</p>
-                        </div>
-                    }
-
-                    <!-- Additional Actions -->
-                    <hr>
-                    <div class="d-grid gap-2">
-                        <button type="button" class="btn btn-outline-secondary btn-sm"
-                                onclick="shareVehicle()">
-                            <i class="fas fa-share-alt"></i> Share
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary btn-sm"
-                                onclick="addToWishlist(@Model.Id)">
-                            <i class="fas fa-heart"></i> Add to Wishlist
-                        </button>
-                        <button type="button" class="btn btn-outline-info btn-sm"
-                                data-toggle="modal" data-target="#contactModal">
-                            <i class="fas fa-envelope"></i> Contact Seller
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Additional Info Card -->
-            <div class="card mt-3">
-                <div class="card-header">
-                    <h6 class="mb-0">
-                        <i class="fas fa-info-circle"></i> Additional Information
-                    </h6>
-                </div>
-                <div class="card-body">
-                    <small class="text-muted">
-                        <p><strong>Free Inspection:</strong> All vehicles come with a complimentary inspection report.</p>
-                        <p><strong>Warranty:</strong> 30-day limited warranty included.</p>
-                        <p><strong>Financing:</strong> Financing options available for qualified buyers.</p>
-                        <p><strong>Return Policy:</strong> 7-day return policy (conditions apply).</p>
-                    </small>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Specifications Section -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="mb-0">
-                        <i class="fas fa-cogs"></i> Vehicle Specifications
-                    </h5>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><strong>Engine Type:</strong></td>
-                                    <td>@Model.Type</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Transmission:</strong></td>
-                                    <td>@Model.Transmission</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Fuel Type:</strong></td>
-                                    <td>Gasoline</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Body Style:</strong></td>
-                                    <td>@Model.Type</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="col-md-6">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td><strong>Exterior Color:</strong></td>
-                                    <td>@Model.Color</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Interior Color:</strong></td>
-                                    <td>Black Leather</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Drivetrain:</strong></td>
-                                    <td>Front Wheel Drive</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>VIN:</strong></td>
-                                    <td>*****@Model.Id.ToString("D4")</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Contact Modal -->
-<div class="modal fade" id="contactModal" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Contact Seller</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label>Your Name:</label>
-                        <input type="text" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Email:</label>
-                        <input type="email" class="form-control" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Phone Number:</label>
-                        <input type="tel" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Message:</label>
-                        <textarea class="form-control" rows="4"
-                                  placeholder="I'm interested in the @Model.Brand @Model.Model..."></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary">Send Message</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Include the Add to Cart Modal from Cart Index view -->
-@Html.Partial("_AddToCartModal")
-
-<script>
-    // Initialize cart functionality when page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        // Update cart count on page load
-        updateCartCount();
-    });
-
-    async function addToCartDirect(carId, itemType) {
-        try {
-            const response = await fetch('/Cart/AddToCart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
-                },
-                body: JSON.stringify({
-                    carId: carId,
-                    itemType: itemType,
-                    startDate: null,
-                    endDate: null
-                })
-            });
-
-            const result = await response.json();
-
-            if (result.success) {
-                showNotification('Item added to cart successfully!', 'success');
-                updateCartCount();
-            } else {
-                showNotification(result.message, 'error');
-            }
-        } catch (error) {
-            showNotification('Error adding item to cart', 'error');
-        }
-    }
-
-    async function updateCartCount() {
-        try {
-            const response = await fetch('/Cart/GetCartCount');
-            const data = await response.json();
-
-            const countElements = document.querySelectorAll('.cart-count');
-            countElements.forEach(el => el.textContent = data.count);
-        } catch (error) {
-            console.error('Error updating cart count:', error);
-        }
-    }
-
-    function showNotification(message, type = 'info') {
-        const toast = document.createElement('div');
-        toast.className = `alert alert-${type === 'error' ? 'danger' : type === 'success' ? 'success' : 'info'} alert-dismissible fade show position-fixed`;
-        toast.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-        toast.innerHTML = `
-            ${message}
-            <button type="button" class="close" onclick="this.parentElement.remove()">
-                <span>&times;</span>
-            </button>
-        `;
-
-        document.body.appendChild(toast);
-
-        setTimeout(() => {
-            if (toast.parentElement) {
-                toast.remove();
-            }
-        }, 5000);
-    }
-
-    function shareVehicle() {
-        if (navigator.share) {
-            navigator.share({
-                title: '@Model.Brand @Model.Model (@Model.Year)',
-                text: 'Check out this vehicle!',
-                url: window.location.href
-            });
-        } else {
-            // Fallback - copy to clipboard
-            navigator.clipboard.writeText(window.location.href);
-            showNotification('Link copied to clipboard!', 'success');
-        }
-    }
-
-    function addToWishlist(carId) {
-        // Implement wishlist functionality
-        showNotification('Added to wishlist!', 'success');
-    }
-</script>
-
 <style>
-    .sticky-top {
-        top: 20px;
+    :root {
+        --gold: #fbbf24;
+        --gold-hover: #f59e0b;
+        --dark-card: rgba(10, 18, 35, 0.85);
+        --glass-border: rgba(251, 191, 36, 0.2);
     }
 
-    .pricing-option {
-        background-color: #f8f9fa;
-        transition: all 0.3s ease;
+    .car-details-page {
+        padding: 40px 0;
+        color: #e2e8f0;
     }
 
-        .pricing-option:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
+    /* Hero Title Section */
+    .vehicle-header {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid var(--glass-border);
+    }
+
+    .vehicle-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(to right, #fff, var(--gold));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    /* Main Container Styles */
+    .glass-card {
+        background: var(--dark-card);
+        backdrop-filter: blur(20px);
+        border: 1px solid var(--glass-border);
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        margin-bottom: 24px;
+        transition: border-color 0.3s ease;
+    }
+
+        .glass-card:hover {
+            border-color: rgba(251, 191, 36, 0.4);
         }
 
-    .price-display {
+    /* Image Styling */
+    .main-image-wrapper {
+        position: relative;
+        border-radius: 24px;
+        overflow: hidden;
+        height: 500px;
+    }
+
+    .main-car-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .main-image-wrapper:hover .main-car-img {
+        transform: scale(1.05);
+    }
+
+    /* Quick Specs Bar */
+    .quick-specs {
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+        background: rgba(251, 191, 36, 0.05);
+        border-top: 1px solid var(--glass-border);
+    }
+
+    .spec-item {
         text-align: center;
     }
 
-    .badge {
-        font-size: 0.875em;
+        .spec-item i {
+            color: var(--gold);
+            font-size: 1.5rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .spec-item span {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #94a3b8;
+        }
+
+        .spec-item p {
+            margin: 0;
+            font-weight: 700;
+        }
+
+    /* --- NEW ACTION TILES STYLES --- */
+    .action-tile {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(251, 191, 36, 0.1);
+        border-radius: 16px;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        margin-bottom: 12px;
     }
 
-    .card {
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        .action-tile:hover {
+            background: rgba(251, 191, 36, 0.08);
+            border-color: var(--gold);
+            transform: translateX(5px);
+        }
+
+    .tile-icon {
+        width: 45px;
+        height: 45px;
+        background: rgba(251, 191, 36, 0.1);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+        color: var(--gold);
     }
 
-    .alert.position-fixed {
-        animation: slideInRight 0.3s ease-out;
+    .tile-label {
+        display: block;
+        font-size: 0.7rem;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
     }
 
+    .tile-price {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #fff;
+    }
+
+        .tile-price small {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 400;
+        }
+
+    .btn-sec-action {
+        background: transparent;
+        border: 1px solid rgba(255,255,255,0.1);
+        color: #e2e8f0;
+        padding: 10px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        transition: all 0.2s;
+    }
+
+        .btn-sec-action:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+    /* Table Styling */
+    .info-table {
+        width: 100%;
+    }
+
+        .info-table td {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .info-table .label {
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .info-table .value {
+            text-align: right;
+            font-weight: 600;
+        }
+
+    .sticky-box {
+        position: sticky;
+        top: 100px;
+    }
 </style>
+
+<div class="car-details-page">
+    <div class="container">
+
+        <div class="vehicle-header d-flex justify-content-between align-items-end">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb" style="background:transparent; padding:0;">
+                        <li class="breadcrumb-item"><a href="/Car" class="text-gold">Inventory</a></li>
+                        <li class="breadcrumb-item active text-white">@Model.Brand</li>
+                    </ol>
+                </nav>
+                <h1 class="vehicle-title">@Model.Brand @Model.Model</h1>
+                <div class="d-flex gap-2 mt-2">
+                    <span class="badge" style="background: rgba(59,130,246,0.1); color: #60a5fa; border: 1px solid #3b82f6;">@Model.Year</span>
+                    <span class="badge" style="background: rgba(16,185,129,0.1); color: #34d399; border: 1px solid #10b981;">@Model.Condition</span>
+                </div>
+            </div>
+            <div class="text-end">
+                <span class="text-muted d-block small">LISTING ID: #MT-@Model.Id.ToString("D4")</span>
+                <span class="text-white"><i class="ri-map-pin-2-line text-gold"></i> Cairo, Giza</span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="glass-card overflow-hidden">
+                    <div class="main-image-wrapper">
+                        <img src="@(Model.ImagePath ?? "/assets/img/default-car.png")" class="main-car-img" alt="Vehicle Image">
+                    </div>
+
+                    <div class="quick-specs">
+                        <div class="spec-item">
+                            <i class="ri-dashboard-3-line"></i>
+                            <span>Mileage</span>
+                            <p>@Model.Mileage.ToString("N0") km</p>
+                        </div>
+                        <div class="spec-item">
+                            <i class="ri-settings-5-line"></i>
+                            <span>Transmission</span>
+                            <p>@Model.Transmission</p>
+                        </div>
+                        <div class="spec-item">
+                            <i class="ri-gas-station-fill"></i>
+                            <span>Fuel</span>
+                            <p>Petrol</p>
+                        </div>
+                        <div class="spec-item">
+                            <i class="ri-palette-line"></i>
+                            <span>Color</span>
+                            <p>@Model.Color</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-4">
+                    <h4 class="text-gold mb-4"><i class="ri-information-fill"></i> Vehicle Specifications</h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <table class="info-table">
+                                <tr><td class="label">Body Type</td><td class="value">@Model.Type</td></tr>
+                                <tr><td class="label">Engine Size</td><td class="value">2.0L Turbo</td></tr>
+                                <tr><td class="label">Doors</td><td class="value">4 Doors</td></tr>
+                            </table>
+                        </div>
+                        <div class="col-md-6">
+                            <table class="info-table">
+                                <tr><td class="label">Interior Color</td><td class="value">Premium Black</td></tr>
+                                <tr><td class="label">Drive Type</td><td class="value">AWD</td></tr>
+                                <tr><td class="label">Status</td><td class="value text-success">@Model.Status</td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="sticky-box">
+                    <div class="glass-card p-4">
+                        <h6 class="text-gold mb-4 fw-bold" style="letter-spacing:1px;">TRANSACTION OPTIONS</h6>
+
+                        @if (User.Identity.IsAuthenticated)
+                        {
+                            @if (Model.Category == CarCategory.ForSale || Model.Category == CarCategory.Both)
+                            {
+                                <div class="action-tile" onclick="addToCartDirect(@Model.Id, 'Buy')">
+                                    <div class="tile-icon"><i class="ri-bank-card-line"></i></div>
+                                    <div class="tile-content">
+                                        <span class="tile-label">Buy Ownership</span>
+                                        <div class="tile-price">$@Model.Price.ToString("N0")</div>
+                                    </div>
+                                    <i class="ri-arrow-right-s-line text-muted"></i>
+                                </div>
+                            }
+
+                            @if (Model.Category == CarCategory.ForRent || Model.Category == CarCategory.Both)
+                            {
+                                <div class="action-tile" onclick="showAddToCartModal(@Model.Id, 'Rent')">
+                                    <div class="tile-icon"><i class="ri-calendar-check-line"></i></div>
+                                    <div class="tile-content">
+                                        <span class="tile-label">Rent per Day</span>
+                                        <div class="tile-price">$@(Model.DailyRentPrice?.ToString("N0") ?? "0") <small>/day</small></div>
+                                    </div>
+                                    <i class="ri-arrow-right-s-line text-muted"></i>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <a href="/Identity/Account/Login" class="btn btn-primary-gold w-100 py-3 fw-bold rounded-pill text-dark text-decoration-none d-block text-center">
+                                LOGIN TO VIEW OPTIONS
+                            </a>
+                        }
+
+                        <div class="d-flex gap-2 mt-3">
+                            <button class="btn-sec-action w-50" onclick="addToWishlist(@Model.Id)">
+                                <i class="ri-heart-3-line"></i> Save
+                            </button>
+                            <button class="btn-sec-action w-50" onclick="shareVehicle()">
+                                <i class="ri-share-forward-line"></i> Share
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div style="background:#10b981; color:white; width:35px; height:35px; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+                                <i class="ri-shield-check-line"></i>
+                            </div>
+                            <div>
+                                <p class="mb-0 fw-bold small">Certified Listing</p>
+                                <p class="mb-0 text-muted" style="font-size: 11px;">Verified by Motorak Inspection Team</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("_AddToCartModal")
+
+@section Scripts {
+    <script>
+        async function addToCartDirect(carId, type) {
+            try {
+                const response = await fetch('/Cart/AddToCart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ carId: carId, itemType: type })
+                });
+                const result = await response.json();
+                alert(result.message);
+            } catch (err) {
+                alert("Error adding to cart");
+            }
+        }
+
+        function shareVehicle() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Link copied to clipboard!");
+        }
+
+        function addToWishlist(id) {
+            alert("Added to your wishlist!");
+        }
+    </script>
+}
